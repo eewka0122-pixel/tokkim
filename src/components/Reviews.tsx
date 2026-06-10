@@ -1,1 +1,78 @@
-"use client"; import { Card } from "@/components/ui/card"; import { Image } from "@/components/ui/image"; import { User } from "@/components/ui/avatar"; import { P } from "@/components/ui/p"; const Reviews = () => { const reviews = [ { name: "Emily Johnson", role: "Food Blogger", text: "The flavors are exquisite and the ambiance is perfect for a romantic dinner.", image: "https://source.unsplash.com/random/600x400?woman", }, { name: "Michael Lee", role: "Chef", text: "Authentic Korean dishes prepared with passion and precision.", image: "https://source.unsplash.com/random/600x400?man", }, { name: "Sofia Martinez", role: "Travel Enthusiast", text: "A culinary journey through Korea right here in the city.", image: "https://source.unsplash.com/random/600x400?traveler", }, ]; return ( <section className="py-20 bg-white dark:bg-gray-900"> <div className="max-w-4xl mx-auto px-4"> <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-white">Reviews</h2> <div className="space-y-8"> {reviews.map((review) => ( <Card key={review.name} className="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-700"> <blockquote className="mb-4">\"{review.text}\"</blockquote> <div className="flex items-center gap-3"> <User className="w-10 h-10 rounded-full" size={32} className="bg-gray-300 dark:bg-gray-600"> <User /> </User> <div> <P className="text-sm text-gray-600 dark:text-gray-400">{review.role}</P> <P className="mt-1 text-gray-900 dark:text-white">{review.text}</P> </div> </div> </Card> ))} </div> </div> </section> ); }; export default Reviews;
+"use client";
+
+import { Star } from "lucide-react";
+
+const reviews = [
+  {
+    quote:
+      "The service felt ceremonial without being stiff. Every course had a story, and the galbi was unforgettable.",
+    name: "Min-ji Park",
+    role: "Michelin Guide Editor",
+  },
+  {
+    quote:
+      "Seoul Garden balances luxury and warmth beautifully. It feels like a private dinner in the heart of Seoul.",
+    name: "Daniel Kim",
+    role: "Food Critic",
+  },
+  {
+    quote:
+      "The atmosphere, banchan, and tableside grilling made our anniversary feel truly special.",
+    name: "Elena Rossi",
+    role: "Guest",
+  },
+];
+
+const Reviews = () => {
+  return (
+    <section
+      id="reviews"
+      className="bg-stone-900 px-4 py-24 text-stone-50 sm:px-6 lg:px-8"
+    >
+      <div className="mx-auto max-w-7xl">
+        <div className="reveal mx-auto max-w-3xl text-center">
+          <p className="text-sm uppercase tracking-[0.35em] text-amber-200">
+            Reviews
+          </p>
+          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
+            Praised for atmosphere, craft, and hospitality.
+          </h2>
+        </div>
+
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {reviews.map((review, index) => (
+            <article
+              key={review.name}
+              className={`reveal rounded-3xl border border-white/10 bg-stone-950/60 p-8 ${
+                index === 1 ? "reveal-delay-100" : ""
+              } ${index === 2 ? "reveal-delay-200" : ""}`}
+            >
+              <div className="mb-6 flex gap-1">
+                {[...Array(5)].map((_, starIndex) => (
+                  <Star
+                    key={starIndex}
+                    className="h-5 w-5 fill-amber-200 text-amber-200"
+                  />
+                ))}
+              </div>
+
+              <blockquote className="text-lg leading-8 text-stone-200">
+                “{review.quote}”
+              </blockquote>
+
+              <div className="mt-8 flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-amber-200 to-amber-500" />
+                <div>
+                  <p className="font-semibold text-stone-50">{review.name}</p>
+                  <p className="text-sm text-stone-400">{review.role}</p>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Reviews;

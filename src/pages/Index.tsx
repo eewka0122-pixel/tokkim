@@ -11,7 +11,7 @@ import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <>
+    <main className="min-h-screen overflow-hidden bg-stone-950 text-stone-50">
       <HeroSection />
       <SignatureDishes />
       <MenuSection />
@@ -20,7 +20,7 @@ const Index = () => {
       <ReservationForm />
       <ContactSection />
       <Footer />
-    </>
+    </main>
   );
 };
 
