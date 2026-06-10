@@ -1,23 +1,35 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import LoadingScreen from "@/components/LoadingScreen";
 import HeroSection from "@/components/HeroSection";
-import SignatureDishes from "@/components/SignatureDishes";
+import PopularDishes from "@/components/PopularDishes";
 import MenuSection from "@/components/MenuSection";
-import Gallery from "@/components/Gallery";
-import Reviews from "@/components/Reviews";
-import ReservationForm from "@/components/ReservationForm";
+import GallerySection from "@/components/GallerySection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <LoadingScreen onComplete={() => setLoading(false)} />;
+  }
+
   return (
-    <main className="min-h-screen overflow-hidden bg-stone-950 text-stone-50">
+    <main className="min-h-screen bg-stone-50 text-stone-950 transition-colors">
       <HeroSection />
-      <SignatureDishes />
+      <PopularDishes />
       <MenuSection />
-      <Gallery />
-      <Reviews />
-      <ReservationForm />
+      <GallerySection />
       <ContactSection />
       <Footer />
     </main>

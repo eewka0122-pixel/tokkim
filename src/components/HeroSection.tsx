@@ -1,82 +1,119 @@
 "use client";
 
-import { ArrowRight, Sparkles } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowDown, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const heroImage =
-  "https://images.unsplash.com/photo-1543352634-a1c51d9f1fa7?auto=format&fit=crop&w=2200&q=80";
-
-const highlights = [
-  "Omakase-style Korean tasting menus",
-  "Private dining rooms",
-  "Han River-inspired hospitality",
-];
 
 const HeroSection = () => {
   return (
-    <section className="relative flex min-h-screen overflow-hidden bg-stone-950 px-4 py-20 text-stone-50 sm:px-6 lg:px-8">
-      <img
-        src={heroImage}
-        alt=""
-        className="absolute inset-0 z-0 h-full w-full object-cover"
-      />
-
-      <div className="absolute inset-0 z-10 bg-gradient-to-br from-stone-950/95 via-stone-950/70 to-stone-950/35" />
-      <div className="absolute left-10 top-24 z-10 h-72 w-72 rounded-full bg-amber-300/20 blur-3xl" />
-      <div className="absolute bottom-0 right-0 z-10 h-96 w-96 rounded-full bg-red-950/30 blur-3xl" />
-
-      <div className="relative z-20 mx-auto flex w-full max-w-7xl flex-col items-start justify-center gap-8">
-        <div className="reveal inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-200/10 px-4 py-2 text-sm font-medium text-amber-100 backdrop-blur">
-          <Sparkles className="h-4 w-4 text-amber-200" />
-          Seoul fine dining, reimagined
-        </div>
-
-        <div className="reveal reveal-delay-100 max-w-3xl">
-          <p className="mb-4 text-sm uppercase tracking-[0.4em] text-amber-200">
-            Contemporary Korean Cuisine
-          </p>
-          <h1 className="font-serif text-5xl font-semibold leading-tight tracking-tight text-stone-50 sm:text-6xl lg:text-8xl">
-            Seoul Garden
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-stone-300 sm:text-xl">
-            A luxurious Korean restaurant experience blending royal court
-            traditions, seasonal ingredients, and modern tableside service.
-          </p>
-        </div>
-
-        <div className="reveal reveal-delay-200 flex flex-col gap-3 sm:flex-row">
-          <Button
-            asChild
-            className="rounded-full bg-amber-200 px-8 py-6 text-base font-semibold text-stone-950 hover:bg-amber-100"
-          >
-            <a href="#reservation">Reserve a table</a>
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="rounded-full border-stone-700 px-8 py-6 text-base font-semibold text-stone-100 hover:bg-stone-800 hover:text-white"
-          >
-            <a href="#menu">
-              Explore menu
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </a>
-          </Button>
-        </div>
-
-        <div className="reveal reveal-delay-300 grid w-full max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
-          {highlights.map((item) => (
-            <div
-              key={item}
-              className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur"
-            >
-              <p className="text-sm text-stone-300">{item}</p>
-            </div>
-          ))}
-        </div>
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?auto=format&fit=crop&w=2200&q=80')",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-50/95 via-stone-50/70 to-stone-100/40" />
+        <div className="absolute top-20 left-10 h-64 w-64 rounded-full bg-amber-100/50 blur-3xl" />
+        <div className="absolute bottom-20 right-10 h-80 w-80 rounded-full bg-stone-200/50 blur-3xl" />
       </div>
 
-      <div className="absolute bottom-10 left-1/2 hidden -translate-x-1/2 text-stone-400 sm:block">
-        <span className="float block h-10 w-6 rounded-full border border-stone-600 border-t-stone-200" />
+      <div className="relative z-10 px-6 py-20 max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="text-center"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+            className="inline-flex items-center gap-3 rounded-full bg-white/80 border border-stone-200 px-6 py-3 mb-8 backdrop-blur-sm shadow-sm"
+          >
+            <Sparkles className="h-5 w-5 text-amber-600" />
+            <span className="text-sm font-medium text-stone-700 uppercase tracking-wider">Новое меню 2024</span>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 1, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="font-serif text-5xl md:text-7xl lg:text-8xl font-medium text-stone-900 tracking-tight leading-[1.05] mb-6"
+          >
+            ТОККИМ
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8, ease: "easeOut" }}
+            className="text-lg md:text-xl text-stone-600 font-medium uppercase tracking-widest mb-12 max-w-2xl mx-auto"
+          >
+            Корейский стрит-фуд
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.8, ease: "easeOut" }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          >
+            <Button
+              asChild
+              size="lg"
+              className="group w-full sm:w-auto px-10 py-4 rounded-full bg-stone-900 text-stone-50 font-medium text-base hover:bg-stone-700 transition-all duration-300 shadow-lg shadow-stone-900/20"
+            >
+              <a href="#menu">Посмотреть меню</a>
+              <ArrowDown className="ml-2 h-5 w-5 transition-transform group-hover:translate-y-1" />
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="group w-full sm:w-auto px-10 py-4 rounded-full border-stone-300 bg-white/80 text-stone-700 font-medium text-base hover:bg-stone-100 hover:border-stone-400 transition-all duration-300 backdrop-blur-sm"
+            >
+              <a href="#order">Заказать доставку</a>
+            </Button>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2, duration: 0.8, ease: "easeOut" }}
+            className="mt-16 flex items-center justify-center gap-12 text-sm text-stone-50"
+          >
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span>Свежие ингредиенты</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span>Приготовлено на глазах</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span>Доставка за 30 мин</span>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2"
+        >
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="flex flex-col items-center gap-2 text-stone-400"
+          >
+            <ArrowDown className="h-6 w-6" />
+            <span className="text-xs uppercase tracking-wider">Прокрутите вниз</span>
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

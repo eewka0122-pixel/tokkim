@@ -1,85 +1,96 @@
 "use client";
 
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
-
 const contactDetails = [
   {
-    icon: <MapPin className="h-5 w-5" />,
-    label: "Address",
-    value: "123 Han River Blvd, Seoul, South Korea",
+    icon: "MapPin",
+    label: "Адрес",
+    value: "123 Корейская улица, Сеул, Южная Корея",
   },
   {
-    icon: <Clock className="h-5 w-5" />,
-    label: "Hours",
-    value: "Mon-Sun, 11:00 AM - 11:00 PM",
+    icon: "Clock",
+    label: "Часы",
+    value: "Пн‑Вс, 11:00 – 23:00",
   },
   {
-    icon: <Phone className="h-5 w-5" />,
-    label: "Phone",
-    value: "+82 2 1234 5678",
+    icon: "Phone",
+    label: "Телефон",
+    value: "+7 (123) 456‑78‑90",
   },
   {
-    icon: <Mail className="h-5 w-5" />,
+    icon: "Mail",
     label: "Email",
-    value: "reservations@seoulgarden.com",
+    value: "reservations@tokkim.com",
   },
 ];
-
-const mapImage =
-  "https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&q=80";
 
 const ContactSection = () => {
   return (
     <section
       id="contact"
-      className="bg-stone-900 px-4 py-24 text-stone-50 sm:px-6 lg:px-8"
+      className="relative py-24 md:py-32 px-6 bg-stone-50"
     >
-      <div className="mx-auto max-w-7xl">
-        <div className="reveal mx-auto max-w-3xl text-center">
-          <p className="text-sm uppercase tracking-[0.35em] text-amber-200">
-            Contact
-          </p>
-          <h2 className="mt-3 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
-            Visit us for an unforgettable evening.
-          </h2>
-          <p className="mt-4 text-lg leading-8 text-stone-400">
-            For private dining, events, or bespoke menus, contact our concierge
-            team directly.
-          </p>
-        </div>
+      {/* Background shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-amber-100/30 blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-stone-200/50 blur-3xl" />
+      </div>
 
-        <div className="mt-12 grid gap-8 md:grid-cols-2">
-          <div className="reveal rounded-[2rem] border border-white/10 bg-stone-950/60 p-8">
+      <div className="relative max-w-7xl mx-auto">
+        {/* Section Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className="text-center mb-16"
+        >
+          <span className="inline-block px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-medium uppercase tracking-wider mb-4">
+            Контакты
+          </span>
+          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-stone-900 tracking-tight mb-8">
+            Свяжитесь с нами
+          </h2>
+        </motion.div>
+
+        {/* Contact Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Left Column */}
+          <div className="bg-white/10 p-6 rounded-lg shadow-sm">
             <div className="space-y-6">
               {contactDetails.map((detail) => (
-                <div key={detail.label} className="flex gap-4">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-amber-200/10 text-amber-100">
-                    {detail.icon}
+                <div
+                  key={detail.label}
+                  className="flex items-start gap-3 rounded-md bg-white/20 p-4 backdrop-blur"
+                >
+                  <span
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-200/50 text-amber-400"
+                  >
+                    <Icon as={detail.icon} className="h-5 w-5" />
                   </span>
                   <div>
-                    <h3 className="font-semibold text-stone-50">
-                      {detail.label}
-                    </h3>
-                    <p className="mt-1 text-stone-400">{detail.value}</p>
+                    <p className="text-stone-700 font-semibold">{detail.label}</p>
+                    <p className="mt-1 text-stone-500">{detail.value}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="reveal reveal-delay-100 overflow-hidden rounded-[2rem] border border-white/10 bg-stone-950/60">
-            <div
-              style={{ backgroundImage: `url(${mapImage})` }}
-              className="relative min-h-[360px] bg-cover bg-center"
-            >
-              <div className="absolute inset-0 bg-stone-950/55" />
-              <div className="absolute bottom-6 left-6 right-6 rounded-2xl border border-white/10 bg-stone-950/70 p-6 backdrop-blur">
-                <h3 className="text-xl font-semibold text-stone-50">
-                  Private dining & events
+          {/* Right Column */}
+          <div className="bg-white/10 p-6 rounded-lg shadow-sm">
+            <div className="relative h-64 w-64 rounded-full overflow-hidden">
+              <img
+                src="/images/Кимпаб с курицей.jpeg"
+                alt="Ресторан"
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-stone-950/40" />
+              <div className="absolute bottom-4 left-4 rounded-md bg-white/80 p-3 backdrop-blur">
+                <h3 className="text-lg font-semibold text-stone-900">
+                  Частный зал
                 </h3>
-                <p className="mt-2 text-stone-300">
-                  Reserve our Han River room for celebrations, business
-                  dinners, and chef-led tasting experiences.
+                <p className="mt-1 text-stone-400">
+                  Для мероприятий и частных ужинов
                 </p>
               </div>
             </div>
