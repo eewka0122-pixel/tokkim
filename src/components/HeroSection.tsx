@@ -1,0 +1,25 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/router";
+
+const HeroSection = () => {
+  const router = useRouter();
+
+  return (
+    <section className="bg-black dark:bg-gray-900 bg-gradient-to-br from-indigo-900 to-purple-900 text-white min-h-screen flex flex-col items-center justify-center px-4">
+      <div className="max-w-3xl text-center">
+        <h1 className="text-5xl md:text-6xl font-extrabold tracking-wide text-white">Seoul Garden</h1>
+        <p className="text-lg md:text-xl text-gray-300 mb-8">Experience the art of Korean cuisine in a luxurious setting</p>
+        <Button
+          className="mt-6 rounded-full bg-white text-indigo-900 hover:bg-gray-100 transition-colors"
+          onClick={() => router.push("/menu")}
+        >
+          View Menu
+        </Button>
+      </div>
+    </section>
+  );
+};
+
+export default HeroSection;

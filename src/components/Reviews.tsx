@@ -1,0 +1,55 @@
+"use client";
+
+import { Card } from "@/components/ui/card";
+import { Quote } from "@/components/ui/quote";
+import { User } from "@/components/ui/avatar";
+import { P } from "@/components/ui/p";
+
+const Reviews = () => {
+  const reviews = [
+    {
+      name: "Emily Johnson",
+      role: "Food Blogger",
+      text: "The flavors are exquisite and the ambiance is perfect for a romantic dinner.",
+      image: "https://source.unsplash.com/random/600x400?woman",
+    },
+    {
+      name: "Michael Lee",
+      role: "Chef",
+      text: "Authentic Korean dishes prepared with passion and precision.",
+      image: "https://source.unsplash.com/random/600x400?man",
+    },
+    {
+      name: "Sofia Martinez",
+      role: "Travel Enthusiast",
+      text: "A culinary journey through Korea right here in the city.",
+      image: "https://source.unsplash.com/random/600x400?traveler",
+    },
+  ];
+
+  return (
+    <section className="py-20 bg-white dark:bg-gray-900">
+      <div className="max-w-4xl mx-auto px-4">
+        <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-white">Reviews</h2>
+        <div className="space-y-8">
+          {reviews.map((review) => (
+            <Card key={review.name} className="bg-gray-100 dark:bg-gray-700 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+              <Quote className="mb-4">"</Quote>
+              <div className="flex items-center gap-3">
+                <User className="w-10 h-10 rounded-full" size={32} className="bg-gray-300 dark:bg-gray-600">
+                  <User />
+                </User>
+                <div>
+                  <P className="text-sm text-gray-600 dark:text-gray-400">{review.role}</P>
+                  <P className="mt-1 text-gray-900 dark:text-white">{review.text}</P>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default Reviews;
