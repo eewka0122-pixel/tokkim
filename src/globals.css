@@ -127,6 +127,22 @@
   }
 }
 
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
 @layer utilities {
   .reveal {
     opacity: 0;
@@ -147,5 +163,21 @@
 
   .float {
     animation: float 6s ease-in-out infinite;
+  }
+
+  .pulse {
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .rotate {
+    animation: rotate 6s linear infinite;
+  }
+
+  .pulse-rotate {
+    animation: pulse 3s ease-in-out infinite, rotate 6s linear infinite;
+  }
+
+  .bounce {
+    animation: bounce 2s ease-in-out infinite;
   }
 }

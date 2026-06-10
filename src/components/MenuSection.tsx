@@ -143,29 +143,23 @@ const MenuSection = () => {
     >
       {/* Background shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-amber-100/30 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-stone-200/50 blur-3xl" />
+        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-amber-100/30 blur-3xl float reveal reveal-delay-100" />
+        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-stone-200/50 blur-3xl float reveal reveal-delay-200" />
       </div>
 
       <div className="relative max-w-7xl mx-auto">
         {/* Section Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16 reveal reveal-delay-100">
           <span className="inline-block px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-medium uppercase tracking-wider mb-4">
             Полное меню
           </span>
           <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-stone-900 tracking-tight mb-8">
             Меню
           </h2>
-        </motion.div>
+        </div>
 
         {/* Category Tabs */}
-        <div className="flex flex-wrap gap-2 justify-center mb-12">
+        <div className="flex flex-wrap gap-2 justify-center mb-12 reveal reveal-delay-200">
           {[Object.keys(menuCategories).map((key) => {
             const cat = key as MenuCategory;
             return (
@@ -189,13 +183,9 @@ const MenuSection = () => {
         {/* Menu Items Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {menuCategories[activeCategory].items.map((item) => (
-            <motion.div
+            <div
               key={item.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-              className="bg-white/10 p-6 rounded-lg shadow-sm hover:shadow-md"
+              className="bg-white/10 p-6 rounded-lg shadow-sm hover:shadow-md reveal reveal-delay-300"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -206,7 +196,7 @@ const MenuSection = () => {
                   {item.price}
                 </span>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

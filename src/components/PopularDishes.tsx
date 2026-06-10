@@ -1,83 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Star, Heart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-
-const popularDishes = [
-  {
-    id: 1,
-    name: "Кимпаб с курицей",
-    description: "Нежная курица, свежие овощи, рис, нори, соус терияки",
-    price: "450₽",
-    rating: 4.9,
-    reviews: 234,
-    image: "/images/Кимпаб с курицей.jpeg",
-    badge: "Хит продаж",
-    category: "Кимпаб",
-  },
-  {
-    id: 2,
-    name: "Пибимпаб с говядиной",
-    description: "Маринованная говядина, рис, овощи, яйцо пашот, гочучанг",
-    price: "580₽",
-    rating: 4.8,
-    reviews: 189,
-    image: "/images/Пибимпаб с говядиной.jpeg",
-    badge: "Новинка",
-    category: "Пибимпаб",
-  },
-  {
-    id: 3,
-    name: "Рамен с курицей",
-    description: "Наваристый бульон, курица, яйцо, водоросли, грибы, лапша",
-    price: "520₽",
-    rating: 4.9,
-    reviews: 312,
-    image: "/images/Рамен с курицей.jpeg",
-    badge: "Любимец гостей",
-    category: "Рамен",
-  },
-  {
-    id: 4,
-    name: "Кимпаб с лососем",
-    description: "Свежий лосось, авокадо, огурец, рис, нори, унаги соус",
-    price: "620₽",
-    rating: 4.7,
-    reviews: 156,
-    image: "/images/Кимпаб с лососем.jpeg",
-    badge: "Премиум",
-    category: "Кимпаб",
-  },
-];
-
-const PopularDishes = () => {
-  return (
-    <section
-      id="popular"
-      className="relative py-24 md:py-32 px-6 bg-stone-50"
-    >
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-amber-100/30 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-stone-200/50 blur-3xl" />
-      </div>
-
-      <div className="relative max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-center mb-16"
-        >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-medium uppercase tracking-wider mb-4">
-            Популярные блюда
-          </span>
-          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-stone-9<dyad-write path="src/components/PopularDishes.tsx" description="Complete Popular Dishes section with animations and hover effects">
-"use client";
-
-import { motion } from "framer-motion";
 import { Star, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -157,38 +79,29 @@ const PopularDishes = () => {
       id="popular"
       className="relative py-24 md:py-32 px-6 bg-stone-50"
     >
-      {/* Parallax background */}
+      {/* Background shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-amber-100/30 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-stone-200/50 blur-3xl" />
+        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-amber-100/30 blur-3xl float reveal reveal-delay-100" />
+        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-stone-200/50 blur-3xl float reveal reveal-delay-200" />
       </div>
 
       <div className="relative max-w-7xl mx-auto">
         {/* Section Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16 reveal reveal-delay-100">
           <span className="inline-block px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-medium uppercase tracking-wider mb-4">
             Популярные блюда
           </span>
           <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-stone-900 tracking-tight mb-8">
-            Наши хиты          </h2>
-        </motion.div>
+            Наши хиты
+          </h2>
+        </div>
 
         {/* Grid of Dishes */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {popularDishes.map((dish) => (
-            <motion.div
+            <div
               key={dish.id}
-              initial={{ opacity: 0, y: 30, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
-              className="bg-white/10 p-6 rounded-lg shadow-sm hover:shadow-xl group"
+              className="bg-white/10 p-6 rounded-lg shadow-sm hover:shadow-xl group reveal reveal-delay-200"
             >
               <div className="relative h-48 w-full rounded-md overflow-hidden mb-4">
                 <img
@@ -240,18 +153,14 @@ const PopularDishes = () => {
                   stroke="solid"
                 />
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
         {/* Subtle Animation */}
-        <motion.div          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2, duration: 0.5 }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-sm text-stone-400"
-        >
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center text-sm text-stone-400 reveal reveal-delay-300">
           <span>Каждое блюдо — история вкуса</span>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

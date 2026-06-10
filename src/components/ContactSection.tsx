@@ -31,36 +31,30 @@ const ContactSection = () => {
     >
       {/* Background shapes */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-amber-100/30 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-stone-200/50 blur-3xl" />
+        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-amber-100/30 blur-3xl float reveal reveal-delay-100" />
+        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-stone-200/50 blur-3xl float reveal reveal-delay-200" />
       </div>
 
       <div className="relative max-w-7xl mx-auto">
         {/* Section Title */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-16 reveal reveal-delay-100">
           <span className="inline-block px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-medium uppercase tracking-wider mb-4">
             Контакты
           </span>
           <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-stone-900 tracking-tight mb-8">
             Свяжитесь с нами
           </h2>
-        </motion.div>
+        </div>
 
         {/* Contact Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 reveal reveal-delay-200">
           {/* Left Column */}
           <div className="bg-white/10 p-6 rounded-lg shadow-sm">
             <div className="space-y-6">
               {contactDetails.map((detail) => (
                 <div
                   key={detail.label}
-                  className="flex items-start gap-3 rounded-md bg-white/20 p-4 backdrop-blur"
+                  className="flex items-start gap-3 rounded-md bg-white/20 p-4 backdrop-blur reveal reveal-delay-300"
                 >
                   <span
                     className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-200/50 text-amber-400"
@@ -78,7 +72,7 @@ const ContactSection = () => {
 
           {/* Right Column */}
           <div className="bg-white/10 p-6 rounded-lg shadow-sm">
-            <div className="relative h-64 w-64 rounded-full overflow-hidden">
+            <div className="relative h-64 w-64 rounded-full overflow-hidden reveal reveal-delay-300">
               <img
                 src="/images/Кимпаб с курицей.jpeg"
                 alt="Ресторан"
