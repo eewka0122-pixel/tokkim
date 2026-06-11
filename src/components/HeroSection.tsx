@@ -36,20 +36,20 @@ const HeroSection = () => {
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 reveal reveal-delay-400">
           <Button
-            asChild
             size="lg"
             className="group w-full sm:w-auto px-10 py-4 rounded-full bg-stone-900 text-stone-50 font-medium text-base hover:bg-stone-700 transition-all duration-300 shadow-lg shadow-stone-900/20"
+            onClick={() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            <a href="#menu">Посмотреть меню</a>
+            Посмотреть меню
             <ArrowDown className="ml-2 h-5 w-5 transition-transform group-hover:translate-y-1" />
           </Button>
           <Button
-            asChild
             variant="outline"
             size="lg"
             className="group w-full sm:w-auto px-10 py-4 rounded-full border-stone-300 bg-white/80 text-stone-700 font-medium text-base hover:bg-stone-100 hover:border-stone-400 transition-all duration-300 backdrop-blur-sm"
+            onClick={() => document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            <a href="#order">Заказать доставку</a>
+            Заказать доставку
           </Button>
         </div>
 
