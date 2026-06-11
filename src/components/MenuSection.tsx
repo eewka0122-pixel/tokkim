@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Icon } from "@/components/ui/icon";
 import { ChefHat, UtensilsCrossed, Wine } from "lucide-react";
 
 type MenuItem = {
@@ -13,7 +12,7 @@ type MenuItem = {
 
 type MenuCategory = "kimpap" | "bibimbap" | "ramen" | "soups" | "onigiri" | "snacks" | "salads";
 
-const menuCategories: Record<MenuCategory, { label: string; icon: any; items: MenuItem[] }> = {
+const menuCategories: Record<MenuCategory, { label: string; icon: JSX.Element; items: MenuItem[] }> = {
   kimpap: {
     label: "Кимпаб",
     icon: <ChefHat className="h-6 w-6" />,
@@ -69,7 +68,7 @@ const menuCategories: Record<MenuCategory, { label: string; icon: any; items: Me
   },
   soups: {
     label: "Супы",
-    icon: () => <ChefHat className="h-6 w-6" />,
+    icon: <ChefHat className="h-6 w-6" />,
     items: [
       {
         name: "Том Ям с креветкой",
@@ -85,7 +84,7 @@ const menuCategories: Record<MenuCategory, { label: string; icon: any; items: Me
   },
   onigiri: {
     label: "Онигири",
-    icon: () => <ChefHat className="h-6 w-6" />,
+    icon: <ChefHat className="h-6 w-6" />,
     items: [
       {
         name: "Онигири с лососем",
@@ -101,7 +100,7 @@ const menuCategories: Record<MenuCategory, { label: string; icon: any; items: Me
   },
   snacks: {
     label: "Закуски",
-    icon: () => <ChefHat className="h-6 w-6" />,
+    icon: <ChefHat className="h-6 w-6" />,
     items: [
       {
         name: "Корейские панккекки",
@@ -117,7 +116,7 @@ const menuCategories: Record<MenuCategory, { label: string; icon: any; items: Me
   },
   salads: {
     label: "Салаты",
-    icon: () => <ChefHat className="h-6 w-6" />,
+    icon: <ChefHat className="h-6 w-6" />,
     items: [
       {
         name: "Салат с грибами моэр",
@@ -160,7 +159,7 @@ const MenuSection = () => {
 
         {/* Category Tabs */}
         <div className="flex flex-wrap gap-2 justify-center mb-12 reveal reveal-delay-200">
-          {[Object.keys(menuCategories).map((key) => {
+          {Object.keys(menuCategories).map((key) => {
             const cat = key as MenuCategory;
             return (
               <Button
