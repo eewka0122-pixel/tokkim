@@ -3,14 +3,6 @@
 import { Facebook, Instagram, Twitter } from "lucide-react";
 
 const Footer = () => {
-  return
-
-<dyad-write path="src/components/Footer.tsx" description="Footer updated with ТОККИМ brand name and Russian text">
-"use client";
-
-import { Facebook, Instagram, Twitter } from "lucide-react";
-
-const Footer = () => {
   return (
     <footer className="bg-[#3A3124] text-[#F5F1E6] px-6 py-16">
       <div className="max-w-7xl mx-auto">
