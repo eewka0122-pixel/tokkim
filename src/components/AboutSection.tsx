@@ -13,21 +13,19 @@ const AboutSection = () => {
   return (
     <section id="about" className="py-24 md:py-32 px-6 bg-[#F5F1E6]">
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
         <div className="text-center mb-20 reveal">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
             История бренда
           </span>
           <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-[#3A3124] tracking-tight">
-            TOKKIM
+            ТОККИМ
           </h2>
           <p className="mt-6 text-lg text-[#6B5E48] max-w-2xl mx-auto">
             Мы объединяем традиции корейской кулинарии с современным подходом к стрит-фуду, 
-            создавая неповторимый вкус в каждой блюде
+            создавая неповторимый вкус в каждом блюде
           </p>
         </div>
 
-        {/* Brand Story */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
           <div className="reveal">
             <img
@@ -41,7 +39,7 @@ const AboutSection = () => {
               Наша философия
             </h3>
             <p className="text-[#6B5E48] leading-relaxed">
-              TOKKIM начался с мечты о том, чтобы корейская кухня стала доступной 
+              ТОККИМ начался с мечты о том, чтобы корейская кухня стала доступной 
               каждому, сохраняя при этом её высокое качество и глубину вкуса. 
               Мы выбрали Сеул и Токио как символы нашего пути — города, где 
               традиции встречаются с современностью.
@@ -54,7 +52,6 @@ const AboutSection = () => {
           </div>
         </div>
 
-        {/* Advantages */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {advantages.map((advantage, index) => (
             <div

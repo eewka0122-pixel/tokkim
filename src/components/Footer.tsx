@@ -3,13 +3,21 @@
 import { Facebook, Instagram, Twitter } from "lucide-react";
 
 const Footer = () => {
+  return
+
+<dyad-write path="src/components/Footer.tsx" description="Footer updated with ТОККИМ brand name and Russian text">
+"use client";
+
+import { Facebook, Instagram, Twitter } from "lucide-react";
+
+const Footer = () => {
   return (
     <footer className="bg-[#3A3124] text-[#F5F1E6] px-6 py-16">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
           <div className="space-y-4">
-            <h3 className="font-serif text-3xl font-bold">TOKKIM</h3>
+            <h3 className="font-serif text-3xl font-bold">ТОККИМ</h3>
             <p className="text-[#D4B98F] text-sm uppercase tracking-wider">
               Корейский стрит-фуд нового поколения
             </p>
@@ -57,7 +65,7 @@ const Footer = () => {
 
         {/* Bottom */}
         <div className="border-t border-[#4A453A] pt-8 text-center text-[#6B5E48]">
-          <p>© {new Date().getFullYear()} TOKKIM. Все права защищены.</p>
+          <p>© {new Date().getFullYear()} ТОККИМ. Все права защищены.</p>
         </div>
       </div>
     </footer>
