@@ -27,7 +27,7 @@ const HeroSection = () => {
           {/* Logo */}
           <div className="mb-8 reveal">
             <h1 className="font-serif text-7xl md:text-8xl lg:text-9xl font-bold tracking-[-0.03em] mb-4">
-              TOKKIM
+              ТОККИМ
             </h1>
             <p className="text-lg md:text-xl opacity-90 tracking-widest uppercase">
               Корейский стрит-фуд нового поколения
