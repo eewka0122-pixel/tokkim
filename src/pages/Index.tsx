@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import LoadingScreen from "@/components/LoadingScreen";
 import HeroSection from "@/components/HeroSection";
+import AboutSection from "@/components/AboutSection";
 import PopularDishes from "@/components/PopularDishes";
 import MenuSection from "@/components/MenuSection";
 import GallerySection from "@/components/GallerySection";
-import ContactSection from "@/components/ContactSection";
+import ReservationSection from "@/components/ReservationSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -16,7 +16,7 @@ const Index = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 3000);
+    }, 2500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -25,12 +25,13 @@ const Index = () => {
   }
 
   return (
-    <main className="min-h-screen bg-stone-50 text-stone-950 transition-colors">
+    <main className="min-h-screen bg-[#F5F1E6] text-[#3A3124] transition-colors">
       <HeroSection />
+      <AboutSection />
       <PopularDishes />
       <MenuSection />
       <GallerySection />
-      <ContactSection />
+      <ReservationSection />
       <Footer />
     </main>
   );

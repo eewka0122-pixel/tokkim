@@ -1,82 +1,70 @@
 "use client";
 
-import { Star } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 const popularDishes = [
   {
     name: "Кимпаб с курицей",
-    description: "Рис, нори, курица, овощи, соус терияки",
-    price: "₩450",
-    rating: 4.5,
-    reviews: 34,
+    description: "Свежая куриная грудка, овощи, рис, нори",
+    price: "₩6,500",
+    image: "/images/Кимпаб с курицей.jpeg",
   },
   {
     name: "Пибимпаб с говядиной",
-    description: "Говядина, рис, овощи, яйцо, гочучанг",
-    price: "₩580",
-    rating: 4.7,
-    reviews: 27,
+    description: "Маринованная говядина, рис, овощи, яйцо",
+    price: "₩8,000",
+    image: "/images/Пибимпаб с говядиной.jpeg",
   },
   {
-    name: "Рамен с морепродуктами",
-    description: "Бульон, лапша, креветки, мидии, овощи",
-    price: "₩650",
-    rating: 4.6,
-    reviews: 19,
+    name: "Рамен с курицей",
+    description: "Ароматный бульон, лапша, куриная печень",
+    price: "₩7,000",
+    image: "/images/Рамен с курицей.jpeg",
   },
 ];
 
 const PopularDishes = () => {
   return (
-    <section id="popular" className="relative py-24 md:py-32 px-6 bg-stone-50">
-      <div className="mx-auto max-w-7xl">
-        <div className="text-center mb-12 reveal">
-          <h2 className="font-serif text-4xl md:text-5xl font-medium text-stone-900">
+    <section id="popular" className="py-24 md:py-32 px-6 bg-[#F5F1E6]">
+      <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
+        <div className="text-center mb-20 reveal">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
             Популярные блюда
+          </span>
+          <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">
+            Наши изысканные блюда
           </h2>
-          <p className="mt-4 text-lg text-stone-600">
-            Лучшие позиции, выбранные нашими гостями
+          <p className="mt-6 text-lg text-[#6B5E48] max-w-2xl mx-auto">
+            Каждое блюдо создано с заботой о вкусе и представлении
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {/* Dishes Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {popularDishes.map((dish) => (
             <Card
               key={dish.name}
-              className="bg-white/10 backdrop-blur-sm border border-white/10 rounded-2xl hover:shadow-xl transition-shadow"
+              className="group overflow-hidden rounded-3xl border-0 bg-white/60 backdrop-blur-sm shadow-2xl shadow-[#D4B98F]/20 transition-transform duration-500 hover:-translate-y-2 reveal"
             >
-              <CardHeader className="p-6">
-                <div className="flex items-start justify-between gap-3">
-                  <CardTitle>
-                    <h3 className="text-lg font-semibold text-stone-800">
-                      {dish.name}
-                    </h3>
-                  </CardTitle>
-                  <span className="whitespace-nowrap rounded-full bg-amber-200/50 px-3 py-1 text-sm text-amber-800">
-                    {dish.price}
-                  </span>
+              <div className="relative h-64 overflow-hidden">
+                <img
+                  src={dish.image}
+                  alt={dish.name}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                {/* Price badge */}
+                <div className="absolute top-4 right-4 bg-[#D4B98F] text-[#3A3124] px-4 py-2 rounded-full font-bold">
+                  {dish.price}
                 </div>
-              </CardHeader>
-              <CardContent className="px-6 pb-6">
-                <p className="text-sm text-stone-500">{dish.description}</p>
-                <div className="mt-3 flex items-center gap-1">
-                  {[...Array(Math.floor(dish.rating))].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-4 w-4 fill-amber-400 text-amber-400"
-                    />
-                  ))}
-                  {dish.rating % 1 >= 0.5 && (
-                    <Star
-                      className="h-4 w-4 fill-amber-400 text-amber-400"
-                      style={{ clipPath: "inset(0 50% 0 0)" }}
-                    />
-                  )}
-                  <span className="ml-2 text-sm text-stone-500">
-                    ({dish.reviews})
-                  </span>
+                <div className="absolute bottom-4 left-4 text-[#F5F1E6]">
+                  <h3 className="font-serif text-xl font-bold">{dish.name}</h3>
                 </div>
+              </div>
+              <CardContent className="p-6">
+                <p className="text-[#6B5E48]">{dish.description}</p>
               </CardContent>
             </Card>
           ))}

@@ -1,57 +1,85 @@
 "use client";
 
+import { useState } from "react";
+import { X } from "lucide-react";
+
 const galleryImages = [
-  "/images/Кимпаб с курицей.jpeg",
-  "/images/Пибимпаб с говядиной.jpeg",
-  "/images/Рамен с курицей.jpeg",
-  "/images/Том ям с креветкой.jpeg",
-  "/images/Онигири с лососем.jpeg",
-  "/images/Кимчи.jpeg",
-  "/images/Пибимпаб с овощами.jpeg",
-  "/images/Кимпаб с лососем.jpeg",
+  { src: "/images/Кимпаб с курицей.jpeg", alt: "Кимпаб с курицей" },
+  { src: "/images/Пибимпаб с говядиной.jpeg", alt: "Пибимпаб с говядиной" },
+  { src: "/images/Рамен с курицей.jpeg", alt: "Рамен с курицей" },
+  { src: "/images/Том ям с креветкой.jpeg", alt: "Том ям с креветкой" },
+  { src: "/images/Онигири с лососем.jpeg", alt: "Онигири с лососем" },
+  { src: "/images/Кимчи.jpeg", alt: "Кимчи" },
+  { src: "/images/Пибимпаб с овощами.jpeg", alt: "Пибимпаб с овощами" },
+  { src: "/images/Кимпаб с лососем.jpeg", alt: "Кимпаб с лососем" },
+  { src: "/images/Пибимпаб с креветкой.jpeg", alt: "Пибимпаб с креветкой" },
+  { src: "/images/Морковка по корейски.jpeg", alt: "Морковка по корейски" },
+  { src: "/images/Салат с грибами моэр.jpeg", alt: "Салат с грибами моэр" },
+  { src: "/images/Онигири с крабом.jpeg", alt: "Онигири с крабом" },
 ];
 
 const GallerySection = () => {
-  return (
-    <section
-      id="gallery"
-      className="relative py-24 md:py-32 px-6 bg-stone-50"
-    >
-      {/* Background shapes */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-amber-100/30 blur-3xl float reveal reveal-delay-100" />
-        <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-stone-200/50 blur-3xl float reveal reveal-delay-200" />
-      </div>
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-      <div className="relative max-w-7xl mx-auto">
-        {/* Section Title */}
-        <div className="text-center mb-16 reveal reveal-delay-100">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-medium uppercase tracking-wider mb-4">
+  return (
+    <section id="gallery" className="py-24 md:py-32 px-6 bg-[#F5F1E6]">
+      <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
+        <div className="text-center mb-20 reveal">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
             Галерея
           </span>
-          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-stone-900 tracking-tight mb-8">
-            Наши блюда
+          <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">
+            Визуальный путешествие
           </h2>
+          <p className="mt-6 text-lg text-[#6B5E48] max-w-2xl mx-auto">
+            Каждое фото рассказывает историю о нашем внимании к деталям
+          </p>
         </div>
 
-        {/* Grid of Images */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {galleryImages.map((src, index) => (
+        {/* Masonry Grid */}
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+          {galleryImages.map((image, index) => (
             <div
               key={index}
-              className="bg-white/10 p-4 rounded-lg shadow-sm hover:shadow-xl overflow-hidden reveal reveal-delay-200"
+              className="break-inside relative mb-6 overflow-hidden rounded-3xl cursor-pointer group reveal"
+              style={{ transitionDelay: `${(index % 3) * 100}ms` }}
+              onClick={() => setSelectedImage(image.src)}
             >
               <img
-                src={src}
-                alt="Блюдо"
-                className="w-full h-48 object-cover rounded-md transition-transform duration-500 hover:scale-105"
+                src={image.src}
+                alt={image.alt}
+                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="mt-2 text-center text-sm text-stone-500">
-                {src.split("/").pop()?.replace(/-/g, " ")}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute bottom-4 left-4 text-[#F5F1E6] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <p className="text-sm font-medium">{image.alt}</p>
               </div>
             </div>
           ))}
         </div>
+
+        {/* Lightbox Modal */}
+        {selectedImage && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6"
+            onClick={() => setSelectedImage(null)}
+          >
+            <div className="relative max-w-4xl max-h-[90vh]">
+              <img
+                src={selectedImage}
+                alt="Full size"
+                className="max-w-full max-h-[90vh] object-contain"
+              />
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute top-4 right-4 text-[#F5F1E6] hover:text-[#D4B98F] transition-colors"
+              >
+                <X className="h-8 w-8" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );
