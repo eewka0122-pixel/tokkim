@@ -25,8 +25,7 @@ const Index = () => {
   }
 
   return (
-    <main className="min-h-screen text-[#3A3124] transition-colors">
-      {/* Логотип в левом верхнем углу */}
+    <main className="min-h-screen text-[#3A3124] transition-colors bg-[#F5F1E6]">
       <nav className="fixed top-0 left-0 w-full z-40 p-6 md:p-8 flex items-center justify-between pointer-events-none">
         <div className="pointer-events-auto">
           <img 
@@ -39,15 +38,17 @@ const Index = () => {
 
       <HeroSection />
       
+      {/* Слой с bg1.jpeg */}
       <div style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover" }}>
-        <div className="bg-[#F5F1E6]/90">
+        <div className="bg-[#F5F1E6]/80">
           <AboutSection />
           <PopularDishes />
         </div>
       </div>
 
+      {/* Слой с bg2.jpeg */}
       <div style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover" }}>
-        <div className="bg-[#F5F1E6]/90">
+        <div className="bg-[#F5F1E6]/80">
           <MenuSection />
           <GallerySection />
         </div>
