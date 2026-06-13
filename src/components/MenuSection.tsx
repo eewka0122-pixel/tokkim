@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 type MenuCategory = "kimpap" | "bibimbap" | "ramen" | "soups" | "onigiri" | "snacks" | "salads";
 
@@ -63,10 +62,9 @@ const menuCategories: Record<MenuCategory, { label: string; items: { name: strin
 
 const MenuSection = () => {
   const [activeCategory, setActiveCategory] = useState<MenuCategory>("kimpap");
-  const [selectedItem, setSelectedItem] = useState<{ name: string; description: string; price: string; image: string } | null>(null);
 
   return (
-    <section id="menu" className="py-24 md:py-32 px-6 bg-[#F5F1E6]">
+    <section id="menu" className="py-24 md:py-32 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20 reveal">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
@@ -104,8 +102,7 @@ const MenuSection = () => {
           {menuCategories[activeCategory].items.map((item) => (
             <Card
               key={item.name}
-              className="group overflow-hidden rounded-3xl border-0 bg-white/60 backdrop-blur-sm shadow-xl shadow-[#D4B98F]/10 transition-transform duration-300 hover:-translate-y-2 cursor-pointer"
-              onClick={() => setSelectedItem(item)}
+              className="group overflow-hidden rounded-3xl border-0 bg-white/60 backdrop-blur-sm shadow-xl shadow-[#D4B98F]/10 transition-transform duration-300 hover:-translate-y-2"
             >
               <div className="relative h-56 overflow-hidden">
                 <img
@@ -127,22 +124,6 @@ const MenuSection = () => {
             </Card>
           ))}
         </div>
-
-        {selectedItem && (
-          <Dialog open={!!selectedItem} onOpenChange={() => setSelectedItem(null)}>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{selectedItem.name}</DialogTitle>
-                <DialogDescription>{selectedItem.description}</DialogDescription>
-              </DialogHeader>
-              <div className="flex items-center justify-end space-x-2">
-                <Button variant="outline" onClick={() => setSelectedItem(null)}>
-                  Закрыть
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
       </div>
     </section>
   );
