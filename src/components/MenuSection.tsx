@@ -103,11 +103,9 @@ const MenuSection = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   
-  // Координаты старта клика для выявления микро-сдвигов
   const [clickStartPos, setClickStartPos] = useState({ x: 0, y: 0 });
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    // Фиксируем точное место, где мышка коснулась экрана
     setClickStartPos({ x: e.clientX, y: e.clientY });
     
     if (!isZoomed) return;
@@ -128,49 +126,4 @@ const MenuSection = () => {
     setIsDragging(false);
   };
 
-  const handleImageClick = (e: React.MouseEvent) => {
-    // Вычисляем, на сколько пикселей сдвинулась мышка с момента нажатия
-    const moveX = Math.abs(e.clientX - clickStartPos.x);
-    const moveY = Math.abs(e.clientY - clickStartPos.y);
-
-    // Если сдвиг больше 5 пикселей, значит человек тащил фотку. Игнорируем клик.
-    if (moveX > 5 || moveY > 5) {
-      return; 
-    }
-
-    // Если сдвиг меньше 5 пикселей — это честный клик. Отрабатываем зум.
-    if (isZoomed) {
-      setIsZoomed(false);
-      setPosition({ x: 0, y: 0 });
-    } else {
-      setIsZoomed(true);
-    }
-  };
-
-  return (
-    <section id="menu" className="py-24 md:py-32 px-6 bg-transparent">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20 reveal">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
-            Полное меню
-          </span>
-          <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">
-            Наше меню
-          </h2>
-          <p className="mt-6 text-lg text-[#6B5E48] max-w-2xl mx-auto">
-            Познакомьтесь с нашими блюдами, созданным с заботой о деталях
-          </p>
-        </div>
-
-        <div className="flex flex-wrap justify-center gap-3 mb-12 reveal">
-          {Object.keys(menuCategories).map((key) => {
-            const cat = key as MenuCategory;
-            return (
-              <Button
-                key={cat}
-                variant={activeCategory === cat ? "default" : "outline"}
-                onClick={() => setActiveCategory(cat)}
-                className={`rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ${
-                  activeCategory === cat
-                    ? "bg-[#D4B98F] text-[#3A3124] border-[#D4B98F] shadow-lg shadow-[#D4B98F]/40"
-                    : "border-[#D4B98F]/30 text-[#6B5E48] hover:bg-[#D4B98F]/10 hover:shadow-md hover:shadow
+  const handleImageClick = (e
