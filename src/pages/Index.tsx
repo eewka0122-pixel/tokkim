@@ -35,24 +35,36 @@ const Index = () => {
 
       <HeroSection />
 
-      {/* Блок 1: Фон bg1. Снизили плотность слоя с 90 до 60 */}
+      {/* Блок 1: Фон bg1 */}
       <div style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: "center" }}>
-        <div className="bg-[#F5F1E6]/60">
+        <div className="relative bg-[#F5F1E6]/60">
+          {/* Плавное проявление из сплошного бежевого в прозрачность 60% */}
+          <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
+          
           <AboutSection />
           <PopularDishes />
+
+          {/* Плавное затухание обратно в сплошной бежевый */}
+          <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
         </div>
       </div>
 
-      {/* Блок 2: Фон bg2. Снизили плотность слоя с 90 до 60 */}
+      {/* Блок 2: Фон bg2 */}
       <div style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: "center" }}>
-        <div className="bg-[#F5F1E6]/60">
+        <div className="relative bg-[#F5F1E6]/60">
+          {/* Плавное проявление из сплошного бежевого в прозрачность 60% */}
+          <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
+          
           <MenuSection />
           <GallerySection />
+
+          {/* Плавное затухание в сплошной бежевый перед футером */}
+          <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
         </div>
       </div>
       
-      {/* Подвал (остается непрозрачным) */}
-      <div className="bg-[#F5F1E6]">
+      {/* Подвал */}
+      <div className="bg-[#F5F1E6] relative z-20">
         <ReservationSection />
         <Footer />
       </div>
