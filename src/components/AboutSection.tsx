@@ -11,7 +11,7 @@ const AboutSection = () => {
   ];
 
   return (
-    <section id="about" className="py-24 md:py-32 px-6 bg-[#F5F1E6]">
+    <section id="about" className="py-24 md:py-32 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20 reveal">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
@@ -45,7 +45,7 @@ const AboutSection = () => {
               традиции встречаются с современностью.
             </p>
             <p className="text-[#6B5E48] leading-relaxed">
-              Каждое блюдо создается с заботой о деталях: от подбора 
+              Каждое блюдо создается с заботой о деталей: от подбора 
               натуральных ингредиентов до подачи в стиле, в котором 
               корейский стрит-фуд становится искусством.
             </p>

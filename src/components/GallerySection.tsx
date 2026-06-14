@@ -22,9 +22,8 @@ const GallerySection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   return (
-    <section id="gallery" className="py-24 md:py-32 px-6 bg-[#F5F1E6]">
+    <section id="gallery" className="py-24 md:py-32 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
         <div className="text-center mb-20 reveal">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
             Галерея
@@ -37,19 +36,19 @@ const GallerySection = () => {
           </p>
         </div>
 
-        {/* Masonry Grid */}
         <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
           {galleryImages.map((image, index) => (
             <div
               key={index}
-              className="break-inside relative mb-6 overflow-hidden rounded-3xl cursor-pointer group reveal"
+              // ПАРЕНИЕ И СВЕЧЕНИЕ ДЛЯ ФОТО:
+              className="break-inside relative mb-6 overflow-hidden rounded-3xl cursor-pointer group reveal border border-white/60 shadow-xl shadow-[#D4B98F]/30 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#D4B98F]/60"
               style={{ transitionDelay: `${(index % 3) * 100}ms` }}
               onClick={() => setSelectedImage(image.src)}
             >
               <img
                 src={image.src}
                 alt={image.alt}
-                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute bottom-4 left-4 text-[#F5F1E6] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -59,23 +58,22 @@ const GallerySection = () => {
           ))}
         </div>
 
-        {/* Lightbox Modal */}
         {selectedImage && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-6"
             onClick={() => setSelectedImage(null)}
           >
             <div className="relative max-w-4xl max-h-[90vh]">
               <img
                 src={selectedImage}
                 alt="Full size"
-                className="max-w-full max-h-[90vh] object-contain"
+                className="max-w-full max-h-[90vh] object-contain rounded-2xl shadow-2xl shadow-[#D4B98F]/50"
               />
               <button
                 onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 text-[#F5F1E6] hover:text-[#D4B98F] transition-colors"
+                className="absolute -top-12 right-0 text-[#F5F1E6] hover:text-[#D4B98F] transition-colors"
               >
-                <X className="h-8 w-8" />
+                <X className="h-10 w-10 drop-shadow-md" />
               </button>
             </div>
           </div>
