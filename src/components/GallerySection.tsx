@@ -22,9 +22,8 @@ const GallerySection = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   return (
-    <section id="gallery" className="py-24 md:py-32 px-6 bg-[#F5F1E6]">
+    <section id="gallery" className="py-24 md:py-32 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
         <div className="text-center mb-20 reveal">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
             Галерея
@@ -37,7 +36,6 @@ const GallerySection = () => {
           </p>
         </div>
 
-        {/* Masonry Grid */}
         <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
           {galleryImages.map((image, index) => (
             <div
@@ -59,7 +57,6 @@ const GallerySection = () => {
           ))}
         </div>
 
-        {/* Lightbox Modal */}
         {selectedImage && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6"
