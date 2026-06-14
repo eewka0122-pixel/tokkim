@@ -14,7 +14,7 @@ const AboutSection = () => {
     <section id="about" className="py-24 md:py-32 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20 reveal">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4 border border-[#D4B98F]/30 backdrop-blur-sm">
             История бренда
           </span>
           <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-[#3A3124] tracking-tight">
@@ -56,14 +56,20 @@ const AboutSection = () => {
           {advantages.map((advantage, index) => (
             <div
               key={advantage.title}
-              className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 border border-[#D4B98F]/20 reveal reveal-delay-200"
+              // Эффект стекла: прозрачный фон, размытие, белая рамка
+              className="relative overflow-hidden group bg-white/30 backdrop-blur-md rounded-2xl p-6 border border-white/60 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:bg-white/40 hover:shadow-xl reveal reveal-delay-200"
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              <div className="w-14 h-14 rounded-2xl bg-[#D4B98F]/20 flex items-center justify-center mb-4">
-                <advantage.icon className="h-7 w-7 text-[#8C6D46]" />
+              {/* Анимация блика при наведении */}
+              <div className="absolute top-0 left-[-100%] w-1/2 h-full bg-gradient-to-r from-transparent via-white/70 to-transparent -skew-x-12 transition-all duration-700 ease-in-out group-hover:left-[200%] z-10" />
+
+              <div className="relative z-20">
+                <div className="w-14 h-14 rounded-2xl bg-[#D4B98F]/40 backdrop-blur-sm border border-white/50 flex items-center justify-center mb-4 shadow-sm">
+                  <advantage.icon className="h-7 w-7 text-[#3A3124]" />
+                </div>
+                <h4 className="font-semibold text-[#3A3124] mb-2">{advantage.title}</h4>
+                <p className="text-sm text-[#3A3124]/80 font-medium">{advantage.description}</p>
               </div>
-              <h4 className="font-semibold text-[#3A3124] mb-2">{advantage.title}</h4>
-              <p className="text-sm text-[#6B5E48]">{advantage.description}</p>
             </div>
           ))}
         </div>
