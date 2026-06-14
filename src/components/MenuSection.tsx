@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -96,6 +97,7 @@ const menuCategories: Record<MenuCategory, { label: string; items: MenuItem[] }>
 const MenuSection = () => {
   const [activeCategory, setActiveCategory] = useState<MenuCategory>("kimpap");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   return (
     <section id="menu" className="py-24 md:py-32 px-6 bg-transparent">
@@ -108,7 +110,7 @@ const MenuSection = () => {
             Наше меню
           </h2>
           <p className="mt-6 text-lg text-[#6B5E48] max-w-2xl mx-auto">
-            Познакомьтесь с нашими блюдами, созданными с заботой о деталях
+            Познакомьтесь с нашими блюдами, созданным с заботой о деталях
           </p>
         </div>
 
@@ -139,7 +141,6 @@ const MenuSection = () => {
               onClick={() => setSelectedItem(item)}
               className="cursor-pointer h-full outline-none"
             >
-              {/* НОВЫЕ КЛАССЫ СВЕЧЕНИЯ И ПАРЕНИЯ ЗДЕСЬ: */}
               <Card className="group overflow-hidden rounded-3xl border border-white/60 bg-white/80 backdrop-blur-md shadow-xl shadow-[#D4B98F]/30 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#D4B98F]/60 h-full">
                 <div className="relative h-56 overflow-hidden">
                   <img
@@ -163,26 +164,51 @@ const MenuSection = () => {
           ))}
         </div>
 
-        <Dialog open={!!selectedItem} onOpenChange={(open) => { if (!open) setSelectedItem(null); }}>
-          <DialogContent className="bg-[#F5F1E6] border border-white/60 shadow-2xl shadow-[#D4B98F]/40 sm:max-w-lg rounded-3xl p-0 overflow-hidden">
+        <Dialog 
+          open={!!selectedItem} 
+          onOpenChange={(open) => { 
+            if (!open) {
+              setSelectedItem(null);
+              // Даем время на закрытие модалки перед сбросом зума
+              setTimeout(() => setIsZoomed(false), 300);
+            } 
+          }}
+        >
+          {/* Классы для плавной анимации выезда и растворения */}
+          <DialogContent className="bg-[#F5F1E6] border border-white/60 shadow-2xl shadow-[#D4B98F]/40 sm:max-w-lg rounded-3xl p-0 overflow-hidden
+            data-[state=open]:animate-in data-[state=closed]:animate-out 
+            data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 
+            data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-100 
+            data-[state=closed]:slide-out-to-bottom-12 data-[state=open]:slide-in-from-bottom-12 
+            duration-500 ease-out"
+          >
             {selectedItem && (
               <>
-                <div className="relative w-full h-72">
+                {/* Контейнер картинки с функцией зума */}
+                <div 
+                  className={`relative w-full h-72 overflow-hidden cursor-pointer ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
+                  onClick={() => setIsZoomed(!isZoomed)}
+                >
                   <img
                     src={selectedItem.image}
                     alt={selectedItem.name}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-cover transition-transform duration-500 ease-in-out ${isZoomed ? "scale-150" : "scale-100"}`}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-6 right-6">
-                    <DialogTitle className="font-serif text-3xl font-bold text-white mb-1 shadow-sm">
-                      {selectedItem.name}
-                    </DialogTitle>
-                    <span className="text-2xl font-bold text-[#D4B98F] drop-shadow-md">{selectedItem.price}</span>
+                  {/* Иконка-подсказка */}
+                  <div className="absolute top-4 left-4 bg-black/40 backdrop-blur-md text-white p-2 rounded-full pointer-events-none transition-opacity duration-300">
+                    {isZoomed ? <ZoomOut className="w-5 h-5" /> : <ZoomIn className="w-5 h-5" />}
                   </div>
                 </div>
                 
-                <div className="p-6">
+                <div className="p-6 md:p-8">
+                  {/* Название и цена теперь внизу, под фото */}
+                  <div className="flex justify-between items-start mb-4 gap-4">
+                    <DialogTitle className="font-serif text-3xl font-bold text-[#3A3124] leading-tight">
+                      {selectedItem.name}
+                    </DialogTitle>
+                    <span className="text-2xl font-bold text-[#D4B98F] whitespace-nowrap mt-1">{selectedItem.price}</span>
+                  </div>
+                  
                   <DialogHeader>
                     <DialogDescription className="text-[#6B5E48] text-base leading-relaxed">
                       {selectedItem.description}
