@@ -14,7 +14,7 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
 
-  // Фича 5: Слежение за курсором для микро-параллакса фона
+  // Микро-параллакс фона от мыши
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth) - 0.5;
@@ -25,7 +25,7 @@ const Index = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Фича 3: Плавный инерционный скролл (Бумажный/Масляный эффект)
+  // Инерционный скролл
   useEffect(() => {
     if (loading) return;
 
@@ -35,7 +35,6 @@ const Index = () => {
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
-      // Коэффициент скорости скролла (0.55 - оптимальная плавность)
       targetScrollY += e.deltaY * 0.55;
       targetScrollY = Math.max(0, Math.min(targetScrollY, document.documentElement.scrollHeight - window.innerHeight));
       
@@ -46,7 +45,6 @@ const Index = () => {
     };
 
     const updateScroll = () => {
-      // Плавное приближение текущего положения к целевому (каждый кадр на 8%)
       currentScrollY += (targetScrollY - currentScrollY) * 0.08;
       window.scrollTo(0, currentScrollY);
 
@@ -76,12 +74,10 @@ const Index = () => {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // Расчет динамической позиции для 3D-смещения картинок
   const bgPositionStyle = `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
 
   return (
     <>
-      {/* СТИЛИ ДЛЯ АНИМАЦИИ ВЫПЛЫВАЮЩИХ СЛОВ (Фича 4) И СТАБИЛИЗАЦИИ */}
       <style dangerouslySetInnerHTML={{__html: `
         html {
           scrollbar-gutter: stable;
@@ -91,6 +87,13 @@ const Index = () => {
           padding-right: 0 !important;
           margin-right: 0 !important;
         }
+        /* ВОЗВРАЩАЕМ РЕЗКОСТЬ: Включаем чистое сглаживание без 3D-искажений */
+        body {
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          text-rendering: optimizeLegibility;
+        }
+        /* Анимация появления заголовков */
         @keyframes splitTextReveal {
           0% { transform: translateY(115%); opacity: 0; }
           100% { transform: translateY(0); opacity: 1; }
@@ -115,7 +118,7 @@ const Index = () => {
 
         <HeroSection />
 
-        {/* Блок 1: История и популярное */}
+        {/* Блок 1: Вернули прозрачность 60% */}
         <div style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
             <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
@@ -125,7 +128,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Блок 2: Меню и галерея */}
+        {/* Блок 2: Вернули прозрачность 60% */}
         <div style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
             <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
