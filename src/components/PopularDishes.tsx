@@ -28,7 +28,8 @@ const PopularDishes = () => {
           {popularDishes.map((dish) => (
             <Card
               key={dish.name}
-              className="group overflow-hidden rounded-3xl border-0 bg-white/60 backdrop-blur-sm shadow-2xl shadow-[#D4B98F]/20 transition-transform duration-500 hover:-translate-y-2 reveal"
+              // НОВЫЕ КЛАССЫ СВЕЧЕНИЯ И ПАРЕНИЯ ЗДЕСЬ:
+              className="group overflow-hidden rounded-3xl border border-white/60 bg-white/80 backdrop-blur-md shadow-xl shadow-[#D4B98F]/30 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#D4B98F]/60 reveal"
             >
               <div className="relative h-64 overflow-hidden">
                 <img
@@ -37,7 +38,7 @@ const PopularDishes = () => {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                <div className="absolute top-4 right-4 bg-[#D4B98F] text-[#3A3124] px-4 py-2 rounded-full font-bold">
+                <div className="absolute top-4 right-4 bg-[#D4B98F] text-[#3A3124] px-4 py-2 rounded-full font-bold shadow-lg shadow-black/20">
                   {dish.price}
                 </div>
                 <div className="absolute bottom-4 left-4 text-[#F5F1E6]">
