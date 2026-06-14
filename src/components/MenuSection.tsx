@@ -98,9 +98,8 @@ const MenuSection = () => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
 
   return (
-    <section id="menu" className="py-24 md:py-32 px-6 bg-[#F5F1E6]">
+    <section id="menu" className="py-24 md:py-32 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
         <div className="text-center mb-20 reveal">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
             Полное меню
@@ -113,7 +112,6 @@ const MenuSection = () => {
           </p>
         </div>
 
-        {/* Category Tabs */}
         <div className="flex flex-wrap justify-center gap-3 mb-12 reveal">
           {Object.keys(menuCategories).map((key) => {
             const cat = key as MenuCategory;
@@ -124,8 +122,8 @@ const MenuSection = () => {
                 onClick={() => setActiveCategory(cat)}
                 className={`rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ${
                   activeCategory === cat
-                    ? "bg-[#D4B98F] text-[#3A3124] border-[#D4B98F] shadow-lg shadow-[#D4B98F]/30"
-                    : "border-[#D4B98F]/30 text-[#6B5E48] hover:bg-[#D4B98F]/10"
+                    ? "bg-[#D4B98F] text-[#3A3124] border-[#D4B98F] shadow-lg shadow-[#D4B98F]/40"
+                    : "border-[#D4B98F]/30 text-[#6B5E48] hover:bg-[#D4B98F]/10 hover:shadow-md hover:shadow-[#D4B98F]/20"
                 }`}
               >
                 {menuCategories[cat].label}
@@ -134,7 +132,6 @@ const MenuSection = () => {
           })}
         </div>
 
-        {/* Menu Items Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {menuCategories[activeCategory].items.map((item) => (
             <div 
@@ -142,7 +139,8 @@ const MenuSection = () => {
               onClick={() => setSelectedItem(item)}
               className="cursor-pointer h-full outline-none"
             >
-              <Card className="group overflow-hidden rounded-3xl border-0 bg-white/60 backdrop-blur-sm shadow-xl shadow-[#D4B98F]/10 transition-transform duration-300 hover:-translate-y-2 h-full">
+              {/* НОВЫЕ КЛАССЫ СВЕЧЕНИЯ И ПАРЕНИЯ ЗДЕСЬ: */}
+              <Card className="group overflow-hidden rounded-3xl border border-white/60 bg-white/80 backdrop-blur-md shadow-xl shadow-[#D4B98F]/30 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#D4B98F]/60 h-full">
                 <div className="relative h-56 overflow-hidden">
                   <img
                     src={item.image}
@@ -150,7 +148,7 @@ const MenuSection = () => {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                  <div className="absolute top-4 right-4 bg-[#D4B98F] text-[#3A3124] px-3 py-1.5 rounded-full font-bold text-sm">
+                  <div className="absolute top-4 right-4 bg-[#D4B98F] text-[#3A3124] px-3 py-1.5 rounded-full font-bold text-sm shadow-md shadow-black/20">
                     {item.price}
                   </div>
                 </div>
@@ -165,9 +163,8 @@ const MenuSection = () => {
           ))}
         </div>
 
-        {/* Железобетонное глобальное модальное окно */}
         <Dialog open={!!selectedItem} onOpenChange={(open) => { if (!open) setSelectedItem(null); }}>
-          <DialogContent className="bg-[#F5F1E6] border-[#D4B98F]/30 sm:max-w-lg rounded-3xl p-0 overflow-hidden">
+          <DialogContent className="bg-[#F5F1E6] border border-white/60 shadow-2xl shadow-[#D4B98F]/40 sm:max-w-lg rounded-3xl p-0 overflow-hidden">
             {selectedItem && (
               <>
                 <div className="relative w-full h-72">
@@ -193,7 +190,7 @@ const MenuSection = () => {
                   </DialogHeader>
                   
                   <div className="mt-8 flex justify-end">
-                    <Button className="bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-full px-10 py-6 font-bold text-lg shadow-lg shadow-[#D4B98F]/30 transition-all hover:scale-105 w-full sm:w-auto">
+                    <Button className="bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-full px-10 py-6 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-105 w-full sm:w-auto">
                       Добавить в корзину
                     </Button>
                   </div>
