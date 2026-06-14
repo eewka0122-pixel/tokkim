@@ -18,26 +18,34 @@ const menuCategories: Record<MenuCategory, { label: string; items: { name: strin
 
 const MenuSection = () => {
   const [activeCategory, setActiveCategory] = useState<MenuCategory>("kimpap");
+
   return (
-    <section id="menu" className="py-24 md:py-32 px-6 bg-transparent">
+    <section id="menu" className="py-24 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20 reveal">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">Полное меню</span>
-          <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">Наше меню</h2>
+        <div className="text-center mb-16">
+          <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124]">Наше меню</h2>
         </div>
-        <div className="flex flex-wrap justify-center gap-3 mb-12 reveal">
+
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
           {Object.keys(menuCategories).map((key) => {
             const cat = key as MenuCategory;
             return (
-              <Button key={cat} variant={activeCategory === cat ? "default" : "outline"} onClick={() => setActiveCategory(cat)} className={`rounded-full px-6 py-3 text-sm font-medium transition-all ${activeCategory === cat ? "bg-[#D4B98F] text-[#3A3124]" : "border-[#D4B98F]/30"}`}>
+              <Button
+                key={cat}
+                variant={activeCategory === cat ? "default" : "outline"}
+                onClick={() => setActiveCategory(cat)}
+                className={`rounded-full px-6 py-3 ${activeCategory === cat ? "bg-[#D4B98F] text-[#3A3124]" : "border-[#D4B98F]/30"}`}
+              >
                 {menuCategories[cat].label}
               </Button>
             );
           })}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        {/* Сетка, которая гарантированно покажет все элементы */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {menuCategories[activeCategory].items.map((item) => (
-            <Card key={item.name} className="group overflow-hidden rounded-3xl border-0 bg-white/60 backdrop-blur-sm shadow-xl transition-transform hover:-translate-y-2">
+            <Card key={item.name} className="rounded-3xl border-0 bg-white/60 backdrop-blur-sm shadow-xl">
               <div className="relative h-56 overflow-hidden">
                 <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 <div className="absolute top-4 right-4 bg-[#D4B98F] text-[#3A3124] px-3 py-1.5 rounded-full font-bold text-sm">{item.price}</div>
