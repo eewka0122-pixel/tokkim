@@ -14,7 +14,7 @@ const AboutSection = () => {
     <section id="about" className="py-24 md:py-32 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20 reveal">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4 border border-[#D4B98F]/30 backdrop-blur-sm">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-white/30 text-[#3A3124] text-sm font-bold uppercase tracking-wider mb-4 border border-white/60 shadow-[0_4px_15px_rgba(0,0,0,0.05),inset_0_1px_2px_rgba(255,255,255,0.8)] backdrop-blur-md">
             История бренда
           </span>
           <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-[#3A3124] tracking-tight">
@@ -56,18 +56,25 @@ const AboutSection = () => {
           {advantages.map((advantage, index) => (
             <div
               key={advantage.title}
-              // Эффект стекла: прозрачный фон, размытие, белая рамка
-              className="relative overflow-hidden group bg-white/30 backdrop-blur-md rounded-2xl p-6 border border-white/60 shadow-lg transition-all duration-500 hover:-translate-y-2 hover:bg-white/40 hover:shadow-xl reveal reveal-delay-200"
+              // ЭФФЕКТ ТОЛСТОГО СТЕКЛА
+              className="relative overflow-hidden group rounded-3xl p-6 transition-all duration-500 ease-out hover:-translate-y-3 hover:scale-[1.02]
+              bg-gradient-to-br from-white/50 via-white/20 to-white/5
+              backdrop-blur-2xl backdrop-saturate-150 backdrop-brightness-110
+              border border-white/70 border-b-white/20 border-r-white/20
+              shadow-[0_8px_32px_rgba(0,0,0,0.1),inset_0_1px_3px_rgba(255,255,255,0.9)]
+              hover:shadow-[0_20px_40px_rgba(0,0,0,0.15),inset_0_1px_3px_rgba(255,255,255,1)]
+              reveal reveal-delay-200"
               style={{ transitionDelay: `${index * 100}ms` }}
             >
-              {/* Анимация блика при наведении */}
-              <div className="absolute top-0 left-[-100%] w-1/2 h-full bg-gradient-to-r from-transparent via-white/70 to-transparent -skew-x-12 transition-all duration-700 ease-in-out group-hover:left-[200%] z-10" />
+              {/* Пробегающий блик при наведении */}
+              <div className="absolute top-0 left-[-100%] w-1/2 h-full bg-gradient-to-r from-transparent via-white/60 to-transparent -skew-x-12 transition-all duration-1000 ease-in-out group-hover:left-[200%] z-10 pointer-events-none" />
 
               <div className="relative z-20">
-                <div className="w-14 h-14 rounded-2xl bg-[#D4B98F]/40 backdrop-blur-sm border border-white/50 flex items-center justify-center mb-4 shadow-sm">
+                {/* Иконка тоже в маленьком "стеклянном" блоке */}
+                <div className="w-14 h-14 rounded-2xl bg-white/40 backdrop-blur-md border border-white/60 shadow-[inset_0_1px_2px_rgba(255,255,255,0.9)] flex items-center justify-center mb-4 transition-transform duration-500 group-hover:scale-110">
                   <advantage.icon className="h-7 w-7 text-[#3A3124]" />
                 </div>
-                <h4 className="font-semibold text-[#3A3124] mb-2">{advantage.title}</h4>
+                <h4 className="font-bold text-[#3A3124] mb-2">{advantage.title}</h4>
                 <p className="text-sm text-[#3A3124]/80 font-medium">{advantage.description}</p>
               </div>
             </div>
