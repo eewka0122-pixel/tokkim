@@ -14,7 +14,8 @@ const HeroSection = () => {
         backgroundRepeat: "no-repeat" 
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/10 to-white/5" />
+      {/* НОВЫЙ СЛОЙ: Единая заливка 60% для всего сайта, чтобы сровнять контраст с нижними картинками */}
+      <div className="absolute inset-0 bg-[#F5F1E6]/60" />
       
       <div className="relative z-10 px-6 text-center text-[#3A3124] w-full">
         <div className="max-w-5xl mx-auto w-full">
@@ -52,11 +53,11 @@ const HeroSection = () => {
         </div>
       </div>
       
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 reveal-delay-200">
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 reveal-delay-200 z-10">
         <ArrowDown className="h-8 w-8 text-[#3A3124]/80 bounce" />
       </div>
 
-      {/* НОВЫЙ СЛОЙ: Мягкий градиент для плавного растворения картинки в бежевый цвет */}
+      {/* Оставил нижний градиент, чтобы сам стык всё равно оставался мягким */}
       <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-20" />
     </section>
   );
