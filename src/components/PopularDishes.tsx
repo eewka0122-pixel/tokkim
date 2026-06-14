@@ -26,13 +26,12 @@ const PopularDishes = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {popularDishes.map((dish) => (
-            /* ВАЖНО: Класс reveal теперь висит на внешнем div, он больше не блокирует карточку */
             <div key={dish.name} className="reveal h-full">
               <Card
                 className="group overflow-hidden rounded-3xl border border-white/60 bg-white/80 backdrop-blur-md cursor-pointer h-full
                 transition-all duration-300 ease-out
                 shadow-lg shadow-[#D4B98F]/20 
-                hover:-translate-y-4 hover:shadow-[0_20px_50px_rgba(212,185,143,0.8)]"
+                hover:-translate-y-4 hover:shadow-[0_15px_40px_rgba(57,255,20,0.6)]"
               >
                 <div className="relative h-64 overflow-hidden">
                   <img
