@@ -26,29 +26,33 @@ const PopularDishes = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {popularDishes.map((dish) => (
-            <Card
-              key={dish.name}
-              // НОВЫЕ КЛАССЫ СВЕЧЕНИЯ И ПАРЕНИЯ ЗДЕСЬ:
-              className="group overflow-hidden rounded-3xl border border-white/60 bg-white/80 backdrop-blur-md shadow-xl shadow-[#D4B98F]/30 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#D4B98F]/60 reveal"
-            >
-              <div className="relative h-64 overflow-hidden">
-                <img
-                  src={dish.image}
-                  alt={dish.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                <div className="absolute top-4 right-4 bg-[#D4B98F] text-[#3A3124] px-4 py-2 rounded-full font-bold shadow-lg shadow-black/20">
-                  {dish.price}
+            /* ВАЖНО: Класс reveal теперь висит на внешнем div, он больше не блокирует карточку */
+            <div key={dish.name} className="reveal h-full">
+              <Card
+                className="group overflow-hidden rounded-3xl border border-white/60 bg-white/80 backdrop-blur-md cursor-pointer h-full
+                transition-all duration-300 ease-out
+                shadow-lg shadow-[#D4B98F]/20 
+                hover:-translate-y-4 hover:shadow-[0_20px_50px_rgba(212,185,143,0.8)]"
+              >
+                <div className="relative h-64 overflow-hidden">
+                  <img
+                    src={dish.image}
+                    alt={dish.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute top-4 right-4 bg-[#D4B98F] text-[#3A3124] px-4 py-2 rounded-full font-bold shadow-lg shadow-black/20">
+                    {dish.price}
+                  </div>
+                  <div className="absolute bottom-4 left-4 text-[#F5F1E6]">
+                    <h3 className="font-serif text-xl font-bold">{dish.name}</h3>
+                  </div>
                 </div>
-                <div className="absolute bottom-4 left-4 text-[#F5F1E6]">
-                  <h3 className="font-serif text-xl font-bold">{dish.name}</h3>
-                </div>
-              </div>
-              <CardContent className="p-6">
-                <p className="text-[#6B5E48]">{dish.description}</p>
-              </CardContent>
-            </Card>
+                <CardContent className="p-6">
+                  <p className="text-[#6B5E48]">{dish.description}</p>
+                </CardContent>
+              </Card>
+            </div>
           ))}
         </div>
       </div>
