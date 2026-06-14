@@ -14,14 +14,13 @@ const AboutSection = () => {
     <section id="about" className="py-24 md:py-32 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-white/20 text-[#3A3124] text-sm font-bold uppercase tracking-wider mb-4 border border-white/50 backdrop-blur-md shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-white/20 text-black text-sm font-bold uppercase tracking-wider mb-4 border border-white/50 backdrop-blur-md shadow-[inset_0_1px_2px_rgba(255,255,255,0.8)]">
             История бренда
           </span>
-          {/* Фича 4: Появление за занавесом */}
-          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-[#3A3124] tracking-tight">
+          <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl font-medium text-black tracking-tight">
             <span className="split-parent"><span className="split-child">ТОККИМ</span></span>
           </h2>
-          <p className="mt-6 text-lg text-[#6B5E48] max-w-2xl mx-auto">
+          <p className="mt-6 text-lg text-black font-medium max-w-2xl mx-auto">
             Мы объединяем традиции корейской кулинарии с современным подходом к стрит-фуду, 
             создавая неповторимый вкус в каждом блюде
           </p>
@@ -36,16 +35,16 @@ const AboutSection = () => {
             />
           </div>
           <div className="space-y-6 reveal-delay-100">
-            <h3 className="font-serif text-3xl font-medium text-[#3A3124]">
+            <h3 className="font-serif text-3xl font-medium text-black">
               Наша философия
             </h3>
-            <p className="text-[#6B5E48] leading-relaxed">
+            <p className="text-black font-medium leading-relaxed">
               ТОККИМ начался с мечты о том, чтобы корейская кухня стала доступной 
               каждому, сохраняя при этом её высокое качество и глубину вкуса. 
               Мы выбрали Сеул и Токио как символы нашего пути — города, где 
               традиции встречаются с современностью.
             </p>
-            <p className="text-[#6B5E48] leading-relaxed">
+            <p className="text-black font-medium leading-relaxed">
               Каждое блюдо создается с заботой о деталей: от подбора 
               натуральных ингредиентов до подачи в стиле, в котором 
               корейский стрит-фуд становится искусством.
@@ -69,10 +68,10 @@ const AboutSection = () => {
 
               <div className="relative z-20">
                 <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md border border-white/50 shadow-[inset_0_1px_3px_rgba(255,255,255,0.8)] flex items-center justify-center mb-4 transition-transform duration-500 group-hover:scale-110">
-                  <advantage.icon className="h-7 w-7 text-[#3A3124]" />
+                  <advantage.icon className="h-7 w-7 text-black" />
                 </div>
-                <h4 className="font-bold text-[#3A3124] mb-2">{advantage.title}</h4>
-                <p className="text-sm text-[#3A3124]/80 font-medium">{advantage.description}</p>
+                <h4 className="font-bold text-black mb-2">{advantage.title}</h4>
+                <p className="text-sm text-black font-medium">{advantage.description}</p>
               </div>
             </div>
           ))}
