@@ -55,6 +55,9 @@ const HeroSection = () => {
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2 reveal-delay-200">
         <ArrowDown className="h-8 w-8 text-[#3A3124]/80 bounce" />
       </div>
+
+      {/* НОВЫЙ СЛОЙ: Мягкий градиент для плавного растворения картинки в бежевый цвет */}
+      <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-20" />
     </section>
   );
 };
