@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -97,7 +97,46 @@ const menuCategories: Record<MenuCategory, { label: string; items: MenuItem[] }>
 const MenuSection = () => {
   const [activeCategory, setActiveCategory] = useState<MenuCategory>("kimpap");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  
+  // Состояния для зума и перетаскивания
   const [isZoomed, setIsZoomed] = useState(false);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [hasDragged, setHasDragged] = useState(false);
+
+  // Обработчики мыши для перетаскивания картинки
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (!isZoomed) return;
+    setIsDragging(true);
+    setHasDragged(false);
+    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !isZoomed) return;
+    setHasDragged(true);
+    setPosition({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleImageClick = () => {
+    if (hasDragged) return; // Если человек тащил мышку, не считаем это за клик (чтобы не сбросить зум случайно)
+    
+    if (isZoomed) {
+      setIsZoomed(false);
+      setPosition({ x: 0, y: 0 }); // Возвращаем в центр при отдалении
+    } else {
+      setIsZoomed(true);
+    }
+  };
 
   return (
     <section id="menu" className="py-24 md:py-32 px-6 bg-transparent">
@@ -169,39 +208,54 @@ const MenuSection = () => {
           onOpenChange={(open) => { 
             if (!open) {
               setSelectedItem(null);
-              // Даем время на закрытие модалки перед сбросом зума
-              setTimeout(() => setIsZoomed(false), 300);
+              setTimeout(() => {
+                setIsZoomed(false);
+                setPosition({ x: 0, y: 0 });
+              }, 300);
             } 
           }}
         >
-          {/* Классы для плавной анимации выезда и растворения */}
+          {/* НОВАЯ АНИМАЦИЯ: Модалка вырастает из центра с эффектом пружины, никакого выезда снизу */}
           <DialogContent className="bg-[#F5F1E6] border border-white/60 shadow-2xl shadow-[#D4B98F]/40 sm:max-w-lg rounded-3xl p-0 overflow-hidden
             data-[state=open]:animate-in data-[state=closed]:animate-out 
             data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 
-            data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-100 
-            data-[state=closed]:slide-out-to-bottom-12 data-[state=open]:slide-in-from-bottom-12 
-            duration-500 ease-out"
+            data-[state=closed]:zoom-out-[0.8] data-[state=open]:zoom-in-[0.8]
+            duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
           >
             {selectedItem && (
               <>
-                {/* Контейнер картинки с функцией зума */}
+                {/* Область просмотра фото */}
                 <div 
-                  className={`relative w-full h-72 overflow-hidden cursor-pointer ${isZoomed ? 'cursor-zoom-out' : 'cursor-zoom-in'}`}
-                  onClick={() => setIsZoomed(!isZoomed)}
+                  className={`relative w-full h-80 overflow-hidden select-none bg-black/5 ${
+                    isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'
+                  }`}
+                  onMouseDown={handleMouseDown}
+                  onMouseMove={handleMouseMove}
+                  onMouseUp={handleMouseUp}
+                  onMouseLeave={handleMouseLeave}
+                  onClick={handleImageClick}
                 >
                   <img
                     src={selectedItem.image}
                     alt={selectedItem.name}
-                    className={`w-full h-full object-cover transition-transform duration-500 ease-in-out ${isZoomed ? "scale-150" : "scale-100"}`}
+                    draggable={false} // Отключаем стандартное перетаскивание картинок браузером
+                    style={{
+                      transform: `translate(${position.x}px, ${position.y}px) scale(${isZoomed ? 2.5 : 1})`,
+                      transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
+                    }}
+                    className="w-full h-full object-cover origin-center"
                   />
+                  
                   {/* Иконка-подсказка */}
-                  <div className="absolute top-4 left-4 bg-black/40 backdrop-blur-md text-white p-2 rounded-full pointer-events-none transition-opacity duration-300">
-                    {isZoomed ? <ZoomOut className="w-5 h-5" /> : <ZoomIn className="w-5 h-5" />}
+                  <div className={`absolute top-4 left-4 bg-black/40 backdrop-blur-md text-white p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`}>
+                    <ZoomIn className="w-5 h-5" />
+                  </div>
+                  <div className={`absolute top-4 left-4 bg-[#D4B98F]/80 backdrop-blur-md text-[#3A3124] p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-100' : 'opacity-0'}`}>
+                    <ZoomOut className="w-5 h-5" />
                   </div>
                 </div>
                 
-                <div className="p-6 md:p-8">
-                  {/* Название и цена теперь внизу, под фото */}
+                <div className="p-6 md:p-8 bg-[#F5F1E6] relative z-10">
                   <div className="flex justify-between items-start mb-4 gap-4">
                     <DialogTitle className="font-serif text-3xl font-bold text-[#3A3124] leading-tight">
                       {selectedItem.name}
