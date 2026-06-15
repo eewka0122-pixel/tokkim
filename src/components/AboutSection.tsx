@@ -1,15 +1,6 @@
 "use client";
 
-import { ChefHat, Award, Clock, Users } from "lucide-react";
-
 const AboutSection = () => {
-  const advantages = [
-    { icon: ChefHat, title: "Эксклюзивные рецепты", description: "Традиционные корейские блюда с современным фокусом" },
-    { icon: Award, title: "Лучшее качество", description: "Только натуральные ингредиенты и свежие продукты" },
-    { icon: Clock, title: "Быстрая доставка", description: "Еду доставляем за 30 минут с сохранением вкуса" },
-    { icon: Users, title: "Гостеприимство", description: "Создаем атмосферу уюта и комфорта" },
-  ];
-
   return (
     <section id="about" className="py-24 md:py-32 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
@@ -26,8 +17,10 @@ const AboutSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="reveal">
+            {/* ВНИМАНИЕ: Если картинка не отображается, замени food-mix.jpg 
+                на ТОЧНОЕ название твоего файла из папки public/images */}
             <img
               src="/images/food-mix.jpg" 
               alt="Ассорти корейских блюд"
@@ -41,7 +34,7 @@ const AboutSection = () => {
             <p className="text-[#3A2F22] font-medium text-lg leading-relaxed drop-shadow-sm">
               ТОККИМ начался с мечты о том, чтобы корейская кухня стала доступной 
               каждому, сохраняя при этом её высокое качество и глубину вкуса. 
-              Мы выбрали Сеул  как символ нашего пути, где 
+              Мы выбрали Сеул как символ нашего пути, где 
               традиции встречаются с современностью.
             </p>
             <p className="text-[#3A2F22] font-medium text-lg leading-relaxed drop-shadow-sm">
@@ -50,24 +43,6 @@ const AboutSection = () => {
               корейский стрит-фуд становится искусством.
             </p>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {advantages.map((advantage, index) => (
-            <div
-              key={advantage.title}
-              className="reveal h-full"
-              style={{ transitionDelay: `${index * 100}ms` }}
-            >
-              <div className="group h-full bg-lime-200/40 backdrop-blur-md rounded-2xl p-6 border border-lime-300/50 shadow-lg transition-all duration-300 ease-out hover:-translate-y-2 hover:bg-lime-200/60 hover:shadow-2xl hover:shadow-lime-400/40 hover:border-lime-300/80 cursor-default">
-                <div className="w-14 h-14 rounded-2xl bg-lime-300/50 flex items-center justify-center mb-4 border border-lime-300/60 transition-colors duration-300 group-hover:bg-lime-300/70">
-                  <advantage.icon className="h-7 w-7 text-[#2A2118]" />
-                </div>
-                <h4 className="font-bold text-[#2A2118] mb-2">{advantage.title}</h4>
-                <p className="text-sm font-medium text-[#3A2F22]">{advantage.description}</p>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </section>
