@@ -112,7 +112,12 @@ const Index = () => {
       <main className="min-h-screen text-[#3A3124]">
         <nav className="fixed top-0 left-0 w-full z-40 p-6 md:p-8 flex items-center justify-between pointer-events-none">
           <div className="pointer-events-auto">
-            <img src="/images/logo (4).png" alt="ТОККИМ" className="h-20 md:h-28 w-auto object-contain drop-shadow-md" />
+            {/* ИЗМЕНЕНИЯ ЗДЕСЬ: Увеличили высоту (h-32 md:h-40) и добавили brightness-0 invert для белого цвета */}
+            <img 
+              src="/images/logo (4).png" 
+              alt="ТОККИМ" 
+              className="h-32 md:h-40 w-auto object-contain drop-shadow-md brightness-0 invert opacity-90 transition-all duration-300" 
+            />
           </div>
         </nav>
 
