@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { ZoomIn, ZoomOut } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ZoomIn, ZoomOut, Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -95,45 +95,87 @@ const menuCategories: Record<MenuCategory, { label: string; items: MenuItem[] }>
 };
 
 const MenuSection = () => {
-  const [activeCategory, setActiveCategory] = useState<MenuCategory>("kimpap");
+  const [activeCategory, setActiveCategory] = useState<string>("kimpap");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   
+  // Локальное состояние корзины: {"Кимпаб с говядиной": 1, "Рамен": 2}
+  const [cartCounts, setCartCounts] = useState<Record<string, number>>({});
+
+  // Состояния для зума картинки (твоя фича)
   const [isZoomed, setIsZoomed] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  
   const [clickStartPos, setClickStartPos] = useState({ x: 0, y: 0 });
 
+  // Логика отслеживания скролла (Scroll Spy) для липкого меню
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = Object.keys(menuCategories);
+      let currentSection = sections[0];
+
+      for (const section of sections) {
+        const element = document.getElementById(`category-${section}`);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          // Если верхняя часть секции поднялась выше середины экрана, считаем её активной
+          if (rect.top <= window.innerHeight / 2.5) {
+            currentSection = section;
+          }
+        }
+      }
+      setActiveCategory(currentSection);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToCategory = (categoryId: string) => {
+    const element = document.getElementById(`category-${categoryId}`);
+    if (element) {
+      // Отступ сверху, чтобы секция не заезжала под липкое меню (с учетом высоты шапки)
+      const yOffset = -150; 
+      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
+
+  const handleAddToCart = (e: React.MouseEvent, itemName: string) => {
+    e.stopPropagation(); // Чтобы не открывалось модальное окно при клике на кнопку
+    setCartCounts(prev => ({ ...prev, [itemName]: (prev[itemName] || 0) + 1 }));
+  };
+
+  const handleRemoveFromCart = (e: React.MouseEvent, itemName: string) => {
+    e.stopPropagation();
+    setCartCounts(prev => {
+      const newCount = (prev[itemName] || 0) - 1;
+      if (newCount <= 0) {
+        const newState = { ...prev };
+        delete newState[itemName];
+        return newState;
+      }
+      return { ...prev, [itemName]: newCount };
+    });
+  };
+
+  // Обработчики мыши для зума в модалке
   const handleMouseDown = (e: React.MouseEvent) => {
     setClickStartPos({ x: e.clientX, y: e.clientY });
-    
     if (!isZoomed) return;
     setIsDragging(true);
     setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
   };
-
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDragging || !isZoomed) return;
     setPosition({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y });
   };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-  };
-
+  const handleMouseUp = () => setIsDragging(false);
+  const handleMouseLeave = () => setIsDragging(false);
   const handleImageClick = (e: React.MouseEvent) => {
     const moveX = Math.abs(e.clientX - clickStartPos.x);
     const moveY = Math.abs(e.clientY - clickStartPos.y);
-
-    if (moveX > 5 || moveY > 5) {
-      return; 
-    }
-
+    if (moveX > 5 || moveY > 5) return; 
     if (isZoomed) {
       setIsZoomed(false);
       setPosition({ x: 0, y: 0 });
@@ -143,70 +185,122 @@ const MenuSection = () => {
   };
 
   return (
-    <section id="menu" className="py-24 md:py-32 px-6 bg-transparent">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-20 reveal">
+    <section id="menu" className="py-24 md:py-32 bg-transparent relative">
+      <div className="max-w-7xl mx-auto px-6">
+        
+        {/* Заголовок блока */}
+        <div className="text-center mb-12 reveal">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
             Полное меню
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">
             Наше меню
           </h2>
-          <p className="mt-6 text-lg text-[#6B5E48] max-w-2xl mx-auto">
-            Познакомьтесь с нашими блюдами, созданным с заботой о деталях
-          </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3 mb-12 reveal">
+        {/* ПРИЛИПАЮЩЕЕ МЕНЮ КАТЕГОРИЙ (Dodo Style) */}
+        <div className="sticky top-20 md:top-[120px] z-30 bg-[#F5F1E6]/95 backdrop-blur-md py-4 border-b border-[#D4B98F]/20 mb-12 -mx-6 px-6 shadow-sm shadow-[#D4B98F]/5">
+          <div className="max-w-7xl mx-auto flex overflow-x-auto gap-2 sm:gap-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            {Object.keys(menuCategories).map((key) => {
+              const cat = key as MenuCategory;
+              return (
+                <button
+                  key={cat}
+                  onClick={() => scrollToCategory(cat)}
+                  className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm md:text-base font-semibold transition-all duration-300 ${
+                    activeCategory === cat
+                      ? "bg-[#D4B98F] text-[#3A3124] shadow-md shadow-[#D4B98F]/40"
+                      : "bg-[#F5F1E6] text-[#6B5E48] hover:bg-[#D4B98F]/10 hover:text-[#3A3124]"
+                  }`}
+                >
+                  {menuCategories[cat].label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ВЫВОД ВСЕХ КАТЕГОРИЙ СПИСКОМ */}
+        <div className="space-y-24">
           {Object.keys(menuCategories).map((key) => {
             const cat = key as MenuCategory;
+            const categoryData = menuCategories[cat];
+
             return (
-              <Button
-                key={cat}
-                variant={activeCategory === cat ? "default" : "outline"}
-                onClick={() => setActiveCategory(cat)}
-                className={`rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 ${
-                  activeCategory === cat
-                    ? "bg-[#D4B98F] text-[#3A3124] border-[#D4B98F] shadow-lg shadow-[#D4B98F]/40"
-                    : "border-[#D4B98F]/30 text-[#6B5E48] hover:bg-[#D4B98F]/10 hover:shadow-md hover:shadow-[#D4B98F]/20"
-                }`}
-              >
-                {menuCategories[cat].label}
-              </Button>
+              <div key={cat} id={`category-${cat}`} className="scroll-mt-48">
+                <h3 className="font-serif text-3xl font-bold text-[#3A3124] mb-8 pb-2 border-b border-[#D4B98F]/30 inline-block">
+                  {categoryData.label}
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {categoryData.items.map((item) => (
+                    <div 
+                      key={item.name}
+                      onClick={() => setSelectedItem(item)}
+                      className="cursor-pointer h-full outline-none"
+                    >
+                      <Card className="group flex flex-col overflow-hidden rounded-3xl border-none bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
+                        {/* Фото блюда */}
+                        <div className="relative h-48 sm:h-56 overflow-hidden bg-gray-50 p-4">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                          />
+                        </div>
+                        
+                        {/* Описание блюда */}
+                        <CardContent className="p-5 flex flex-col flex-grow bg-white">
+                          <h3 className="font-bold text-[#3A3124] text-lg mb-2 leading-tight">
+                            {item.name}
+                          </h3>
+                          <p className="text-[#6B5E48] text-sm line-clamp-3 mb-4 flex-grow">
+                            {item.description}
+                          </p>
+                          
+                          {/* Интерактивная кнопка / Счетчик (Dodo Style) */}
+                          <div className="mt-auto">
+                            {!cartCounts[item.name] ? (
+                              <Button 
+                                onClick={(e) => handleAddToCart(e, item.name)}
+                                className="w-full bg-[#F3EFE8] text-[#3A3124] hover:bg-[#EBE2D4] hover:text-[#3A3124] rounded-xl font-bold py-6 transition-colors border-none shadow-none"
+                              >
+                                {item.price}
+                              </Button>
+                            ) : (
+                              <div 
+                                onClick={(e) => e.stopPropagation()} 
+                                className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-1 shadow-inner h-[48px]"
+                              >
+                                <button 
+                                  onClick={(e) => handleRemoveFromCart(e, item.name)}
+                                  className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors"
+                                >
+                                  <Minus className="w-4 h-4" />
+                                </button>
+                                <span className="font-bold text-[#3A3124] px-4">
+                                  {cartCounts[item.name]}
+                                </span>
+                                <button 
+                                  onClick={(e) => handleAddToCart(e, item.name)}
+                                  className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors"
+                                >
+                                  <Plus className="w-4 h-4" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  ))}
+                </div>
+              </div>
             );
           })}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {menuCategories[activeCategory].items.map((item) => (
-            <div 
-              key={item.name}
-              onClick={() => setSelectedItem(item)}
-              className="cursor-pointer h-full outline-none"
-            >
-              <Card className="group overflow-hidden rounded-3xl border border-white/60 bg-white/80 backdrop-blur-md shadow-xl shadow-[#D4B98F]/30 transition-all duration-500 hover:-translate-y-3 hover:shadow-2xl hover:shadow-[#D4B98F]/60 h-full">
-                <div className="relative h-56 overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                  <div className="absolute top-4 right-4 bg-[#D4B98F] text-[#3A3124] px-3 py-1.5 rounded-full font-bold text-sm shadow-md shadow-black/20">
-                    {item.price}
-                  </div>
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="font-serif text-xl font-bold text-[#3A3124] mb-2">
-                    {item.name}
-                  </h3>
-                  <p className="text-[#6B5E48] text-sm line-clamp-2">{item.description}</p>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
-        </div>
-
+        {/* МОДАЛЬНОЕ ОКНО ТОВАРА */}
         <Dialog 
           open={!!selectedItem} 
           onOpenChange={(open) => { 
@@ -219,16 +313,13 @@ const MenuSection = () => {
             } 
           }}
         >
-          <DialogContent className="bg-[#F5F1E6] border border-white/60 shadow-2xl shadow-[#D4B98F]/40 sm:max-w-lg rounded-3xl p-0 overflow-hidden
-            data-[state=open]:animate-in data-[state=closed]:animate-out 
-            data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 
-            data-[state=closed]:zoom-out-[0.8] data-[state=open]:zoom-in-[0.8]
-            duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          <DialogContent className="bg-white border-none shadow-2xl sm:max-w-[800px] rounded-[2rem] p-0 overflow-hidden flex flex-col md:flex-row gap-0"
           >
             {selectedItem && (
               <>
+                {/* Левая часть: Картинка с зумом */}
                 <div 
-                  className={`relative w-full h-80 overflow-hidden select-none bg-black/5 ${
+                  className={`relative w-full md:w-[400px] h-[300px] md:h-[500px] shrink-0 overflow-hidden select-none bg-gray-50 flex items-center justify-center p-8 ${
                     isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'
                   }`}
                   onMouseDown={handleMouseDown}
@@ -242,38 +333,59 @@ const MenuSection = () => {
                     alt={selectedItem.name}
                     draggable={false}
                     style={{
-                      transform: `translate(${position.x}px, ${position.y}px) scale(${isZoomed ? 2.5 : 1})`,
+                      transform: `translate(${position.x}px, ${position.y}px) scale(${isZoomed ? 2 : 1})`,
                       transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                     }}
-                    className="w-full h-full object-cover origin-center"
+                    className="w-full h-full object-contain origin-center"
                   />
-                  
-                  <div className={`absolute top-4 left-4 bg-black/40 backdrop-blur-md text-white p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`}>
+                  <div className={`absolute top-4 left-4 bg-black/5 text-gray-500 p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`}>
                     <ZoomIn className="w-5 h-5" />
                   </div>
-                  <div className={`absolute top-4 left-4 bg-[#D4B98F]/80 backdrop-blur-md text-[#3A3124] p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-100' : 'opacity-0'}`}>
+                  <div className={`absolute top-4 left-4 bg-[#D4B98F]/20 text-[#8C6D46] p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-100' : 'opacity-0'}`}>
                     <ZoomOut className="w-5 h-5" />
                   </div>
                 </div>
                 
-                <div className="p-6 md:p-8 bg-[#F5F1E6] relative z-10">
-                  <div className="flex justify-between items-start mb-4 gap-4">
-                    <DialogTitle className="font-serif text-3xl font-bold text-[#3A3124] leading-tight">
-                      {selectedItem.name}
-                    </DialogTitle>
-                    <span className="text-2xl font-bold text-[#D4B98F] whitespace-nowrap mt-1">{selectedItem.price}</span>
-                  </div>
+                {/* Правая часть: Описание и кнопка */}
+                <div className="flex flex-col p-6 md:p-10 w-full md:w-[400px]">
+                  <DialogTitle className="font-serif text-3xl font-bold text-[#3A3124] leading-tight mb-4">
+                    {selectedItem.name}
+                  </DialogTitle>
                   
-                  <DialogHeader>
+                  <DialogHeader className="flex-grow">
                     <DialogDescription className="text-[#6B5E48] text-base leading-relaxed">
                       {selectedItem.description}
                     </DialogDescription>
                   </DialogHeader>
                   
-                  <div className="mt-8 flex justify-end">
-                    <Button className="bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-full px-10 py-6 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-105 w-full sm:w-auto">
-                      Добавить в корзину
-                    </Button>
+                  {/* Кнопка добавления в модалке */}
+                  <div className="mt-8 pt-6 border-t border-gray-100">
+                    {!cartCounts[selectedItem.name] ? (
+                      <Button 
+                        onClick={(e) => handleAddToCart(e, selectedItem.name)}
+                        className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]"
+                      >
+                        Добавить за {selectedItem.price}
+                      </Button>
+                    ) : (
+                      <div className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-2 shadow-inner h-[56px]">
+                        <button 
+                          onClick={(e) => handleRemoveFromCart(e, selectedItem.name)}
+                          className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"
+                        >
+                          <Minus className="w-5 h-5" />
+                        </button>
+                        <span className="font-bold text-xl text-[#3A3124] px-6">
+                          {cartCounts[selectedItem.name]}
+                        </span>
+                        <button 
+                          onClick={(e) => handleAddToCart(e, selectedItem.name)}
+                          className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"
+                        >
+                          <Plus className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </>
