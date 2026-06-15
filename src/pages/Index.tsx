@@ -13,7 +13,10 @@ import Footer from "@/components/Footer";
 const Index = () => {
   const [loading, setLoading] = useState(true);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
-  const [isScrolled, setIsScrolled] = useState(false); // НОВОЕ: Отслеживаем позицию скролла
+  
+  // НОВОЕ: Теперь здесь хранится точное значение от 0 до 1
+  // 0 - мы на самом верху, 1 - мы проскроллили первый экран
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   // Микро-параллакс фона от мыши
   useEffect(() => {
@@ -26,13 +29,18 @@ const Index = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Инерционный скролл и отслеживание скролла для логотипа
+  // Инерционный скролл и точное отслеживание прогресса для логотипа
   useEffect(() => {
     if (loading) return;
 
     let targetScrollY = window.scrollY;
     let currentScrollY = window.scrollY;
     let isScrolling = false;
+
+    const calculateProgress = (scrollY: number) => {
+      // Рассчитываем процент скролла (от 0 до 1) относительно 85% первого экрана
+      return Math.min(1, Math.max(0, scrollY / (window.innerHeight * 0.85)));
+    };
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -49,8 +57,8 @@ const Index = () => {
       currentScrollY += (targetScrollY - currentScrollY) * 0.08;
       window.scrollTo(0, currentScrollY);
 
-      // Меняем цвет логотипа, если проскроллили 85% первого экрана
-      setIsScrolled(currentScrollY > window.innerHeight * 0.85);
+      // Обновляем прогресс плавно каждый кадр (60 FPS)
+      setScrollProgress(calculateProgress(currentScrollY));
 
       if (Math.abs(targetScrollY - currentScrollY) > 0.3) {
         requestAnimationFrame(updateScroll);
@@ -63,13 +71,13 @@ const Index = () => {
       if (!isScrolling) {
         targetScrollY = window.scrollY;
         currentScrollY = window.scrollY;
-        // Для обычного скролла (если тянут ползунок мышкой)
-        setIsScrolled(window.scrollY > window.innerHeight * 0.85);
+        // Обновляем прогресс, если пользователь тянет ползунок скролла мышкой
+        setScrollProgress(calculateProgress(window.scrollY));
       }
     };
 
-    // Проверяем позицию сразу после загрузки страницы
-    setIsScrolled(window.scrollY > window.innerHeight * 0.85);
+    // Задаем начальное значение при загрузке
+    setScrollProgress(calculateProgress(window.scrollY));
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("scroll", handleScrollSync);
@@ -120,19 +128,30 @@ const Index = () => {
 
       <main className="min-h-screen text-[#3A3124]">
         <nav className="fixed top-0 left-0 w-full z-40 p-6 md:p-8 flex items-center justify-between pointer-events-none">
-          <div className="pointer-events-auto">
-            {/* ИЗМЕНЕНИЯ ЗДЕСЬ: Динамическое изменение цвета (brightness-0 invert) при скролле */}
+          {/* ИЗМЕНЕНИЯ ЗДЕСЬ: Блок логотипа с идеальным наложением */}
+          <div className="pointer-events-auto relative flex items-center h-32 md:h-40">
+            {/* 1. Оригинальный (темный) логотип. 
+                Проявляется от 0 до 100% при скролле вниз */}
             <img 
               src="/images/logo (4).png" 
               alt="ТОККИМ" 
-              className={`h-32 md:h-40 w-auto object-contain drop-shadow-md transition-all duration-500 ease-in-out ${!isScrolled ? 'brightness-0 invert opacity-90' : 'opacity-100'}`} 
+              className="h-full w-auto object-contain drop-shadow-md" 
+              style={{ opacity: scrollProgress }}
+            />
+            {/* 2. Белый логотип (с фильтром). 
+                Исчезает при скролле вниз. Лежит ровно поверх первого. */}
+            <img 
+              src="/images/logo (4).png" 
+              alt="ТОККИМ" 
+              className="absolute top-0 left-0 h-full w-auto object-contain drop-shadow-md brightness-0 invert" 
+              style={{ opacity: (1 - scrollProgress) * 0.9 }}
             />
           </div>
         </nav>
 
         <HeroSection />
 
-        {/* Блок 1: Вернули прозрачность 60% */}
+        {/* Блок 1 */}
         <div style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
             <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
@@ -142,7 +161,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Блок 2: Вернули прозрачность 60% */}
+        {/* Блок 2 */}
         <div style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
             <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
