@@ -5,16 +5,35 @@ import { Button } from "@/components/ui/button";
 
 const HeroSection = () => {
   return (
-    <section 
-      className="hero-section relative flex items-center justify-center overflow-hidden min-h-screen" 
-      style={{ 
-        backgroundImage: "url('/images/hero-bg.jpg')", 
-        backgroundSize: "cover", 
-        backgroundPosition: "center", 
-        backgroundRepeat: "no-repeat" 
-      }}
-    >
-      <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-white/10 to-white/5" />
+    <section className="hero-section relative flex items-center justify-center overflow-hidden min-h-screen">
+      
+      {/* Видео на фоне */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover object-[50%_100%] z-0"
+        poster="/images/hero-bg.jpg"
+      >
+        <source src="/videos/hero-video.mp4" type="video/mp4" />
+      </video>
+
+      {/* НОВЫЙ БЛОК: Киноэффект — Блюр по краям */}
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none backdrop-blur-[12px]"
+        style={{
+          // Радиальная маска: 50% в центре - прозрачно (без блюра), к краям плавно размывается
+          maskImage: "radial-gradient(circle, transparent 50%, black 100%)",
+          WebkitMaskImage: "radial-gradient(circle, transparent 50%, black 100%)"
+        }}
+      />
+      
+      {/* НОВЫЙ БЛОК: Легкое затемнение по углам (виньетка) для глубины кадра */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle,transparent_60%,rgba(0,0,0,0.3)_100%)]" />
+
+      {/* 100% прозрачный слой (основной) */}
+      <div className="absolute inset-0 bg-transparent z-0 pointer-events-none" />
       
       <div className="relative z-10 px-6 text-center text-[#3A3124] w-full">
         <div className="max-w-5xl mx-auto w-full">
@@ -22,7 +41,7 @@ const HeroSection = () => {
             <img 
               src="/images/logo (4).png" 
               alt="ТОККИМ" 
-              className="w-full max-w-[350px] md:max-w-[600px] lg:max-w-[700px] object-contain mb-4 drop-shadow-2xl mx-auto relative left-6 md:left-12"
+              className="w-full max-w-[350px] md:max-w-[600px] lg:max-w-[700px] object-contain mb-4 drop-shadow-2xl mx-auto transform translate-x-16 md:translate-x-32"
             />
             <p className="text-xl md:text-2xl font-bold opacity-90 tracking-[0.2em] uppercase text-[#3A3124] drop-shadow-sm">
               Корейский стрит-фуд нового поколения
@@ -32,7 +51,7 @@ const HeroSection = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10 reveal-delay-100">
             <Button 
               size="lg" 
-              className="group px-10 py-6 rounded-full bg-[#D4B98F]/40 backdrop-blur-md border border-white/50 text-[#3A3124] font-bold text-lg hover:bg-[#D4B98F]/60 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105" 
+              className="group px-10 py-6 rounded-full bg-[#D4B98F]/60 border border-white/50 text-[#3A3124] font-bold text-lg hover:bg-[#D4B98F]/80 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105" 
               onClick={() => document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" })}
             >
               Посмотреть меню
@@ -42,7 +61,7 @@ const HeroSection = () => {
             <Button 
               variant="outline" 
               size="lg" 
-              className="group px-10 py-6 rounded-full bg-white/20 backdrop-blur-md border border-white/60 text-[#3A3124] font-bold text-lg hover:bg-white/40 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105" 
+              className="group px-10 py-6 rounded-full bg-white/40 border border-white/60 text-[#3A3124] font-bold text-lg hover:bg-white/60 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105" 
               onClick={() => document.getElementById("reservation")?.scrollIntoView({ behavior: "smooth" })}
             >
               <Calendar className="mr-2 h-6 w-6" />
@@ -52,11 +71,11 @@ const HeroSection = () => {
         </div>
       </div>
       
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 reveal-delay-200">
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 reveal-delay-200 z-10 pointer-events-none">
         <ArrowDown className="h-8 w-8 text-[#3A3124]/80 bounce" />
       </div>
 
-      {/* НОВЫЙ СЛОЙ: Мягкий градиент для плавного растворения картинки в бежевый цвет */}
+      {/* Нижний градиент */}
       <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-20" />
     </section>
   );

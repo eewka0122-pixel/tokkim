@@ -57,7 +57,7 @@ const Footer = () => {
 
         {/* Bottom */}
         <div className="border-t border-[#4A453A] pt-8 text-center text-[#6B5E48]">
-          <p>© {new Date().getFullYear()} ТОККИМ. Все права защищены.</p>
+          <p>© {new Date().getFullYear()} Вячеслав Ким. Все права защищены.</p>
         </div>
       </div>
     </footer>
