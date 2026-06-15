@@ -13,9 +13,6 @@ import Footer from "@/components/Footer";
 const Index = () => {
   const [loading, setLoading] = useState(true);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
-  
-  // НОВОЕ: Теперь здесь хранится точное значение от 0 до 1
-  // 0 - мы на самом верху, 1 - мы проскроллили первый экран
   const [scrollProgress, setScrollProgress] = useState(0);
 
   // Микро-параллакс фона от мыши
@@ -38,8 +35,16 @@ const Index = () => {
     let isScrolling = false;
 
     const calculateProgress = (scrollY: number) => {
-      // Рассчитываем процент скролла (от 0 до 1) относительно 85% первого экрана
-      return Math.min(1, Math.max(0, scrollY / (window.innerHeight * 0.85)));
+      // ИЗМЕНЕНИЯ ЗДЕСЬ: Ждем, пока проскроллим 70% экрана, прежде чем начать смену цвета.
+      // Полная смена цвета завершится на 90% экрана.
+      const startFade = window.innerHeight * 0.70;
+      const endFade = window.innerHeight * 0.90;
+
+      if (scrollY <= startFade) return 0; // Строго белый
+      if (scrollY >= endFade) return 1;   // Строго темный
+
+      // Плавный переход только в этом промежутке
+      return (scrollY - startFade) / (endFade - startFade);
     };
 
     const handleWheel = (e: WheelEvent) => {
@@ -57,7 +62,6 @@ const Index = () => {
       currentScrollY += (targetScrollY - currentScrollY) * 0.08;
       window.scrollTo(0, currentScrollY);
 
-      // Обновляем прогресс плавно каждый кадр (60 FPS)
       setScrollProgress(calculateProgress(currentScrollY));
 
       if (Math.abs(targetScrollY - currentScrollY) > 0.3) {
@@ -71,12 +75,10 @@ const Index = () => {
       if (!isScrolling) {
         targetScrollY = window.scrollY;
         currentScrollY = window.scrollY;
-        // Обновляем прогресс, если пользователь тянет ползунок скролла мышкой
         setScrollProgress(calculateProgress(window.scrollY));
       }
     };
 
-    // Задаем начальное значение при загрузке
     setScrollProgress(calculateProgress(window.scrollY));
 
     window.addEventListener("wheel", handleWheel, { passive: false });
@@ -128,23 +130,20 @@ const Index = () => {
 
       <main className="min-h-screen text-[#3A3124]">
         <nav className="fixed top-0 left-0 w-full z-40 p-6 md:p-8 flex items-center justify-between pointer-events-none">
-          {/* ИЗМЕНЕНИЯ ЗДЕСЬ: Блок логотипа с идеальным наложением */}
           <div className="pointer-events-auto relative flex items-center h-32 md:h-40">
-            {/* 1. Оригинальный (темный) логотип. 
-                Проявляется от 0 до 100% при скролле вниз */}
+            {/* 1. Оригинальный (темный) логотип. */}
             <img 
               src="/images/logo (4).png" 
               alt="ТОККИМ" 
               className="h-full w-auto object-contain drop-shadow-md" 
               style={{ opacity: scrollProgress }}
             />
-            {/* 2. Белый логотип (с фильтром). 
-                Исчезает при скролле вниз. Лежит ровно поверх первого. */}
+            {/* 2. Белый логотип (с фильтром). Убрал множитель 0.9 для более чистого белого цвета. */}
             <img 
               src="/images/logo (4).png" 
               alt="ТОККИМ" 
               className="absolute top-0 left-0 h-full w-auto object-contain drop-shadow-md brightness-0 invert" 
-              style={{ opacity: (1 - scrollProgress) * 0.9 }}
+              style={{ opacity: 1 - scrollProgress }}
             />
           </div>
         </nav>
