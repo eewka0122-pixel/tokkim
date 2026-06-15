@@ -101,14 +101,14 @@ const MenuSection = () => {
   // Локальное состояние корзины: {"Кимпаб с говядиной": 1, "Рамен": 2}
   const [cartCounts, setCartCounts] = useState<Record<string, number>>({});
 
-  // Состояния для зума картинки (твоя фича)
+  // Состояния для зума картинки
   const [isZoomed, setIsZoomed] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [clickStartPos, setClickStartPos] = useState({ x: 0, y: 0 });
 
-  // Логика отслеживания скролла (Scroll Spy) для липкого меню
+  // Логика отслеживания скролла (Scroll Spy)
   useEffect(() => {
     const handleScroll = () => {
       const sections = Object.keys(menuCategories);
@@ -118,7 +118,6 @@ const MenuSection = () => {
         const element = document.getElementById(`category-${section}`);
         if (element) {
           const rect = element.getBoundingClientRect();
-          // Если верхняя часть секции поднялась выше середины экрана, считаем её активной
           if (rect.top <= window.innerHeight / 2.5) {
             currentSection = section;
           }
@@ -134,15 +133,15 @@ const MenuSection = () => {
   const scrollToCategory = (categoryId: string) => {
     const element = document.getElementById(`category-${categoryId}`);
     if (element) {
-      // Отступ сверху, чтобы секция не заезжала под липкое меню (с учетом высоты шапки)
-      const yOffset = -150; 
+      // ИЗМЕНЕНИЕ ЗДЕСЬ: Уменьшил отступ, чтобы меню скроллилось идеально под новую прилипающую панель
+      const yOffset = -100; 
       const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
 
   const handleAddToCart = (e: React.MouseEvent, itemName: string) => {
-    e.stopPropagation(); // Чтобы не открывалось модальное окно при клике на кнопку
+    e.stopPropagation();
     setCartCounts(prev => ({ ...prev, [itemName]: (prev[itemName] || 0) + 1 }));
   };
 
@@ -198,9 +197,14 @@ const MenuSection = () => {
           </h2>
         </div>
 
-        {/* ПРИЛИПАЮЩЕЕ МЕНЮ КАТЕГОРИЙ (Dodo Style) */}
-        <div className="sticky top-20 md:top-[120px] z-30 bg-[#F5F1E6]/95 backdrop-blur-md py-4 border-b border-[#D4B98F]/20 mb-12 -mx-6 px-6 shadow-sm shadow-[#D4B98F]/5">
-          <div className="max-w-7xl mx-auto flex overflow-x-auto gap-2 sm:gap-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {/* ПРИЛИПАЮЩЕЕ МЕНЮ КАТЕГОРИЙ */}
+        {/* ИЗМЕНЕНИЕ ЗДЕСЬ: top-0 вместо top-[120px], чтобы полоса липла к самому верху */}
+        <div className="sticky top-0 z-30 bg-[#F5F1E6]/95 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 -mx-6 px-6 shadow-md shadow-[#D4B98F]/10">
+          <div className="max-w-7xl mx-auto flex items-center overflow-x-auto gap-2 sm:gap-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            
+            {/* ИЗМЕНЕНИЕ ЗДЕСЬ: Невидимый блок-распорка, сдвигающий кнопки так, чтобы их не закрывал логотип ТОККИМ */}
+            <div className="shrink-0 w-[90px] md:w-[220px]"></div>
+
             {Object.keys(menuCategories).map((key) => {
               const cat = key as MenuCategory;
               return (
@@ -258,7 +262,7 @@ const MenuSection = () => {
                             {item.description}
                           </p>
                           
-                          {/* Интерактивная кнопка / Счетчик (Dodo Style) */}
+                          {/* Интерактивная кнопка / Счетчик */}
                           <div className="mt-auto">
                             {!cartCounts[item.name] ? (
                               <Button 
@@ -317,7 +321,6 @@ const MenuSection = () => {
           >
             {selectedItem && (
               <>
-                {/* Левая часть: Картинка с зумом */}
                 <div 
                   className={`relative w-full md:w-[400px] h-[300px] md:h-[500px] shrink-0 overflow-hidden select-none bg-gray-50 flex items-center justify-center p-8 ${
                     isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'
@@ -346,7 +349,6 @@ const MenuSection = () => {
                   </div>
                 </div>
                 
-                {/* Правая часть: Описание и кнопка */}
                 <div className="flex flex-col p-6 md:p-10 w-full md:w-[400px]">
                   <DialogTitle className="font-serif text-3xl font-bold text-[#3A3124] leading-tight mb-4">
                     {selectedItem.name}
@@ -358,7 +360,6 @@ const MenuSection = () => {
                     </DialogDescription>
                   </DialogHeader>
                   
-                  {/* Кнопка добавления в модалке */}
                   <div className="mt-8 pt-6 border-t border-gray-100">
                     {!cartCounts[selectedItem.name] ? (
                       <Button 
