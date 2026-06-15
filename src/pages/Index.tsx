@@ -6,7 +6,6 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import PopularDishes from "@/components/PopularDishes";
 import MenuSection from "@/components/MenuSection";
-import GallerySection from "@/components/GallerySection";
 import ReservationSection from "@/components/ReservationSection";
 import Footer from "@/components/Footer";
 
@@ -35,7 +34,7 @@ const Index = () => {
     let isScrolling = false;
 
     const calculateProgress = (scrollY: number) => {
-      // ИЗМЕНЕНИЯ ЗДЕСЬ: Ждем, пока проскроллим 70% экрана, прежде чем начать смену цвета.
+      // Ждем, пока проскроллим 70% экрана, прежде чем начать смену цвета.
       // Полная смена цвета завершится на 90% экрана.
       const startFade = window.innerHeight * 0.70;
       const endFade = window.innerHeight * 0.90;
@@ -138,7 +137,7 @@ const Index = () => {
               className="h-full w-auto object-contain drop-shadow-md" 
               style={{ opacity: scrollProgress }}
             />
-            {/* 2. Белый логотип (с фильтром). Убрал множитель 0.9 для более чистого белого цвета. */}
+            {/* 2. Белый логотип (с фильтром). */}
             <img 
               src="/images/logo (4).png" 
               alt="ТОККИМ" 
@@ -160,12 +159,12 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Блок 2 */}
+        {/* Блок 2: Теперь здесь только Меню */}
         <div style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
             <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
             <MenuSection />
-            <GallerySection />
+            {/* GallerySection удалена отсюда */}
             <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
           </div>
         </div>
