@@ -146,8 +146,8 @@ const Index = () => {
         {/* НАВИГАЦИЯ (Шапка) */}
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
           
-          {/* ЛЕВАЯ КОЛОНКА: Логотип + Новые ссылки под ним */}
-          <div className="flex flex-col gap-4 md:gap-6 pointer-events-auto max-w-[80vw] md:max-w-none">
+          {/* ЛЕВАЯ КОЛОНКА: Логотип + Ссылки столбиком */}
+          <div className="flex flex-col gap-4 md:gap-6 pointer-events-auto">
             
             {/* Логотип */}
             <div 
@@ -168,21 +168,21 @@ const Index = () => {
               />
             </div>
 
-            {/* Ссылки (горизонтальный скролл на мобильных) */}
-            <div className="flex items-center gap-5 md:gap-8 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              <button onClick={() => scrollToSection("about")} className="whitespace-nowrap font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
+            {/* Ссылки (теперь выстроены в столбик) */}
+            <div className="flex flex-col items-start gap-3 pl-2">
+              <button onClick={() => scrollToSection("about")} className="text-left font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
                 О нас
               </button>
-              <button onClick={() => scrollToSection("menu")} className="whitespace-nowrap font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
+              <button onClick={() => scrollToSection("menu")} className="text-left font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
                 Наше меню
               </button>
-              <button onClick={() => scrollToSection("contacts")} className="whitespace-nowrap font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
+              <button onClick={() => scrollToSection("contacts")} className="text-left font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
                 Доставка
               </button>
-              <button onClick={() => scrollToSection("contacts")} className="whitespace-nowrap font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
+              <button onClick={() => scrollToSection("contacts")} className="text-left font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
                 Контакты
               </button>
-              <button onClick={() => scrollToSection("menu")} className="whitespace-nowrap font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
+              <button onClick={() => scrollToSection("menu")} className="text-left font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
                 Акции и скидки
               </button>
             </div>
