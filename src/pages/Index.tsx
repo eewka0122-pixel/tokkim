@@ -29,7 +29,7 @@ const Index = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Инерционный скролл и точное отслеживание прогресса для логотипа и кнопки
+  // Инерционный скролл и точное отслеживание прогресса для логотипа и кнопок
   useEffect(() => {
     if (loading) return;
 
@@ -95,7 +95,7 @@ const Index = () => {
 
   // Плавный скролл к якорям
   const scrollToSection = (id: string) => {
-    setIsNavOpen(false); // Закрываем меню при клике на ссылку
+    setIsNavOpen(false); 
     if (id === "top") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -110,11 +110,17 @@ const Index = () => {
 
   const bgPositionStyle = `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
 
-  // Динамические стили для кнопки меню (инверсия цвета)
+  // Динамические стили для кнопок и ссылок (инверсия цвета при скролле)
   const menuButtonStyle = {
     backgroundColor: scrollProgress > 0.5 ? 'rgba(212, 185, 143, 0.2)' : 'rgba(255, 255, 255, 0.1)',
     color: scrollProgress > 0.5 ? '#3A3124' : '#FFFFFF',
     borderColor: scrollProgress > 0.5 ? 'rgba(212, 185, 143, 0.3)' : 'rgba(255, 255, 255, 0.2)'
+  };
+
+  const linkStyle = {
+    color: scrollProgress > 0.5 ? '#3A3124' : '#FFFFFF',
+    textShadow: scrollProgress > 0.5 ? 'none' : '0 2px 8px rgba(0,0,0,0.5)',
+    transition: 'color 0.3s ease, opacity 0.2s ease'
   };
 
   return (
@@ -138,31 +144,52 @@ const Index = () => {
       <main className="min-h-screen text-[#3A3124]">
         
         {/* НАВИГАЦИЯ (Шапка) */}
-        <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-center justify-between pointer-events-none">
-          {/* Логотип-кнопка (на главную) */}
-          <div 
-            className="pointer-events-auto relative flex items-center h-32 md:h-40 cursor-pointer transition-transform hover:scale-105"
-            onClick={() => scrollToSection("top")}
-          >
-            {/* Темный логотип */}
-            <img 
-              src="/images/logo (4).png" 
-              alt="ТОККИМ" 
-              className="h-full w-auto object-contain drop-shadow-md" 
-              style={{ opacity: scrollProgress }}
-            />
-            {/* Белый логотип */}
-            <img 
-              src="/images/logo (4).png" 
-              alt="ТОККИМ" 
-              className="absolute top-0 left-0 h-full w-auto object-contain drop-shadow-md brightness-0 invert" 
-              style={{ opacity: 1 - scrollProgress }}
-            />
+        <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
+          
+          {/* ЛЕВАЯ КОЛОНКА: Логотип + Новые ссылки под ним */}
+          <div className="flex flex-col gap-4 md:gap-6 pointer-events-auto max-w-[80vw] md:max-w-none">
+            
+            {/* Логотип */}
+            <div 
+              className="relative flex items-center h-24 md:h-32 cursor-pointer transition-transform hover:scale-105 origin-left"
+              onClick={() => scrollToSection("top")}
+            >
+              <img 
+                src="/images/logo (4).png" 
+                alt="ТОККИМ" 
+                className="h-full w-auto object-contain drop-shadow-md" 
+                style={{ opacity: scrollProgress }}
+              />
+              <img 
+                src="/images/logo (4).png" 
+                alt="ТОККИМ" 
+                className="absolute top-0 left-0 h-full w-auto object-contain drop-shadow-md brightness-0 invert" 
+                style={{ opacity: 1 - scrollProgress }}
+              />
+            </div>
+
+            {/* Ссылки (горизонтальный скролл на мобильных) */}
+            <div className="flex items-center gap-5 md:gap-8 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              <button onClick={() => scrollToSection("about")} className="whitespace-nowrap font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
+                О нас
+              </button>
+              <button onClick={() => scrollToSection("menu")} className="whitespace-nowrap font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
+                Наше меню
+              </button>
+              <button onClick={() => scrollToSection("contacts")} className="whitespace-nowrap font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
+                Доставка
+              </button>
+              <button onClick={() => scrollToSection("contacts")} className="whitespace-nowrap font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
+                Контакты
+              </button>
+              <button onClick={() => scrollToSection("menu")} className="whitespace-nowrap font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
+                Акции и скидки
+              </button>
+            </div>
           </div>
 
-          {/* Контейнер для Кнопки и Выпадающего меню */}
+          {/* ПРАВАЯ КОЛОНКА: Кнопка Гамбургер */}
           <div className="pointer-events-auto relative">
-            {/* Кнопка Гамбургер */}
             <button
               onClick={() => setIsNavOpen(!isNavOpen)}
               className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border shadow-lg transition-all hover:scale-105"
