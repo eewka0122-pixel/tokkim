@@ -15,7 +15,7 @@ const Index = () => {
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
   
-  // Состояние для полноэкранного меню навигации
+  // Состояние для выпадающего меню навигации
   const [isNavOpen, setIsNavOpen] = useState(false);
 
   // Микро-параллакс фона от мыши
@@ -28,18 +28,6 @@ const Index = () => {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
-
-  // Блокировка скролла при открытом меню навигации
-  useEffect(() => {
-    if (isNavOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isNavOpen]);
 
   // Инерционный скролл и точное отслеживание прогресса для логотипа и кнопки
   useEffect(() => {
@@ -60,7 +48,6 @@ const Index = () => {
     };
 
     const handleWheel = (e: WheelEvent) => {
-      if (isNavOpen) return; // Отключаем инерцию, если открыто меню
       e.preventDefault();
       targetScrollY += e.deltaY * 0.55;
       targetScrollY = Math.max(0, Math.min(targetScrollY, document.documentElement.scrollHeight - window.innerHeight));
@@ -100,7 +87,7 @@ const Index = () => {
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("scroll", handleScrollSync);
     };
-  }, [loading, isNavOpen]);
+  }, [loading]);
 
   if (loading) {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
@@ -108,7 +95,7 @@ const Index = () => {
 
   // Плавный скролл к якорям
   const scrollToSection = (id: string) => {
-    setIsNavOpen(false);
+    setIsNavOpen(false); // Закрываем меню при клике на ссылку
     if (id === "top") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -173,56 +160,45 @@ const Index = () => {
             />
           </div>
 
-          {/* Кнопка Гамбургер */}
-          <button
-            onClick={() => setIsNavOpen(true)}
-            className={`pointer-events-auto w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border shadow-lg transition-all hover:scale-110 ${isNavOpen ? 'opacity-0 scale-75 pointer-events-none' : 'opacity-100 scale-100'}`}
-            style={menuButtonStyle}
-            aria-label="Меню"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-        </nav>
+          {/* Контейнер для Кнопки и Выпадающего меню */}
+          <div className="pointer-events-auto relative">
+            {/* Кнопка Гамбургер */}
+            <button
+              onClick={() => setIsNavOpen(!isNavOpen)}
+              className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border shadow-lg transition-all hover:scale-105"
+              style={menuButtonStyle}
+              aria-label="Меню"
+            >
+              {isNavOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
 
-        {/* ПОЛНОЭКРАННОЕ МЕНЮ НАВИГАЦИИ (Overlay) */}
-        <div 
-          className={`fixed inset-0 z-[110] bg-[#F5F1E6] flex flex-col items-center justify-center transition-all duration-500 ease-[0-[0.16,1,0.3,1]] ${
-            isNavOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
-          }`}
-        >
-          {/* Кнопка закрытия */}
-          <button
-            onClick={() => setIsNavOpen(false)}
-            className="absolute top-8 right-8 w-14 h-14 flex items-center justify-center rounded-full bg-[#D4B98F]/20 text-[#3A3124] hover:bg-[#D4B98F]/40 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
-
-          {/* Ссылки */}
-          <div className="flex flex-col items-center space-y-8 md:space-y-12">
-            <button 
-              onClick={() => scrollToSection("menu")}
-              className="font-serif text-4xl md:text-6xl font-bold text-[#3A3124] hover:text-[#8C6D46] transition-colors relative group"
+            {/* Выпадающее меню (Dropdown) */}
+            <div 
+              className={`absolute top-full right-0 mt-4 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] border border-gray-100 p-2 flex flex-col transition-all duration-300 origin-top-right ${
+                isNavOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'
+              }`}
             >
-              Меню
-              <span className="absolute -bottom-2 left-1/2 w-0 h-1 bg-[#8C6D46] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </button>
-            <button 
-              onClick={() => scrollToSection("about")}
-              className="font-serif text-4xl md:text-6xl font-bold text-[#3A3124] hover:text-[#8C6D46] transition-colors relative group"
-            >
-              О нас
-              <span className="absolute -bottom-2 left-1/2 w-0 h-1 bg-[#8C6D46] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </button>
-            <button 
-              onClick={() => scrollToSection("contacts")}
-              className="font-serif text-4xl md:text-6xl font-bold text-[#3A3124] hover:text-[#8C6D46] transition-colors relative group"
-            >
-              Контакты
-              <span className="absolute -bottom-2 left-1/2 w-0 h-1 bg-[#8C6D46] transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-            </button>
+              <button 
+                onClick={() => scrollToSection("menu")}
+                className="text-left px-5 py-3.5 rounded-xl font-bold text-[#3A3124] text-lg hover:bg-[#F5F1E6] hover:text-[#8C6D46] transition-colors"
+              >
+                Меню
+              </button>
+              <button 
+                onClick={() => scrollToSection("about")}
+                className="text-left px-5 py-3.5 rounded-xl font-bold text-[#3A3124] text-lg hover:bg-[#F5F1E6] hover:text-[#8C6D46] transition-colors"
+              >
+                О нас
+              </button>
+              <button 
+                onClick={() => scrollToSection("contacts")}
+                className="text-left px-5 py-3.5 rounded-xl font-bold text-[#3A3124] text-lg hover:bg-[#F5F1E6] hover:text-[#8C6D46] transition-colors"
+              >
+                Контакты
+              </button>
+            </div>
           </div>
-        </div>
+        </nav>
 
         <HeroSection />
 
