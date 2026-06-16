@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Menu, X } from "lucide-react";
 import LoadingScreen from "@/components/LoadingScreen";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
@@ -14,7 +13,6 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [isNavOpen, setIsNavOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
 
   // Единый источник правды для инерционного скролла
@@ -34,18 +32,6 @@ const Index = () => {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
-
-  // Блокировка скролла при открытом бургере
-  useEffect(() => {
-    if (isNavOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isNavOpen]);
 
   // Функция плавной анимации скролла
   const updateScroll = () => {
@@ -90,7 +76,6 @@ const Index = () => {
     if (loading) return;
 
     const handleWheel = (e: WheelEvent) => {
-      if (isNavOpen) return;
       e.preventDefault();
       
       scrollState.current.targetY += e.deltaY * 0.55;
@@ -119,7 +104,7 @@ const Index = () => {
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("scroll", handleScrollSync);
     };
-  }, [loading, isNavOpen]);
+  }, [loading]);
 
   if (loading) {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
@@ -127,8 +112,6 @@ const Index = () => {
 
   // СКРОЛЛ ПО КЛИКУ: Соединяем красную линию с красной точкой
   const scrollToSection = (id: string) => {
-    setIsNavOpen(false); 
-    
     if (id === "top") {
       scrollState.current.targetY = 0;
       if (!scrollState.current.isScrolling) {
@@ -140,7 +123,6 @@ const Index = () => {
     
     const element = document.getElementById(id);
     if (element) {
-      // Чтобы сам текст (красная линия) доехал до верха экрана (красной точки)
       const yOffset = window.innerWidth >= 768 ? 96 : 80; 
       
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
@@ -164,12 +146,6 @@ const Index = () => {
   const b = Math.round(255 - (255 - 36) * scrollProgress);
   const syncColor = `rgb(${r}, ${g}, ${b})`;
   const syncShadow = scrollProgress < 0.5 ? "0 2px 8px rgba(0,0,0,0.5)" : "none";
-
-  const btnR = Math.round(255 - (255 - 212) * scrollProgress);
-  const btnG = Math.round(255 - (255 - 185) * scrollProgress);
-  const btnB = Math.round(255 - (255 - 143) * scrollProgress);
-  const syncBtnBg = `rgba(${btnR}, ${btnG}, ${btnB}, ${0.1 + scrollProgress * 0.1})`;
-  const syncBtnBorder = `rgba(${btnR}, ${btnG}, ${btnB}, ${0.2 + scrollProgress * 0.1})`;
 
   const navLinks = [
     { id: "module-about", label: "О нас" },
@@ -232,35 +208,6 @@ const Index = () => {
                     activeSection === link.id ? "border border-[#3A3124]" : "border border-transparent hover:opacity-60"
                   }`} 
                   style={{ color: syncColor, textShadow: syncShadow }}
-                >
-                  {link.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Правый блок: Гамбургер */}
-          <div className="pointer-events-auto relative mt-2">
-            <button
-              onClick={() => setIsNavOpen(!isNavOpen)}
-              className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border shadow-lg transition-all hover:scale-105"
-              style={{ backgroundColor: syncBtnBg, borderColor: syncBtnBorder, color: syncColor }}
-              aria-label="Меню"
-            >
-              {isNavOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-
-            {/* Выпадающий список */}
-            <div 
-              className={`absolute top-full right-0 mt-4 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] border border-gray-100 p-2 flex flex-col transition-all duration-300 origin-top-right ${
-                isNavOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible pointer-events-none'
-              }`}
-            >
-              {navLinks.map((link, idx) => (
-                <button 
-                  key={`drop-${idx}`}
-                  onClick={() => scrollToSection(link.id)}
-                  className="text-left px-5 py-3.5 rounded-xl font-bold text-[#3A3124] text-lg hover:bg-[#F5F1E6] hover:text-[#8C6D46] transition-colors"
                 >
                   {link.label}
                 </button>
