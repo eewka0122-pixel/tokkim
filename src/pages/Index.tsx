@@ -6,7 +6,6 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import PopularDishes from "@/components/PopularDishes";
 import MenuSection from "@/components/MenuSection";
-import ReservationSection from "@/components/ReservationSection";
 import Footer from "@/components/Footer";
 
 const Index = () => {
@@ -164,13 +163,12 @@ const Index = () => {
           <div className="relative bg-[#F5F1E6]/60">
             <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
             <MenuSection />
-            {/* GallerySection удалена отсюда */}
             <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
           </div>
         </div>
         
+        {/* Блок футера (секция бронирования удалена) */}
         <div className="bg-[#F5F1E6] relative z-20">
-          <ReservationSection />
           <Footer />
         </div>
       </main>
