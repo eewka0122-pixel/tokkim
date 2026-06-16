@@ -159,7 +159,7 @@ const Index = () => {
     { id: "module-menu", label: "Наше меню" },
     { id: "module-contacts", label: "Доставка" },
     { id: "module-contacts", label: "Контакты" },
-    { id: "module-menu", label: "Акции и скидки" }, // Заглушка ведет на меню
+    { id: "module-menu", label: "Акции и скидки" },
   ];
 
   return (
@@ -182,8 +182,11 @@ const Index = () => {
 
       <main className="min-h-screen text-[#3A3124]">
         
-        {/* ФИКСИРОВАННАЯ ПЕЛЕНА СВЕРХУ ЭКРАНА */}
-        <div className="fixed top-0 left-0 w-full h-48 md:h-56 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-[90]" />
+        {/* ИСПРАВЛЕНО: ФИКСИРОВАННАЯ ПЕЛЕНА ПОЯВЛЯЕТСЯ ТОЛЬКО ПРИ СКРОЛЛЕ */}
+        <div 
+          className="fixed top-0 left-0 w-full h-48 md:h-56 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-[90]" 
+          style={{ opacity: scrollProgress }} 
+        />
 
         {/* НАВИГАЦИЯ */}
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
