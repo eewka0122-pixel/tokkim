@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { ZoomIn, ZoomOut, Plus, Minus, ShoppingBag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -133,7 +133,10 @@ const MenuSection = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [clickStartPos, setClickStartPos] = useState({ x: 0, y: 0 });
 
-  // Блокировка скролла фона при открытой корзине
+  // РЕФ ДЛЯ КОРЗИНЫ
+  const cartOverlayRef = useRef<HTMLDivElement>(null);
+
+  // Блокировка стандартного скролла
   useEffect(() => {
     if (isCartOpen) {
       document.body.style.overflow = "hidden";
@@ -142,6 +145,25 @@ const MenuSection = () => {
     }
     return () => {
       document.body.style.overflow = "";
+    };
+  }, [isCartOpen]);
+
+  // ПЕРЕХВАТЧИК: Блокировка кастомного инерционного скролла из Index.tsx
+  useEffect(() => {
+    const el = cartOverlayRef.current;
+    if (!el || !isCartOpen) return;
+
+    const stopScrollPropagation = (e: Event) => {
+      e.stopPropagation();
+    };
+
+    // Слушаем события прокрутки на контейнере корзины и не отдаем их окну
+    el.addEventListener("wheel", stopScrollPropagation, { passive: false });
+    el.addEventListener("touchmove", stopScrollPropagation, { passive: false });
+
+    return () => {
+      el.removeEventListener("wheel", stopScrollPropagation);
+      el.removeEventListener("touchmove", stopScrollPropagation);
     };
   }, [isCartOpen]);
 
@@ -471,7 +493,7 @@ const MenuSection = () => {
       </div>
 
       {/* БОКОВАЯ ПАНЕЛЬ КОРЗИНЫ (DRAWER) */}
-      <div className={`fixed inset-0 z-[60] transition-opacity duration-300 ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+      <div ref={cartOverlayRef} className={`fixed inset-0 z-[60] transition-opacity duration-300 ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
         {/* Overlay */}
         <div 
           className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
@@ -480,7 +502,7 @@ const MenuSection = () => {
         
         {/* Sidebar */}
         <div className={`absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isCartOpen ? "translate-x-0" : "translate-x-full"}`}>
-          <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
             <h2 className="font-serif text-2xl font-bold text-[#3A3124]">Корзина</h2>
             <button 
               onClick={() => setIsCartOpen(false)}
@@ -490,7 +512,7 @@ const MenuSection = () => {
             </button>
           </div>
 
-          <div className="flex-grow overflow-y-auto p-6 space-y-6">
+          <div className="flex-grow overflow-y-auto p-6 space-y-6 overscroll-contain">
             {Object.keys(cartCounts).length === 0 ? (
               <div className="text-center text-gray-500 mt-10">
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-20" />
