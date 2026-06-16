@@ -15,6 +15,7 @@ const Index = () => {
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
 
   // Микро-параллакс фона
   useEffect(() => {
@@ -74,6 +75,7 @@ const Index = () => {
       window.scrollTo(0, currentScrollY);
 
       setScrollProgress(calculateProgress(currentScrollY));
+      updateActiveSection(currentScrollY);
 
       if (Math.abs(targetScrollY - currentScrollY) > 0.3) {
         requestAnimationFrame(updateScroll);
@@ -87,10 +89,27 @@ const Index = () => {
         targetScrollY = window.scrollY;
         currentScrollY = window.scrollY;
         setScrollProgress(calculateProgress(window.scrollY));
+        updateActiveSection(window.scrollY);
       }
     };
 
+    const updateActiveSection = (scrollY: number) => {
+      const sections = ["module-about", "module-menu", "module-contacts"];
+      let current = "";
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 2) {
+            current = section;
+          }
+        }
+      }
+      setActiveSection(current);
+    };
+
     setScrollProgress(calculateProgress(window.scrollY));
+    updateActiveSection(window.scrollY);
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("scroll", handleScrollSync);
@@ -104,7 +123,7 @@ const Index = () => {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // Плавный выезд модулей (Точная привязка к контенту)
+  // Плавный выезд модулей с идеальным отступом под шапку
   const scrollToSection = (id: string) => {
     setIsNavOpen(false); 
     if (id === "top") {
@@ -113,9 +132,11 @@ const Index = () => {
     }
     const element = document.getElementById(id);
     if (element) {
-      const yOffset = 0; 
+      // Идеальный отступ (-110px), чтобы контент останавливался ровно под логотипом и пеленой
+      const yOffset = -110; 
       const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
+      setActiveSection(id);
     }
   };
 
@@ -134,13 +155,12 @@ const Index = () => {
   const syncBtnBg = `rgba(${btnR}, ${btnG}, ${btnB}, ${0.1 + scrollProgress * 0.1})`;
   const syncBtnBorder = `rgba(${btnR}, ${btnG}, ${btnB}, ${0.2 + scrollProgress * 0.1})`;
 
-  // Чистые ссылки на оригинальные внутренние id
   const navLinks = [
-    { id: "about", label: "О нас" },
-    { id: "menu", label: "Наше меню" },
-    { id: "contacts", label: "Доставка" },
-    { id: "contacts", label: "Контакты" },
-    { id: "menu", label: "Акции и скидки" },
+    { id: "module-about", label: "О нас" },
+    { id: "module-menu", label: "Наше меню" },
+    { id: "module-contacts", label: "Доставка" },
+    { id: "module-contacts", label: "Контакты" },
+    { id: "module-menu", label: "Акции и скидки" },
   ];
 
   return (
@@ -166,7 +186,7 @@ const Index = () => {
         {/* НАВИГАЦИЯ */}
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
           
-          {/* Левый блок: Логотип и чистое текстовое меню */}
+          {/* Левый блок: Логотип и меню */}
           <div className="flex flex-col items-start pointer-events-auto">
             <div 
               className="relative flex items-center h-20 md:h-24 cursor-pointer transition-transform hover:scale-105 origin-left z-10"
@@ -186,12 +206,15 @@ const Index = () => {
               />
             </div>
 
-            <div className="flex flex-col items-start gap-1.5 md:gap-2 -mt-2 pl-1">
+            {/* Ссылки с обводкой активного пункта */}
+            <div className="flex flex-col items-start gap-1 md:gap-1.5 -mt-2 pl-1">
               {navLinks.map((link, idx) => (
                 <button 
                   key={idx}
                   onClick={() => scrollToSection(link.id)} 
-                  className="text-left font-bold text-sm md:text-base uppercase tracking-wider transition-opacity duration-200 hover:opacity-60" 
+                  className={`text-left font-bold text-sm md:text-base uppercase tracking-wider transition-all duration-200 px-2 py-0.5 -ml-2 rounded-sm ${
+                    activeSection === link.id ? "border border-current" : "border border-transparent hover:opacity-60"
+                  }`} 
                   style={{ color: syncColor, textShadow: syncShadow }}
                 >
                   {link.label}
@@ -233,7 +256,7 @@ const Index = () => {
         <HeroSection />
 
         {/* Блок 1: О НАС */}
-        <div style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
+        <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
             <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
             <AboutSection />
@@ -243,7 +266,7 @@ const Index = () => {
         </div>
 
         {/* Блок 2: НАШЕ МЕНЮ */}
-        <div style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
+        <div id="module-menu" style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
             <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
             <MenuSection />
@@ -252,7 +275,7 @@ const Index = () => {
         </div>
         
         {/* Блок 3: КОНТАКТЫ И ДОСТАВКА */}
-        <div className="bg-[#F5F1E6] relative z-20">
+        <div id="module-contacts" className="bg-[#F5F1E6] relative z-20 pt-10">
           <ReservationSection />
           <Footer />
         </div>
