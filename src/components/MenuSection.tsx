@@ -123,8 +123,19 @@ const MenuSection = () => {
   const [cartCounts, setCartCounts] = useState<Record<string, number>>({});
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Состояния для формы заказа
-  const [formData, setFormData] = useState({ name: "", phone: "", address: "", payment: "card" });
+  // Новые детальные состояния для формы заказа
+  const [formData, setFormData] = useState({ 
+    name: "", 
+    email: "",
+    phone: "", 
+    deliveryMethod: "delivery", // 'delivery' или 'pickup'
+    address: "", 
+    pickupAddress: "г. Раменское, ул. Бронницкая, д. 19а",
+    payment: "card", // 'card', 'cash', или 'online'
+    changeFrom: "",
+    persons: "1",
+    notes: ""
+  });
 
   // Состояния для зума картинки
   const [isZoomed, setIsZoomed] = useState(false);
@@ -157,7 +168,6 @@ const MenuSection = () => {
       e.stopPropagation();
     };
 
-    // Слушаем события прокрутки на контейнере корзины и не отдаем их окну
     el.addEventListener("wheel", stopScrollPropagation, { passive: false });
     el.addEventListener("touchmove", stopScrollPropagation, { passive: false });
 
@@ -255,8 +265,12 @@ const MenuSection = () => {
 
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Order submitted:", { items: cartCounts, total: cartTotal, ...formData });
-    alert(`Заказ на сумму ${cartTotal} ₽ успешно оформлен!`);
+    // Подготовленный payload данных. 
+    // В будущем его можно передать в Telegram-бота (например, запущенного локально из C:\botsTG\bot_zakazov)
+    const orderData = { items: cartCounts, total: cartTotal, ...formData };
+    console.log("Формирование и отправка заказа:", orderData);
+    
+    alert(`Заказ на сумму ${cartTotal} ₽ успешно оформлен и передан в работу!`);
     setCartCounts({});
     setIsCartOpen(false);
   };
@@ -501,9 +515,9 @@ const MenuSection = () => {
         />
         
         {/* Sidebar */}
-        <div className={`absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isCartOpen ? "translate-x-0" : "translate-x-full"}`}>
+        <div className={`absolute top-0 right-0 h-full w-full max-w-[500px] bg-white shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isCartOpen ? "translate-x-0" : "translate-x-full"}`}>
           <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
-            <h2 className="font-serif text-2xl font-bold text-[#3A3124]">Корзина</h2>
+            <h2 className="font-serif text-2xl font-bold text-[#3A3124]">Оформление заказа</h2>
             <button 
               onClick={() => setIsCartOpen(false)}
               className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors text-gray-500"
@@ -512,7 +526,9 @@ const MenuSection = () => {
             </button>
           </div>
 
-          <div className="flex-grow overflow-y-auto p-6 space-y-6 overscroll-contain">
+          <div className="flex-grow overflow-y-auto p-6 space-y-8 overscroll-contain">
+            
+            {/* БЛОК ТОВАРОВ */}
             {Object.keys(cartCounts).length === 0 ? (
               <div className="text-center text-gray-500 mt-10">
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-20" />
@@ -548,49 +564,124 @@ const MenuSection = () => {
               </div>
             )}
 
+            {/* НОВАЯ ФОРМА ОФОРМЛЕНИЯ ЗАКАЗА ИЗ РЕФЕРЕНСА */}
             {Object.keys(cartCounts).length > 0 && (
-              <div className="mt-8 border-t border-gray-100 pt-6">
-                <h3 className="font-bold text-lg mb-4 text-[#3A3124]">Оформление заказа</h3>
-                <form id="orderForm" onSubmit={handleSubmitOrder} className="space-y-4">
-                  <input 
-                    required type="text" placeholder="Имя" 
-                    className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50"
-                    value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  />
-                  <input 
-                    required type="tel" placeholder="Телефон" 
-                    className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50"
-                    value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  />
-                  <input 
-                    required type="text" placeholder="Улица, дом, квартира" 
-                    className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50"
-                    value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})}
-                  />
-                  <div className="flex gap-4">
-                    <label className={`flex-1 p-3 rounded-xl border text-center cursor-pointer transition-all text-sm font-medium ${formData.payment === 'card' ? 'border-[#D4B98F] bg-[#D4B98F]/10 text-[#3A3124]' : 'border-gray-200 bg-gray-50 text-gray-500'}`}>
-                      <input type="radio" name="payment" className="hidden" checked={formData.payment === 'card'} onChange={() => setFormData({...formData, payment: 'card'})} />
-                      Картой курьеру
-                    </label>
-                    <label className={`flex-1 p-3 rounded-xl border text-center cursor-pointer transition-all text-sm font-medium ${formData.payment === 'cash' ? 'border-[#D4B98F] bg-[#D4B98F]/10 text-[#3A3124]' : 'border-gray-200 bg-gray-50 text-gray-500'}`}>
-                      <input type="radio" name="payment" className="hidden" checked={formData.payment === 'cash'} onChange={() => setFormData({...formData, payment: 'cash'})} />
-                      Наличными
-                    </label>
+              <form id="orderForm" onSubmit={handleSubmitOrder} className="space-y-6 pt-2">
+                
+                {/* 1. Личная информация */}
+                <div className="space-y-4">
+                  <div className="flex items-center text-xs font-bold uppercase tracking-widest text-gray-400">
+                    <span className="flex-shrink-0 mr-3">Личная информация</span>
+                    <div className="flex-grow border-t border-gray-100"></div>
                   </div>
-                </form>
-              </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input 
+                      required type="text" placeholder="Ваше имя *" 
+                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
+                      value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    />
+                    <input 
+                      type="email" placeholder="Эл. почта" 
+                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
+                      value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    />
+                    <input 
+                      required type="tel" placeholder="Телефон *" 
+                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm sm:col-span-2"
+                      value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                {/* 2. Способ доставки */}
+                <div className="space-y-4">
+                  <div className="flex items-center text-xs font-bold uppercase tracking-widest text-gray-400">
+                    <span className="flex-shrink-0 mr-3">Способ доставки</span>
+                    <div className="flex-grow border-t border-gray-100"></div>
+                  </div>
+                  <select 
+                    className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm cursor-pointer"
+                    value={formData.deliveryMethod} onChange={(e) => setFormData({...formData, deliveryMethod: e.target.value})}
+                  >
+                    <option value="delivery">Доставка курьером</option>
+                    <option value="pickup">Самовывоз</option>
+                  </select>
+                </div>
+
+                {/* 3. Адрес (Динамический) */}
+                <div className="space-y-4">
+                  <div className="flex items-center text-xs font-bold uppercase tracking-widest text-gray-400">
+                    <span className="flex-shrink-0 mr-3">
+                      {formData.deliveryMethod === 'pickup' ? 'Адрес самовывоза' : 'Адрес доставки'}
+                    </span>
+                    <div className="flex-grow border-t border-gray-100"></div>
+                  </div>
+                  {formData.deliveryMethod === 'pickup' ? (
+                    <select 
+                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm cursor-pointer"
+                      value={formData.pickupAddress} onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
+                    >
+                      <option value="г. Раменское, ул. Бронницкая, д. 19а">г. Раменское, ул. Бронницкая, д. 19а</option>
+                      <option value="г. Москва, Новый Арбат, д. 15">г. Москва, Новый Арбат, д. 15</option>
+                    </select>
+                  ) : (
+                    <input 
+                      required type="text" placeholder="Улица, дом, квартира *" 
+                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
+                      value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    />
+                  )}
+                </div>
+
+                {/* 4. Дополнительная информация */}
+                <div className="space-y-4">
+                  <div className="flex items-center text-xs font-bold uppercase tracking-widest text-gray-400">
+                    <span className="flex-shrink-0 mr-3">Дополнительная информация</span>
+                    <div className="flex-grow border-t border-gray-100"></div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <select 
+                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm cursor-pointer"
+                      value={formData.payment} onChange={(e) => setFormData({...formData, payment: e.target.value})}
+                    >
+                      <option value="card">Картой курьеру</option>
+                      <option value="cash">Наличными</option>
+                      <option value="online">Онлайн</option>
+                    </select>
+                    
+                    <input 
+                      type="text" placeholder="Сдача с" 
+                      disabled={formData.payment !== 'cash'}
+                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm disabled:opacity-50 disabled:bg-gray-100"
+                      value={formData.changeFrom} onChange={(e) => setFormData({...formData, changeFrom: e.target.value})}
+                    />
+                    
+                    <input 
+                      type="number" min="1" placeholder="Персон" 
+                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
+                      value={formData.persons} onChange={(e) => setFormData({...formData, persons: e.target.value})}
+                    />
+                  </div>
+                  
+                  <textarea 
+                    placeholder="Примечание к заказу" rows={2}
+                    className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm resize-none"
+                    value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                  />
+                </div>
+              </form>
             )}
           </div>
 
           {Object.keys(cartCounts).length > 0 && (
-            <div className="p-6 bg-white border-t border-gray-100 shrink-0">
+            <div className="p-6 bg-white border-t border-gray-100 shrink-0 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)]">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-gray-500">Итого:</span>
-                <span className="text-2xl font-bold text-[#3A3124]">{cartTotal} ₽</span>
+                <span className="text-3xl font-bold text-[#3A3124]">{cartTotal} ₽</span>
               </div>
               <Button 
                 type="submit" form="orderForm"
-                className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-6 font-bold text-lg shadow-lg transition-all"
+                className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]"
               >
                 Заказать доставку
               </Button>
