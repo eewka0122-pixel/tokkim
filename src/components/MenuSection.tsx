@@ -133,6 +133,18 @@ const MenuSection = () => {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [clickStartPos, setClickStartPos] = useState({ x: 0, y: 0 });
 
+  // Блокировка скролла фона при открытой корзине
+  useEffect(() => {
+    if (isCartOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isCartOpen]);
+
   // Логика отслеживания скролла (Scroll Spy)
   useEffect(() => {
     const handleScroll = () => {
@@ -221,7 +233,6 @@ const MenuSection = () => {
 
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here we can easily integrate with your Telegram bot logic later
     console.log("Order submitted:", { items: cartCounts, total: cartTotal, ...formData });
     alert(`Заказ на сумму ${cartTotal} ₽ успешно оформлен!`);
     setCartCounts({});
