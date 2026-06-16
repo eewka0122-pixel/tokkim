@@ -123,7 +123,7 @@ const Index = () => {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // Скролл строго в край экрана (под фиксированную пелену)
+  // Скролл строго в край экрана
   const scrollToSection = (id: string) => {
     setIsNavOpen(false); 
     if (id === "top") {
@@ -181,12 +181,6 @@ const Index = () => {
       `}} />
 
       <main className="min-h-screen text-[#3A3124]">
-        
-        {/* ИСПРАВЛЕНО: ФИКСИРОВАННАЯ ПЕЛЕНА ПОЯВЛЯЕТСЯ ТОЛЬКО ПРИ СКРОЛЛЕ */}
-        <div 
-          className="fixed top-0 left-0 w-full h-48 md:h-56 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-[90]" 
-          style={{ opacity: scrollProgress }} 
-        />
 
         {/* НАВИГАЦИЯ */}
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
