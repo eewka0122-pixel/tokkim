@@ -140,9 +140,7 @@ const Index = () => {
     
     const element = document.getElementById(id);
     if (element) {
-      // Чтобы сам текст (красная линия) доехал до верха экрана (красной точки), 
-      // мы прибавляем к скроллу размер невидимого отступа (padding).
-      // На ПК он 96px (pt-24), на мобилках 80px (pt-20).
+      // Чтобы сам текст (красная линия) доехал до верха экрана (красной точки)
       const yOffset = window.innerWidth >= 768 ? 96 : 80; 
       
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
@@ -294,15 +292,23 @@ const Index = () => {
         {/* Блок 1: О НАС */}
         <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
-            <AboutSection />
-            <PopularDishes />
+            {/* Идеальный блюр стыка: короткий и строго ПОД контентом (z-0) */}
+            <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
+            <div className="relative z-10">
+              <AboutSection />
+              <PopularDishes />
+            </div>
           </div>
         </div>
 
         {/* Блок 2: НАШЕ МЕНЮ */}
         <div id="module-menu" style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
-            <MenuSection />
+            {/* Идеальный блюр стыка: короткий и строго ПОД контентом (z-0) */}
+            <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
+            <div className="relative z-10">
+              <MenuSection />
+            </div>
           </div>
         </div>
         
