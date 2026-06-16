@@ -278,7 +278,7 @@ const MenuSection = () => {
 
   return (
     <>
-      <section id="menu" className="pt-[110px] pb-16 md:pt-[130px] md:pb-24 bg-transparent relative">
+      <section id="menu" className="pt-20 pb-16 md:pt-24 md:pb-24 bg-transparent relative">
         
         {/* Заголовок блока */}
         <div className="max-w-7xl mx-auto px-6">
@@ -292,8 +292,8 @@ const MenuSection = () => {
           </div>
         </div>
 
-        {/* ПРИЛИПАЮЩЕЕ МЕНЮ КАТЕГОРИЙ (Исправлен отступ, чтобы не пряталось под шапку) */}
-        <div className="sticky top-[80px] md:top-[110px] z-30 w-full bg-[#F5F1E6]/95 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
+        {/* ПРИЛИПАЮЩЕЕ МЕНЮ КАТЕГОРИЙ */}
+        <div className="sticky top-[80px] md:top-[96px] z-30 w-full bg-[#F5F1E6]/95 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
           <div className="max-w-7xl mx-auto px-6 flex items-center overflow-x-auto gap-2 sm:gap-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <div className="shrink-0 w-[90px] md:w-[220px]"></div>
 
