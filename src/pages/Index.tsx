@@ -14,14 +14,9 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
-  
-  // Состояние для выпадающего меню-бургера справа
   const [isNavOpen, setIsNavOpen] = useState(false);
-  
-  // Состояние для рамки активного раздела слева
-  const [activeSection, setActiveSection] = useState("");
 
-  // Микро-параллакс фона от мыши
+  // Микро-параллакс фона
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth) - 0.5;
@@ -32,7 +27,7 @@ const Index = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Блокировка скролла всей страницы при открытом полноэкранном модуле
+  // Блокировка скролла при открытом бургере
   useEffect(() => {
     if (isNavOpen) {
       document.body.style.overflow = "hidden";
@@ -44,7 +39,7 @@ const Index = () => {
     };
   }, [isNavOpen]);
 
-  // Инерционный скролл и точное отслеживание прогресса
+  // Скролл и отслеживание прогресса
   useEffect(() => {
     if (loading) return;
 
@@ -63,6 +58,7 @@ const Index = () => {
     };
 
     const handleWheel = (e: WheelEvent) => {
+      if (isNavOpen) return;
       e.preventDefault();
       targetScrollY += e.deltaY * 0.55;
       targetScrollY = Math.max(0, Math.min(targetScrollY, document.documentElement.scrollHeight - window.innerHeight));
@@ -78,7 +74,6 @@ const Index = () => {
       window.scrollTo(0, currentScrollY);
 
       setScrollProgress(calculateProgress(currentScrollY));
-      updateActiveSection(currentScrollY);
 
       if (Math.abs(targetScrollY - currentScrollY) > 0.3) {
         requestAnimationFrame(updateScroll);
@@ -92,28 +87,10 @@ const Index = () => {
         targetScrollY = window.scrollY;
         currentScrollY = window.scrollY;
         setScrollProgress(calculateProgress(window.scrollY));
-        updateActiveSection(window.scrollY);
       }
-    };
-
-    // Определяем, какой модуль сейчас на экране, чтобы включить рамку
-    const updateActiveSection = (scrollY: number) => {
-      const sections = ["module-about", "module-menu", "module-contacts"];
-      let current = "";
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= window.innerHeight / 2) {
-            current = section;
-          }
-        }
-      }
-      setActiveSection(current);
     };
 
     setScrollProgress(calculateProgress(window.scrollY));
-    updateActiveSection(window.scrollY);
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("scroll", handleScrollSync);
@@ -121,13 +98,13 @@ const Index = () => {
       window.removeEventListener("wheel", handleWheel);
       window.removeEventListener("scroll", handleScrollSync);
     };
-  }, [loading]);
+  }, [loading, isNavOpen]);
 
   if (loading) {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // Плавный скролл к модулям СТРОГО В КРАЙ ЭКРАНА (Отступ 0)
+  // Плавный выезд модулей (Точная привязка к контенту)
   const scrollToSection = (id: string) => {
     setIsNavOpen(false); 
     if (id === "top") {
@@ -139,13 +116,12 @@ const Index = () => {
       const yOffset = 0; 
       const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
-      setActiveSection(id);
     }
   };
 
   const bgPositionStyle = `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
 
-  // Синхронная интерполяция цвета для всех элементов
+  // Интерполяция цвета
   const r = Math.round(255 - (255 - 58) * scrollProgress);
   const g = Math.round(255 - (255 - 49) * scrollProgress);
   const b = Math.round(255 - (255 - 36) * scrollProgress);
@@ -158,13 +134,13 @@ const Index = () => {
   const syncBtnBg = `rgba(${btnR}, ${btnG}, ${btnB}, ${0.1 + scrollProgress * 0.1})`;
   const syncBtnBorder = `rgba(${btnR}, ${btnG}, ${btnB}, ${0.2 + scrollProgress * 0.1})`;
 
-  // Привязка ссылок к новым ID оберток
+  // Чистые ссылки на оригинальные внутренние id
   const navLinks = [
-    { id: "module-about", label: "О нас" },
-    { id: "module-menu", label: "Наше меню" },
-    { id: "module-contacts", label: "Доставка" },
-    { id: "module-contacts", label: "Контакты" },
-    { id: "module-menu", label: "Акции и скидки" },
+    { id: "about", label: "О нас" },
+    { id: "menu", label: "Наше меню" },
+    { id: "contacts", label: "Доставка" },
+    { id: "contacts", label: "Контакты" },
+    { id: "menu", label: "Акции и скидки" },
   ];
 
   return (
@@ -190,10 +166,8 @@ const Index = () => {
         {/* НАВИГАЦИЯ */}
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
           
-          {/* Левый блок: Логотип и меню (ВСЕГДА ВИДИМО) */}
+          {/* Левый блок: Логотип и чистое текстовое меню */}
           <div className="flex flex-col items-start pointer-events-auto">
-            
-            {/* Логотип */}
             <div 
               className="relative flex items-center h-20 md:h-24 cursor-pointer transition-transform hover:scale-105 origin-left z-10"
               onClick={() => scrollToSection("top")}
@@ -212,15 +186,12 @@ const Index = () => {
               />
             </div>
 
-            {/* Ссылки с четкой рамкой активного состояния */}
-            <div className="flex flex-col items-start gap-2 mt-4">
+            <div className="flex flex-col items-start gap-1.5 md:gap-2 -mt-2 pl-1">
               {navLinks.map((link, idx) => (
                 <button 
                   key={idx}
                   onClick={() => scrollToSection(link.id)} 
-                  className={`text-left font-bold text-sm md:text-base uppercase tracking-wider transition-all duration-200 px-2 py-0.5 ${
-                    activeSection === link.id ? "border border-current" : "border border-transparent hover:opacity-60"
-                  }`} 
+                  className="text-left font-bold text-sm md:text-base uppercase tracking-wider transition-opacity duration-200 hover:opacity-60" 
                   style={{ color: syncColor, textShadow: syncShadow }}
                 >
                   {link.label}
@@ -229,7 +200,7 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Правый блок: Гамбургер с компактным выпадающим списком */}
+          {/* Правый блок: Гамбургер */}
           <div className="pointer-events-auto relative">
             <button
               onClick={() => setIsNavOpen(!isNavOpen)}
@@ -240,7 +211,7 @@ const Index = () => {
               {isNavOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
 
-            {/* Компактный Dropdown */}
+            {/* Выпадающий список */}
             <div 
               className={`absolute top-full right-0 mt-4 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.15)] border border-gray-100 p-2 flex flex-col transition-all duration-300 origin-top-right ${
                 isNavOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible pointer-events-none'
@@ -262,24 +233,26 @@ const Index = () => {
         <HeroSection />
 
         {/* Блок 1: О НАС */}
-        {/* ГРАДИЕНТЫ ПОЛНОСТЬЮ УДАЛЕНЫ */}
-        <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
+        <div style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
+            <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
             <AboutSection />
             <PopularDishes />
+            <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
           </div>
         </div>
 
         {/* Блок 2: НАШЕ МЕНЮ */}
-        {/* ГРАДИЕНТЫ ПОЛНОСТЬЮ УДАЛЕНЫ */}
-        <div id="module-menu" style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
+        <div style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
+            <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
             <MenuSection />
+            <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
           </div>
         </div>
         
         {/* Блок 3: КОНТАКТЫ И ДОСТАВКА */}
-        <div id="module-contacts" className="bg-[#F5F1E6] relative z-20">
+        <div className="bg-[#F5F1E6] relative z-20">
           <ReservationSection />
           <Footer />
         </div>
