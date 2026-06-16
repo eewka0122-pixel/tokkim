@@ -289,8 +289,8 @@ const MenuSection = () => {
           </div>
         </div>
 
-        {/* ПРИЛИПАЮЩЕЕ МЕНЮ КАТЕГОРИЙ (Вернул top-0) */}
-        <div className="sticky top-0 z-30 w-full bg-[#F5F1E6]/95 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
+        {/* ПРИЛИПАЮЩЕЕ МЕНЮ КАТЕГОРИЙ (Эффект стекла: bg-[#F5F1E6]/40 + backdrop-blur-md) */}
+        <div className="sticky top-0 z-30 w-full bg-[#F5F1E6]/40 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
           <div className="max-w-7xl mx-auto px-6 flex items-center overflow-x-auto gap-2 sm:gap-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <div className="shrink-0 w-[90px] md:w-[220px]"></div>
 
@@ -303,7 +303,7 @@ const MenuSection = () => {
                   className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm md:text-base font-semibold transition-all duration-300 ${
                     activeCategory === cat
                       ? "bg-[#D4B98F] text-[#3A3124] shadow-md shadow-[#D4B98F]/40"
-                      : "bg-[#F5F1E6] text-[#6B5E48] hover:bg-[#D4B98F]/10 hover:text-[#3A3124]"
+                      : "bg-[#F5F1E6]/80 text-[#6B5E48] hover:bg-[#D4B98F]/20 hover:text-[#3A3124]"
                   }`}
                 >
                   {menuCategories[cat].label}
