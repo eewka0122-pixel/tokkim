@@ -12,10 +12,17 @@ import Footer from "@/components/Footer";
 const Index = () => {
   const [loading, setLoading] = useState(true);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
-  const [isScrolled, setIsScrolled] = useState(false);
 
-  // Исходный микро-параллакс фона
+  // Единый источник правды для инерционного скролла
+  const scrollState = useRef({
+    targetY: 0,
+    currentY: 0,
+    isScrolling: false
+  });
+
+  // Микро-параллакс фона
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth) - 0.5;
@@ -26,51 +33,119 @@ const Index = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // Логика скролла (Смена цвета и активной секции)
-  useEffect(() => {
-    const handleScroll = () => {
-      // ИСПРАВЛЕНО: Цвет меняется только когда прокрутили видео (минус 100px для плавности)
-      setIsScrolled(window.scrollY > window.innerHeight - 100);
+  // Функция плавной анимации скролла
+  const updateScroll = () => {
+    const state = scrollState.current;
+    state.currentY += (state.targetY - state.currentY) * 0.08;
+    
+    window.scrollTo(0, state.currentY);
 
-      const sections = ["module-about", "module-promos", "module-menu", "module-contacts"];
-      let current = "";
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= window.innerHeight / 2) {
-            current = section;
-          }
+    // НАСТРОЕНО: Изменение цвета происходит позже, ровно при переходе с видео на контент
+    const startFade = window.innerHeight - 120;
+    const endFade = window.innerHeight - 20;
+    let progress = 0;
+    if (state.currentY > startFade) {
+      progress = state.currentY >= endFade ? 1 : (state.currentY - startFade) / (endFade - startFade);
+    }
+    setScrollProgress(progress);
+
+    // Определение активной секции (С правильным порядком для подсветки пунктов)
+    const sections = ["module-about", "module-promos", "module-menu", "module-contacts"];
+    let current = "";
+    for (const section of sections) {
+      const element = document.getElementById(section);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= window.innerHeight / 2) {
+          current = section;
         }
       }
-      setActiveSection(current);
+    }
+    setActiveSection(current);
+
+    // Продолжаем анимацию, пока не достигнем цели
+    if (Math.abs(state.targetY - state.currentY) > 0.5) {
+      requestAnimationFrame(updateScroll);
+    } else {
+      state.isScrolling = false;
+    }
+  };
+
+  // Скролл колесом мыши
+  useEffect(() => {
+    if (loading) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      
+      scrollState.current.targetY += e.deltaY * 0.55;
+      scrollState.current.targetY = Math.max(0, Math.min(scrollState.current.targetY, document.documentElement.scrollHeight - window.innerHeight));
+      
+      if (!scrollState.current.isScrolling) {
+        scrollState.current.isScrolling = true;
+        requestAnimationFrame(updateScroll);
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    handleScroll(); // Чтобы цвет сразу стал правильным при загрузке
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    const handleScrollSync = () => {
+      if (!scrollState.current.isScrolling) {
+        scrollState.current.targetY = window.scrollY;
+        scrollState.current.currentY = window.scrollY;
+      }
+    };
+
+    // Инициализация при старте
+    scrollState.current.targetY = window.scrollY;
+    scrollState.current.currentY = window.scrollY;
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("scroll", handleScrollSync);
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("scroll", handleScrollSync);
+    };
+  }, [loading]);
 
   if (loading) {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // Плавный скролл до нужного блока
+  // Скролл по клику
   const scrollToSection = (id: string) => {
     if (id === "top") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollState.current.targetY = 0;
+      if (!scrollState.current.isScrolling) {
+        scrollState.current.isScrolling = true;
+        requestAnimationFrame(updateScroll);
+      }
       return;
     }
+    
     const element = document.getElementById(id);
     if (element) {
-      // Учитываем отступ под боковое меню на разных экранах
-      const yOffset = window.innerWidth >= 768 ? 96 : 80;
+      const yOffset = window.innerWidth >= 768 ? 96 : 80; 
+      
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
-      window.scrollTo({ top: elementPosition - yOffset, behavior: "smooth" });
+      const offsetPosition = elementPosition + yOffset;
+
+      scrollState.current.targetY = offsetPosition;
+      
+      if (!scrollState.current.isScrolling) {
+        scrollState.current.isScrolling = true;
+        requestAnimationFrame(updateScroll);
+      }
+      setActiveSection(id);
     }
   };
 
   const bgPositionStyle = `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
+
+  // Интерполяция цвета шапки и меню
+  const r = Math.round(255 - (255 - 58) * scrollProgress);
+  const g = Math.round(255 - (255 - 49) * scrollProgress);
+  const b = Math.round(255 - (255 - 36) * scrollProgress);
+  const syncColor = `rgb(${r}, ${g}, ${b})`;
+  const syncShadow = scrollProgress < 0.5 ? "0 2px 8px rgba(0,0,0,0.5)" : "none";
 
   const navLinks = [
     { id: "module-about", label: "О нас" },
@@ -82,11 +157,10 @@ const Index = () => {
 
   return (
     <>
-      {/* Исходные системные стили, которые я по тупости удалил */}
       <style dangerouslySetInnerHTML={{__html: `
         html {
           scrollbar-gutter: stable;
-          scroll-behavior: smooth !important;
+          scroll-behavior: auto !important;
         }
         body[data-scroll-locked] {
           padding-right: 0 !important;
@@ -103,36 +177,37 @@ const Index = () => {
 
         {/* НАВИГАЦИЯ */}
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
+          
+          {/* Левый блок: Логотип и меню */}
           <div className="flex flex-col items-start pointer-events-auto">
-            <div
+            <div 
               className="relative flex items-center h-20 md:h-24 cursor-pointer transition-transform hover:scale-105 origin-left z-10"
               onClick={() => scrollToSection("top")}
             >
-              <img
-                src="/images/logo (4).png"
-                alt="ТОККИМ"
-                className={`h-full w-auto object-contain drop-shadow-md transition-opacity duration-500 ${isScrolled ? 'opacity-100' : 'opacity-0'}`}
+              <img 
+                src="/images/logo (4).png" 
+                alt="ТОККИМ" 
+                className="h-full w-auto object-contain drop-shadow-md" 
+                style={{ opacity: scrollProgress }}
               />
-              <img
-                src="/images/logo (4).png"
-                alt="ТОККИМ"
-                className={`absolute top-0 left-0 h-full w-auto object-contain drop-shadow-md brightness-0 invert transition-opacity duration-500 ${isScrolled ? 'opacity-0' : 'opacity-100'}`}
+              <img 
+                src="/images/logo (4).png" 
+                alt="ТОККИМ" 
+                className="absolute top-0 left-0 h-full w-auto object-contain drop-shadow-md brightness-0 invert" 
+                style={{ opacity: 1 - scrollProgress }}
               />
             </div>
 
-            {/* Ссылки меню */}
+            {/* Ссылки с обводкой активного пункта */}
             <div className="flex flex-col items-start gap-1 md:gap-1.5 mt-2 pl-1">
               {navLinks.map((link, idx) => (
-                <button
+                <button 
                   key={idx}
-                  onClick={() => scrollToSection(link.id)}
+                  onClick={() => scrollToSection(link.id)} 
                   className={`text-left font-bold text-sm md:text-base uppercase tracking-wider transition-all duration-200 px-2 py-0.5 -ml-2 rounded-sm ${
                     activeSection === link.id ? "border border-[#3A3124]" : "border border-transparent hover:opacity-60"
-                  }`}
-                  style={{
-                    color: isScrolled ? "#2A2118" : "#FFFFFF",
-                    textShadow: isScrolled ? "none" : "0 2px 8px rgba(0,0,0,0.5)"
-                  }}
+                  }`} 
+                  style={{ color: syncColor, textShadow: syncShadow }}
                 >
                   {link.label}
                 </button>
@@ -141,13 +216,13 @@ const Index = () => {
           </div>
         </nav>
 
-        {/* ГЛАВНЫЙ ЭКРАН С ВИДЕО-ФОНОМ (Вернул все видео-сурсы) */}
+        {/* ГЛАВНЫЙ ЭКРАН С ВИДЕО-ФОНОМ */}
         <div className="relative w-full min-h-screen">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
             className="absolute inset-0 w-full h-full object-cover z-0"
           >
             <source src="/hero.mp4" type="video/mp4" />
@@ -155,16 +230,16 @@ const Index = () => {
             <source src="/videos/hero.mp4" type="video/mp4" />
             <source src="/bg.mp4" type="video/mp4" />
           </video>
-
+          
           <div className="relative z-10 w-full h-full">
             <HeroSection />
           </div>
         </div>
 
-        {/* Блок 1: О НАС И АКЦИИ (Строгая старая верстка без лишних w-full h-full) */}
+        {/* Блок 1: О НАС И АКЦИИ */}
         <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
-            {/* Идеальный блюр стыка: короткий и строго ПОД контентом */}
+            {/* Идеальный блюр стыка: короткий и строго ПОД контентом (z-0) */}
             <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
             <div className="relative z-10">
               <AboutSection />
@@ -176,13 +251,14 @@ const Index = () => {
         {/* Блок 2: НАШЕ МЕНЮ */}
         <div id="module-menu" style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
+            {/* Идеальный блюр стыка: короткий и строго ПОД контентом (z-0) */}
             <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
             <div className="relative z-10">
               <MenuSection />
             </div>
           </div>
         </div>
-
+        
         {/* Блок 3: КОНТАКТЫ И ДОСТАВКА */}
         <div id="module-contacts" className="bg-[#F5F1E6] relative z-20 pt-10 pb-10">
           <ReservationSection />
