@@ -33,9 +33,6 @@ const Index = () => {
     } else {
       document.body.style.overflow = "";
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [isNavOpen]);
 
   useEffect(() => {
@@ -77,15 +74,6 @@ const Index = () => {
       }
     };
 
-    const handleScrollSync = () => {
-      if (!isScrolling) {
-        targetScrollY = window.scrollY;
-        currentScrollY = window.scrollY;
-        setScrollProgress(calculateProgress(window.scrollY));
-        updateActiveSection(window.scrollY);
-      }
-    };
-
     const updateActiveSection = (scrollY: number) => {
       const sections = ["module-about", "module-menu", "module-contacts"];
       let current = "";
@@ -93,38 +81,27 @@ const Index = () => {
         const element = document.getElementById(section);
         if (element) {
           const rect = element.getBoundingClientRect();
-          if (rect.top <= 200) { // Активный блок считается при достижении верха
-            current = section;
-          }
+          if (rect.top <= 10) current = section;
         }
       }
       setActiveSection(current);
     };
 
-    setScrollProgress(calculateProgress(window.scrollY));
-    updateActiveSection(window.scrollY);
-
     window.addEventListener("wheel", handleWheel, { passive: false });
-    window.addEventListener("scroll", handleScrollSync);
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("scroll", handleScrollSync);
-    };
+    return () => window.removeEventListener("wheel", handleWheel);
   }, [loading, isNavOpen]);
 
   if (loading) return <LoadingScreen onComplete={() => setLoading(false)} />;
 
-  // ИСПРАВЛЕННЫЙ СКРОЛЛ: отступ -110px выставляет блок ровно под шапку
   const scrollToSection = (id: string) => {
-    setIsNavOpen(false); 
+    setIsNavOpen(false);
     if (id === "top") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     const element = document.getElementById(id);
     if (element) {
-      const yOffset = -110; 
-      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+      const y = element.getBoundingClientRect().top + window.scrollY;
       window.scrollTo({ top: y, behavior: "smooth" });
       setActiveSection(id);
     }
@@ -153,7 +130,7 @@ const Index = () => {
           </div>
           <div className="flex flex-col items-start gap-1.5 mt-2 pl-1">
             {navLinks.map((link, idx) => (
-              <button key={idx} onClick={() => scrollToSection(link.id)} className={`text-left font-bold text-sm md:text-base uppercase tracking-wider transition-all duration-200 ${activeSection === link.id ? "opacity-100 underline decoration-2 underline-offset-4" : "opacity-70 hover:opacity-100"}`} style={{ color: syncColor, textShadow: syncShadow }}>
+              <button key={idx} onClick={() => scrollToSection(link.id)} className={`text-left font-bold text-sm md:text-base uppercase tracking-wider transition-all duration-200 ${activeSection === link.id ? "opacity-100" : "opacity-70 hover:opacity-100"}`} style={{ color: syncColor, textShadow: syncShadow }}>
                 {link.label}
               </button>
             ))}
@@ -163,6 +140,11 @@ const Index = () => {
           <button onClick={() => setIsNavOpen(!isNavOpen)} className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border shadow-lg" style={{ backgroundColor: syncBtnBg, color: syncColor }}>
             {isNavOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
+          <div className={`absolute top-full right-0 mt-4 w-56 bg-white/95 backdrop-blur-xl rounded-2xl p-2 flex flex-col transition-all ${isNavOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}>
+            {navLinks.map((link, idx) => (
+              <button key={idx} onClick={() => scrollToSection(link.id)} className="px-5 py-3 font-bold hover:bg-[#F5F1E6] rounded-xl text-left">{link.label}</button>
+            ))}
+          </div>
         </div>
       </nav>
 
@@ -174,15 +156,16 @@ const Index = () => {
         <div className="relative z-10 w-full h-full"><HeroSection /></div>
       </div>
 
+      {/* Блоки без градиентов */}
       <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle }}>
-        <div className="relative bg-[#F5F1E6]/60"><AboutSection /><PopularDishes /></div>
+        <div className="bg-[#F5F1E6]/60"><AboutSection /><PopularDishes /></div>
       </div>
 
       <div id="module-menu" style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle }}>
-        <div className="relative bg-[#F5F1E6]/60"><MenuSection /></div>
+        <div className="bg-[#F5F1E6]/60"><MenuSection /></div>
       </div>
       
-      <div id="module-contacts" className="bg-[#F5F1E6] relative z-20 pt-10 pb-10"><ReservationSection /><Footer /></div>
+      <div id="module-contacts" className="bg-[#F5F1E6] pt-10 pb-10"><ReservationSection /><Footer /></div>
     </main>
   );
 };
