@@ -40,16 +40,10 @@ const Index = () => {
     
     window.scrollTo(0, state.currentY);
 
-    // НАСТРОЕНО: Изменение цвета происходит позже, ровно при переходе с видео на контент
-    const startFade = window.innerHeight - 120;
-    const endFade = window.innerHeight - 20;
-    let progress = 0;
-    if (state.currentY > startFade) {
-      progress = state.currentY >= endFade ? 1 : (state.currentY - startFade) / (endFade - startFade);
-    }
-    setScrollProgress(progress);
+    // Цвет меняется строго после прохождения видео
+    setScrollProgress(state.currentY > window.innerHeight - 100 ? 1 : 0);
 
-    // Определение активной секции (С правильным порядком для подсветки пунктов)
+    // Определение активной секции
     const sections = ["module-about", "module-promos", "module-menu", "module-contacts"];
     let current = "";
     for (const section of sections) {
@@ -71,46 +65,7 @@ const Index = () => {
     }
   };
 
-  // Скролл колесом мыши
-  useEffect(() => {
-    if (loading) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      
-      scrollState.current.targetY += e.deltaY * 0.55;
-      scrollState.current.targetY = Math.max(0, Math.min(scrollState.current.targetY, document.documentElement.scrollHeight - window.innerHeight));
-      
-      if (!scrollState.current.isScrolling) {
-        scrollState.current.isScrolling = true;
-        requestAnimationFrame(updateScroll);
-      }
-    };
-
-    const handleScrollSync = () => {
-      if (!scrollState.current.isScrolling) {
-        scrollState.current.targetY = window.scrollY;
-        scrollState.current.currentY = window.scrollY;
-      }
-    };
-
-    // Инициализация при старте
-    scrollState.current.targetY = window.scrollY;
-    scrollState.current.currentY = window.scrollY;
-
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    window.addEventListener("scroll", handleScrollSync);
-    return () => {
-      window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("scroll", handleScrollSync);
-    };
-  }, [loading]);
-
-  if (loading) {
-    return <LoadingScreen onComplete={() => setLoading(false)} />;
-  }
-
-  // Скролл по клику
+  // Скролл по клику: Исходная логика с точными отступами
   const scrollToSection = (id: string) => {
     if (id === "top") {
       scrollState.current.targetY = 0;
@@ -137,6 +92,71 @@ const Index = () => {
       setActiveSection(id);
     }
   };
+
+  // Скролл колесом мыши и глобальный перехватчик ссылок
+  useEffect(() => {
+    if (loading) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      
+      scrollState.current.targetY += e.deltaY * 0.55;
+      scrollState.current.targetY = Math.max(0, Math.min(scrollState.current.targetY, document.documentElement.scrollHeight - window.innerHeight));
+      
+      if (!scrollState.current.isScrolling) {
+        scrollState.current.isScrolling = true;
+        requestAnimationFrame(updateScroll);
+      }
+    };
+
+    const handleScrollSync = () => {
+      if (!scrollState.current.isScrolling) {
+        scrollState.current.targetY = window.scrollY;
+        scrollState.current.currentY = window.scrollY;
+      }
+      setScrollProgress(window.scrollY > window.innerHeight - 100 ? 1 : 0);
+    };
+
+    // НОВОЕ: Глобальный перехватчик кликов
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest("a");
+      
+      // Если кликнули по ссылке вида href="#module-menu"
+      if (anchor) {
+        const href = anchor.getAttribute("href");
+        if (href && href.startsWith("#")) {
+          const id = href.substring(1);
+          if (document.getElementById(id)) {
+            e.preventDefault(); // Вырубаем стандартный кривой скролл
+            scrollToSection(id); // Вызываем наш идеальный скролл
+          }
+        }
+      }
+    };
+
+    // Делаем функцию доступной глобально на всякий случай
+    (window as any).customScrollTo = scrollToSection;
+
+    scrollState.current.targetY = window.scrollY;
+    scrollState.current.currentY = window.scrollY;
+    handleScrollSync();
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    window.addEventListener("scroll", handleScrollSync);
+    document.addEventListener("click", handleGlobalClick);
+    
+    return () => {
+      window.removeEventListener("wheel", handleWheel);
+      window.removeEventListener("scroll", handleScrollSync);
+      document.removeEventListener("click", handleGlobalClick);
+      delete (window as any).customScrollTo;
+    };
+  }, [loading]);
+
+  if (loading) {
+    return <LoadingScreen onComplete={() => setLoading(false)} />;
+  }
 
   const bgPositionStyle = `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
 
@@ -177,8 +197,6 @@ const Index = () => {
 
         {/* НАВИГАЦИЯ */}
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
-          
-          {/* Левый блок: Логотип и меню */}
           <div className="flex flex-col items-start pointer-events-auto">
             <div 
               className="relative flex items-center h-20 md:h-24 cursor-pointer transition-transform hover:scale-105 origin-left z-10"
@@ -198,7 +216,6 @@ const Index = () => {
               />
             </div>
 
-            {/* Ссылки с обводкой активного пункта */}
             <div className="flex flex-col items-start gap-1 md:gap-1.5 mt-2 pl-1">
               {navLinks.map((link, idx) => (
                 <button 
@@ -239,7 +256,6 @@ const Index = () => {
         {/* Блок 1: О НАС И АКЦИИ */}
         <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
-            {/* Идеальный блюр стыка: короткий и строго ПОД контентом (z-0) */}
             <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
             <div className="relative z-10">
               <AboutSection />
@@ -251,7 +267,6 @@ const Index = () => {
         {/* Блок 2: НАШЕ МЕНЮ */}
         <div id="module-menu" style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
-            {/* Идеальный блюр стыка: короткий и строго ПОД контентом (z-0) */}
             <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
             <div className="relative z-10">
               <MenuSection />
