@@ -97,9 +97,12 @@ const Index = () => {
         className="bg-cover bg-fixed bg-center relative" 
         style={{ backgroundImage: "url('/images/bg1.jpeg')" }}
       >
-        <div className="bg-[#F5F1E6]/80 backdrop-blur-sm relative z-10 w-full h-full">
-          <AboutSection />
-          <PopularDishes /> {/* Здесь id="module-promos" */}
+        <div className="relative bg-[#F5F1E6]/60 w-full h-full">
+          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
+          <div className="relative z-10">
+            <AboutSection />
+            <PopularDishes /> {/* Здесь id="module-promos" */}
+          </div>
         </div>
       </div>
 
@@ -108,12 +111,15 @@ const Index = () => {
         className="bg-cover bg-fixed bg-center relative" 
         style={{ backgroundImage: "url('/images/bg2.jpeg')" }}
       >
-        <div className="bg-[#F5F1E6]/80 backdrop-blur-sm relative z-10 w-full h-full">
-          <MenuSection />
+        <div className="relative bg-[#F5F1E6]/60 w-full h-full">
+          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
+          <div className="relative z-10">
+            <MenuSection />
+          </div>
         </div>
       </div>
       
-      <div id="module-contacts" className="bg-[#F5F1E6] pt-10 pb-10">
+      <div id="module-contacts" className="bg-[#F5F1E6] pt-10 pb-10 relative z-20">
         <ReservationSection />
         <Footer />
       </div>
