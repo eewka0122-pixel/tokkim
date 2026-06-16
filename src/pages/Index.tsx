@@ -17,7 +17,7 @@ const Index = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
 
-  // Единый источник правды для инерционного скролла, чтобы клик и колесо мыши не конфликтовали
+  // Единый источник правды для инерционного скролла
   const scrollState = useRef({
     targetY: 0,
     currentY: 0,
@@ -63,7 +63,7 @@ const Index = () => {
     }
     setScrollProgress(progress);
 
-    // Определение активной секции в меню
+    // Определение активной секции
     const sections = ["module-about", "module-menu", "module-contacts"];
     let current = "";
     for (const section of sections) {
@@ -125,7 +125,7 @@ const Index = () => {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // Скролл строго в край экрана (yOffset = 0, так как мы урезали отступы внутри компонентов)
+  // СКРОЛЛ ПО КЛИКУ: Соединяем красную линию с красной точкой
   const scrollToSection = (id: string) => {
     setIsNavOpen(false); 
     
@@ -140,7 +140,11 @@ const Index = () => {
     
     const element = document.getElementById(id);
     if (element) {
-      const yOffset = 0; 
+      // Чтобы сам текст (красная линия) доехал до верха экрана (красной точки), 
+      // мы прибавляем к скроллу размер невидимого отступа (padding).
+      // На ПК он 96px (pt-24), на мобилках 80px (pt-20).
+      const yOffset = window.innerWidth >= 768 ? 96 : 80; 
+      
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
       const offsetPosition = elementPosition + yOffset;
 
