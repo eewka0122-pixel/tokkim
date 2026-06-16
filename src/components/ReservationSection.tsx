@@ -4,7 +4,7 @@ import { MapPin, Phone, Mail, Clock, Truck, CreditCard } from "lucide-react";
 
 const ReservationSection = () => {
   return (
-    <section id="contacts" className="py-24 px-6 bg-transparent">
+    <section id="contacts" className="pt-[110px] pb-16 md:pt-[130px] md:pb-24 px-6 bg-transparent">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
