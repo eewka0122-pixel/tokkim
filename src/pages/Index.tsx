@@ -16,8 +16,8 @@ const Index = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Меняем состояние стиля, когда прокрутка больше 100px
-      setIsScrolled(window.scrollY > 100);
+      // ИСПРАВЛЕНО: Цвет меняется только когда прокрутили почти весь первый экран (высота окна минус 100px для плавности)
+      setIsScrolled(window.scrollY > window.innerHeight - 100);
 
       // Логика подсветки активной кнопки
       const sections = ["module-about", "module-promos", "module-menu", "module-contacts"];
@@ -33,6 +33,9 @@ const Index = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
+    // Вызываем один раз при монтировании, чтобы сразу задать правильный цвет
+    handleScroll(); 
+    
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
