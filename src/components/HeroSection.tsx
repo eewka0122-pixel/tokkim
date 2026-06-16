@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, Calendar } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const HeroSection = () => {
@@ -57,7 +57,8 @@ const HeroSection = () => {
             </p>
           </div>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mt-10 reveal-delay-100">
+          {/* Блок с кнопкой (оставил только "Посмотреть меню", она автоматически встанет по центру) */}
+          <div className="flex flex-col sm:flex-row items-center justify-center mt-10 reveal-delay-100">
             <Button 
               size="lg" 
               className="group px-10 py-6 rounded-full bg-[#D4B98F]/60 border border-white/50 text-[#3A3124] font-bold text-lg hover:bg-[#D4B98F]/80 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105" 
@@ -65,16 +66,6 @@ const HeroSection = () => {
             >
               Посмотреть меню
               <ArrowDown className="ml-2 h-6 w-6 transition-transform group-hover:translate-y-1" />
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              size="lg" 
-              className="group px-10 py-6 rounded-full bg-white/40 border border-white/60 text-[#3A3124] font-bold text-lg hover:bg-white/60 transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105" 
-              onClick={() => scrollToModule("module-contacts")}
-            >
-              <Calendar className="mr-2 h-6 w-6" />
-              Заказать доставку
             </Button>
           </div>
         </div>
