@@ -32,6 +32,18 @@ const Index = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
+  // Блокировка скролла всей страницы при открытом полноэкранном модуле
+  useEffect(() => {
+    if (isNavOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isNavOpen]);
+
   // Инерционный скролл и точное отслеживание прогресса
   useEffect(() => {
     if (loading) return;
@@ -115,7 +127,7 @@ const Index = () => {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // Плавный скролл к модулям СТРОГО В КРАЙ ЭКРАНА
+  // Плавный скролл к модулям СТРОГО В КРАЙ ЭКРАНА (Отступ 0)
   const scrollToSection = (id: string) => {
     setIsNavOpen(false); 
     if (id === "top") {
@@ -124,7 +136,6 @@ const Index = () => {
     }
     const element = document.getElementById(id);
     if (element) {
-      // Идеально нулевой отступ, чтобы блок занимал ровно весь экран
       const yOffset = 0; 
       const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
@@ -139,7 +150,7 @@ const Index = () => {
   const g = Math.round(255 - (255 - 49) * scrollProgress);
   const b = Math.round(255 - (255 - 36) * scrollProgress);
   const syncColor = `rgb(${r}, ${g}, ${b})`;
-  const syncShadow = `0 2px 8px rgba(0,0,0,${(1 - scrollProgress) * 0.6})`;
+  const syncShadow = scrollProgress < 0.5 ? "0 2px 8px rgba(0,0,0,0.5)" : "none";
 
   const btnR = Math.round(255 - (255 - 212) * scrollProgress);
   const btnG = Math.round(255 - (255 - 185) * scrollProgress);
@@ -201,14 +212,14 @@ const Index = () => {
               />
             </div>
 
-            {/* Ссылки с рамкой активного состояния */}
-            <div className="flex flex-col items-start gap-1 md:gap-1.5 -mt-2 pl-1">
+            {/* Ссылки с четкой рамкой активного состояния */}
+            <div className="flex flex-col items-start gap-2 mt-4">
               {navLinks.map((link, idx) => (
                 <button 
                   key={idx}
                   onClick={() => scrollToSection(link.id)} 
-                  className={`text-left font-bold text-sm md:text-base uppercase tracking-wider transition-all duration-200 border px-2 py-1 -ml-2 rounded-sm ${
-                    activeSection === link.id ? "border-current" : "border-transparent hover:opacity-60"
+                  className={`text-left font-bold text-sm md:text-base uppercase tracking-wider transition-all duration-200 px-2 py-0.5 ${
+                    activeSection === link.id ? "border border-current" : "border border-transparent hover:opacity-60"
                   }`} 
                   style={{ color: syncColor, textShadow: syncShadow }}
                 >
@@ -251,21 +262,19 @@ const Index = () => {
         <HeroSection />
 
         {/* Блок 1: О НАС */}
+        {/* ГРАДИЕНТЫ ПОЛНОСТЬЮ УДАЛЕНЫ */}
         <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
-            <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
             <AboutSection />
             <PopularDishes />
-            <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
           </div>
         </div>
 
         {/* Блок 2: НАШЕ МЕНЮ */}
+        {/* ГРАДИЕНТЫ ПОЛНОСТЬЮ УДАЛЕНЫ */}
         <div id="module-menu" style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
-            <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
             <MenuSection />
-            <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
           </div>
         </div>
         
