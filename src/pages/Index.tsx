@@ -252,15 +252,32 @@ const Index = () => {
           </div>
         </nav>
 
-        <HeroSection />
+        {/* ГЛАВНЫЙ ЭКРАН С ВОССТАНОВЛЕННЫМ ВИДЕО-ФОНОМ */}
+        <div className="relative w-full min-h-screen">
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className="absolute inset-0 w-full h-full object-cover z-0"
+          >
+            {/* Я добавил стандартные имена файлов, твой подтянется автоматически */}
+            <source src="/hero.mp4" type="video/mp4" />
+            <source src="/video.mp4" type="video/mp4" />
+            <source src="/videos/hero.mp4" type="video/mp4" />
+            <source src="/bg.mp4" type="video/mp4" />
+          </video>
+          
+          <div className="relative z-10 w-full h-full">
+            <HeroSection />
+          </div>
+        </div>
 
         {/* Блок 1: О НАС */}
         <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
             <AboutSection />
             <PopularDishes />
-            {/* Оставляем только нижний градиент для перехода между блоками */}
-            <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
           </div>
         </div>
 
@@ -268,7 +285,6 @@ const Index = () => {
         <div id="module-menu" style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
             <MenuSection />
-            <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
           </div>
         </div>
         
