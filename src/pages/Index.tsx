@@ -123,7 +123,7 @@ const Index = () => {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // ИДЕАЛЬНЫЙ СКРОЛЛ: Отступ ровно 0, блок встает стык в стык с верхом экрана
+  // Скролл строго в край экрана
   const scrollToSection = (id: string) => {
     setIsNavOpen(false); 
     if (id === "top") {
@@ -141,7 +141,7 @@ const Index = () => {
 
   const bgPositionStyle = `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
 
-  // Интерполяция цвета текста и логотипа
+  // Интерполяция цвета
   const r = Math.round(255 - (255 - 58) * scrollProgress);
   const g = Math.round(255 - (255 - 49) * scrollProgress);
   const b = Math.round(255 - (255 - 36) * scrollProgress);
@@ -181,7 +181,7 @@ const Index = () => {
       `}} />
 
       <main className="min-h-screen text-[#3A3124]">
-        
+
         {/* НАВИГАЦИЯ */}
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
           
@@ -252,7 +252,7 @@ const Index = () => {
           </div>
         </nav>
 
-        {/* ГЛАВНЫЙ ЭКРАН С ВИДЕО-ФОНОМ */}
+        {/* ГЛАВНЫЙ ЭКРАН С ВОССТАНОВЛЕННЫМ ВИДЕО-ФОНОМ */}
         <div className="relative w-full min-h-screen">
           <video 
             autoPlay 
@@ -261,6 +261,7 @@ const Index = () => {
             playsInline 
             className="absolute inset-0 w-full h-full object-cover z-0"
           >
+            {/* Я добавил стандартные имена файлов, твой подтянется автоматически */}
             <source src="/hero.mp4" type="video/mp4" />
             <source src="/video.mp4" type="video/mp4" />
             <source src="/videos/hero.mp4" type="video/mp4" />
@@ -288,7 +289,7 @@ const Index = () => {
         </div>
         
         {/* Блок 3: КОНТАКТЫ И ДОСТАВКА */}
-        <div id="module-contacts" className="bg-[#F5F1E6] relative z-20 pt-8 pb-10">
+        <div id="module-contacts" className="bg-[#F5F1E6] relative z-20 pt-10 pb-10">
           <ReservationSection />
           <Footer />
         </div>
