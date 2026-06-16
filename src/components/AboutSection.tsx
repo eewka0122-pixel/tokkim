@@ -2,7 +2,7 @@
 
 const AboutSection = () => {
   return (
-    <section id="about" className="py-24 md:py-32 px-6 bg-transparent">
+    <section id="about" className="pt-[110px] pb-16 md:pt-[130px] md:pb-24 px-6 bg-transparent">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20 reveal">
           <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/40 text-[#4A3826] text-sm font-bold uppercase tracking-wider mb-4 drop-shadow-sm">
