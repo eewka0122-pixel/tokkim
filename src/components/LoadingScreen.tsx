@@ -3,77 +3,46 @@
 import { useEffect, useState } from "react";
 
 const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
-  const [progress, setProgress] = useState(0);
-  const [complete, setComplete] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setComplete(true);
-          }, 500);
-          return 100;
-        }
-        // Simulate random progress increment
-        return prev + Math.floor(Math.random() * 10) + 1;
-      });
-    }, 100);
+    // Минимальное время показа лоадера 1.5 секунды, чтобы анимация успела отыграть
+    const timer = setTimeout(() => {
+      setFadeOut(true);
+      setTimeout(onComplete, 500); // Ждем завершения анимации исчезновения
+    }, 1500);
 
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (complete) {
-      onComplete();
-    }
-  }, [complete]);
+    return () => clearTimeout(timer);
+  }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-50"
-         style={{ background: "linear-gradient(135deg, #F5F3F0 0%, #F8F9FA 50%, #FDFBF7 100%)" }}
-         aria-label="Loading"
-         role="status"
+    <div 
+      className={`fixed inset-0 z-[9999] flex items-center justify-center bg-[#F5F1E6] transition-opacity duration-500 ${
+        fadeOut ? "opacity-0" : "opacity-100"
+      }`}
     >
-      <div className="text-center space-y-6">
-        <div className="relative inline-block">
-          <svg
-            width="120"
-            height="120"
-            viewBox="0 0 120 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="pulse-rotate"
-          >
-            <defs>
-              <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#D2B48C" />
-                <stop offset="50%" stopColor="#C4A37A" />
-                <stop offset="100%" stopColor="#B8956A" />
-              </linearGradient>
-            </defs>
-            <circle cx="60" cy="60" r="50" stroke="url(#logoGradient)" strokeWidth="3" strokeDasharray="314" strokeDashoffset="314" />
-            <text x="60" y="68" textAnchor="middle" fontFamily="Georgia, serif" fontSize="28" fontWeight="600" fill="url(#logoGradient)">ТОККИМ</text>
-          </svg>
+      <div className="relative flex flex-col items-center">
+        {/* Вращающийся логотип */}
+        <div className="animate-[spin_3s_linear_infinite]">
+          <img 
+            src="/images/logo_symbol.png" // Убедись, что файл с логотипом лежит здесь
+            alt="Loading..." 
+            className="w-24 h-24 object-contain"
+          />
         </div>
-
-        <p className="text-stone-600 text-sm uppercase tracking-widest font-medium reveal reveal-delay-100">
-          Корейский стрит-фуд
-        </p>
-
-        <div className="relative w-80 h-2 bg-stone-200 rounded-full overflow-hidden reveal reveal-delay-200">
-          <div
-            className="h-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600"
-            style={{ width: `${progress}%` }}
-            transition="width 0.1s ease-out"
-          ></div>
+        
+        {/* Можно добавить легкое свечение под ним, если захочешь */}
+        <div className="mt-8 w-12 h-0.5 bg-[#5D6D5A]/20 rounded-full overflow-hidden">
+          <div className="h-full bg-[#5D6D5A] animate-[loading_1.5s_ease-in-out_infinite]" />
         </div>
-
-        <p className="text-stone-400 text-xs uppercase tracking-wide reveal reveal-delay-300">
-          Загрузка меню...
-        </p>
       </div>
+
+      <style jsx>{`
+        @keyframes loading {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+      `}</style>
     </div>
   );
 };
