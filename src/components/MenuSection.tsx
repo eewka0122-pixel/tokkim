@@ -283,17 +283,14 @@ const MenuSection = () => {
         {/* Заголовок блока */}
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12 reveal">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/20 text-[#8C6D46] text-sm font-medium uppercase tracking-wider mb-4">
-              Полное меню
-            </span>
             <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">
               Наше меню
             </h2>
           </div>
         </div>
 
-        {/* ПРИЛИПАЮЩЕЕ МЕНЮ КАТЕГОРИЙ */}
-        <div className="sticky top-[80px] md:top-[96px] z-30 w-full bg-[#F5F1E6]/95 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
+        {/* ПРИЛИПАЮЩЕЕ МЕНЮ КАТЕГОРИЙ (Вернул top-0) */}
+        <div className="sticky top-0 z-30 w-full bg-[#F5F1E6]/95 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
           <div className="max-w-7xl mx-auto px-6 flex items-center overflow-x-auto gap-2 sm:gap-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <div className="shrink-0 w-[90px] md:w-[220px]"></div>
 
