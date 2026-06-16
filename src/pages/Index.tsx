@@ -123,7 +123,7 @@ const Index = () => {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // Плавный выезд модулей с идеальным отступом под шапку
+  // Скролл строго в край экрана (под фиксированную пелену)
   const scrollToSection = (id: string) => {
     setIsNavOpen(false); 
     if (id === "top") {
@@ -132,8 +132,7 @@ const Index = () => {
     }
     const element = document.getElementById(id);
     if (element) {
-      // Идеальный отступ (-110px), чтобы контент останавливался ровно под логотипом и пеленой
-      const yOffset = -110; 
+      const yOffset = 0; 
       const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
       setActiveSection(id);
@@ -160,7 +159,7 @@ const Index = () => {
     { id: "module-menu", label: "Наше меню" },
     { id: "module-contacts", label: "Доставка" },
     { id: "module-contacts", label: "Контакты" },
-    { id: "module-menu", label: "Акции и скидки" },
+    { id: "module-menu", label: "Акции и скидки" }, // Заглушка ведет на меню
   ];
 
   return (
@@ -183,6 +182,9 @@ const Index = () => {
 
       <main className="min-h-screen text-[#3A3124]">
         
+        {/* ФИКСИРОВАННАЯ ПЕЛЕНА СВЕРХУ ЭКРАНА */}
+        <div className="fixed top-0 left-0 w-full h-48 md:h-56 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-[90]" />
+
         {/* НАВИГАЦИЯ */}
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
           
@@ -207,13 +209,13 @@ const Index = () => {
             </div>
 
             {/* Ссылки с обводкой активного пункта */}
-            <div className="flex flex-col items-start gap-1 md:gap-1.5 -mt-2 pl-1">
+            <div className="flex flex-col items-start gap-1 md:gap-1.5 mt-2 pl-1">
               {navLinks.map((link, idx) => (
                 <button 
                   key={idx}
                   onClick={() => scrollToSection(link.id)} 
                   className={`text-left font-bold text-sm md:text-base uppercase tracking-wider transition-all duration-200 px-2 py-0.5 -ml-2 rounded-sm ${
-                    activeSection === link.id ? "border border-current" : "border border-transparent hover:opacity-60"
+                    activeSection === link.id ? "border border-[#3A3124]" : "border border-transparent hover:opacity-60"
                   }`} 
                   style={{ color: syncColor, textShadow: syncShadow }}
                 >
@@ -224,7 +226,7 @@ const Index = () => {
           </div>
 
           {/* Правый блок: Гамбургер */}
-          <div className="pointer-events-auto relative">
+          <div className="pointer-events-auto relative mt-2">
             <button
               onClick={() => setIsNavOpen(!isNavOpen)}
               className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border shadow-lg transition-all hover:scale-105"
@@ -258,9 +260,9 @@ const Index = () => {
         {/* Блок 1: О НАС */}
         <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
-            <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
             <AboutSection />
             <PopularDishes />
+            {/* Оставляем только нижний градиент для перехода между блоками */}
             <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
           </div>
         </div>
@@ -268,14 +270,13 @@ const Index = () => {
         {/* Блок 2: НАШЕ МЕНЮ */}
         <div id="module-menu" style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
-            <div className="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
             <MenuSection />
             <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-10" />
           </div>
         </div>
         
         {/* Блок 3: КОНТАКТЫ И ДОСТАВКА */}
-        <div id="module-contacts" className="bg-[#F5F1E6] relative z-20 pt-10">
+        <div id="module-contacts" className="bg-[#F5F1E6] relative z-20 pt-10 pb-10">
           <ReservationSection />
           <Footer />
         </div>
