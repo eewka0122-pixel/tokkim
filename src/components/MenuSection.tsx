@@ -123,13 +123,16 @@ const MenuSection = () => {
   const [cartCounts, setCartCounts] = useState<Record<string, number>>({});
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Новые детальные состояния для формы заказа
+  // Новые детальные состояния для формы заказа (добавлены домофон, подъезд, этаж)
   const [formData, setFormData] = useState({ 
     name: "", 
     email: "",
     phone: "", 
     deliveryMethod: "delivery", // 'delivery' или 'pickup'
     address: "", 
+    intercom: "", // домофон
+    entrance: "", // подъезд
+    floor: "",    // этаж
     pickupAddress: "г. Раменское, ул. Бронницкая, д. 19а",
     payment: "card", // 'card', 'cash', или 'online'
     changeFrom: "",
@@ -265,8 +268,6 @@ const MenuSection = () => {
 
   const handleSubmitOrder = (e: React.FormEvent) => {
     e.preventDefault();
-    // Подготовленный payload данных. 
-    // В будущем его можно передать в Telegram-бота (например, запущенного локально из C:\botsTG\bot_zakazov)
     const orderData = { items: cartCounts, total: cartTotal, ...formData };
     console.log("Формирование и отправка заказа:", orderData);
     
@@ -564,7 +565,7 @@ const MenuSection = () => {
               </div>
             )}
 
-            {/* НОВАЯ ФОРМА ОФОРМЛЕНИЯ ЗАКАЗА ИЗ РЕФЕРЕНСА */}
+            {/* ФОРМА ОФОРМЛЕНИЯ ЗАКАЗА */}
             {Object.keys(cartCounts).length > 0 && (
               <form id="orderForm" onSubmit={handleSubmitOrder} className="space-y-6 pt-2">
                 
@@ -608,7 +609,7 @@ const MenuSection = () => {
                   </select>
                 </div>
 
-                {/* 3. Адрес (Динамический) */}
+                {/* 3. Адрес */}
                 <div className="space-y-4">
                   <div className="flex items-center text-xs font-bold uppercase tracking-widest text-gray-400">
                     <span className="flex-shrink-0 mr-3">
@@ -625,11 +626,31 @@ const MenuSection = () => {
                       <option value="г. Москва, Новый Арбат, д. 15">г. Москва, Новый Арбат, д. 15</option>
                     </select>
                   ) : (
-                    <input 
-                      required type="text" placeholder="Улица, дом, квартира *" 
-                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
-                      value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})}
-                    />
+                    <div className="space-y-3">
+                      <input 
+                        required type="text" placeholder="Улица, дом, квартира *" 
+                        className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
+                        value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})}
+                      />
+                      {/* НОВЫЙ БЛОК: Домофон, Подъезд, Этаж */}
+                      <div className="grid grid-cols-3 gap-3">
+                        <input 
+                          type="text" placeholder="Домофон" 
+                          className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
+                          value={formData.intercom} onChange={(e) => setFormData({...formData, intercom: e.target.value})}
+                        />
+                        <input 
+                          type="text" placeholder="Подъезд" 
+                          className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
+                          value={formData.entrance} onChange={(e) => setFormData({...formData, entrance: e.target.value})}
+                        />
+                        <input 
+                          type="text" placeholder="Этаж" 
+                          className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
+                          value={formData.floor} onChange={(e) => setFormData({...formData, floor: e.target.value})}
+                        />
+                      </div>
+                    </div>
                   )}
                 </div>
 
