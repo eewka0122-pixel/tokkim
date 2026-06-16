@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Menu, X } from "lucide-react";
 import LoadingScreen from "@/components/LoadingScreen";
 import HeroSection from "@/components/HeroSection";
@@ -16,6 +16,13 @@ const Index = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("");
+
+  // Единый источник правды для инерционного скролла, чтобы клик и колесо мыши не конфликтовали
+  const scrollState = useRef({
+    targetY: 0,
+    currentY: 0,
+    isScrolling: false
+  });
 
   // Микро-параллакс фона
   useEffect(() => {
@@ -40,76 +47,71 @@ const Index = () => {
     };
   }, [isNavOpen]);
 
-  // Скролл и отслеживание прогресса
+  // Функция плавной анимации скролла
+  const updateScroll = () => {
+    const state = scrollState.current;
+    state.currentY += (state.targetY - state.currentY) * 0.08;
+    
+    window.scrollTo(0, state.currentY);
+
+    // Подсчет прогресса для изменения цвета шапки
+    const startFade = window.innerHeight * 0.70;
+    const endFade = window.innerHeight * 0.90;
+    let progress = 0;
+    if (state.currentY > startFade) {
+      progress = state.currentY >= endFade ? 1 : (state.currentY - startFade) / (endFade - startFade);
+    }
+    setScrollProgress(progress);
+
+    // Определение активной секции в меню
+    const sections = ["module-about", "module-menu", "module-contacts"];
+    let current = "";
+    for (const section of sections) {
+      const element = document.getElementById(section);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= window.innerHeight / 2) {
+          current = section;
+        }
+      }
+    }
+    setActiveSection(current);
+
+    // Продолжаем анимацию, пока не достигнем цели
+    if (Math.abs(state.targetY - state.currentY) > 0.5) {
+      requestAnimationFrame(updateScroll);
+    } else {
+      state.isScrolling = false;
+    }
+  };
+
+  // Скролл колесом мыши
   useEffect(() => {
     if (loading) return;
-
-    let targetScrollY = window.scrollY;
-    let currentScrollY = window.scrollY;
-    let isScrolling = false;
-
-    const calculateProgress = (scrollY: number) => {
-      const startFade = window.innerHeight * 0.70;
-      const endFade = window.innerHeight * 0.90;
-
-      if (scrollY <= startFade) return 0;
-      if (scrollY >= endFade) return 1;
-
-      return (scrollY - startFade) / (endFade - startFade);
-    };
 
     const handleWheel = (e: WheelEvent) => {
       if (isNavOpen) return;
       e.preventDefault();
-      targetScrollY += e.deltaY * 0.55;
-      targetScrollY = Math.max(0, Math.min(targetScrollY, document.documentElement.scrollHeight - window.innerHeight));
       
-      if (!isScrolling) {
-        isScrolling = true;
+      scrollState.current.targetY += e.deltaY * 0.55;
+      scrollState.current.targetY = Math.max(0, Math.min(scrollState.current.targetY, document.documentElement.scrollHeight - window.innerHeight));
+      
+      if (!scrollState.current.isScrolling) {
+        scrollState.current.isScrolling = true;
         requestAnimationFrame(updateScroll);
-      }
-    };
-
-    const updateScroll = () => {
-      currentScrollY += (targetScrollY - currentScrollY) * 0.08;
-      window.scrollTo(0, currentScrollY);
-
-      setScrollProgress(calculateProgress(currentScrollY));
-      updateActiveSection(currentScrollY);
-
-      if (Math.abs(targetScrollY - currentScrollY) > 0.3) {
-        requestAnimationFrame(updateScroll);
-      } else {
-        isScrolling = false;
       }
     };
 
     const handleScrollSync = () => {
-      if (!isScrolling) {
-        targetScrollY = window.scrollY;
-        currentScrollY = window.scrollY;
-        setScrollProgress(calculateProgress(window.scrollY));
-        updateActiveSection(window.scrollY);
+      if (!scrollState.current.isScrolling) {
+        scrollState.current.targetY = window.scrollY;
+        scrollState.current.currentY = window.scrollY;
       }
     };
 
-    const updateActiveSection = (scrollY: number) => {
-      const sections = ["module-about", "module-menu", "module-contacts"];
-      let current = "";
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= window.innerHeight / 2) {
-            current = section;
-          }
-        }
-      }
-      setActiveSection(current);
-    };
-
-    setScrollProgress(calculateProgress(window.scrollY));
-    updateActiveSection(window.scrollY);
+    // Инициализация при старте
+    scrollState.current.targetY = window.scrollY;
+    scrollState.current.currentY = window.scrollY;
 
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("scroll", handleScrollSync);
@@ -123,25 +125,38 @@ const Index = () => {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // Скролл строго в край экрана
+  // Скролл строго в край экрана (yOffset = 0, так как мы урезали отступы внутри компонентов)
   const scrollToSection = (id: string) => {
     setIsNavOpen(false); 
+    
     if (id === "top") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      scrollState.current.targetY = 0;
+      if (!scrollState.current.isScrolling) {
+        scrollState.current.isScrolling = true;
+        requestAnimationFrame(updateScroll);
+      }
       return;
     }
+    
     const element = document.getElementById(id);
     if (element) {
       const yOffset = 0; 
-      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
-      window.scrollTo({ top: y, behavior: "smooth" });
+      const elementPosition = element.getBoundingClientRect().top + window.scrollY;
+      const offsetPosition = elementPosition + yOffset;
+
+      scrollState.current.targetY = offsetPosition;
+      
+      if (!scrollState.current.isScrolling) {
+        scrollState.current.isScrolling = true;
+        requestAnimationFrame(updateScroll);
+      }
       setActiveSection(id);
     }
   };
 
   const bgPositionStyle = `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
 
-  // Интерполяция цвета
+  // Интерполяция цвета шапки и меню
   const r = Math.round(255 - (255 - 58) * scrollProgress);
   const g = Math.round(255 - (255 - 49) * scrollProgress);
   const b = Math.round(255 - (255 - 36) * scrollProgress);
@@ -252,7 +267,7 @@ const Index = () => {
           </div>
         </nav>
 
-        {/* ГЛАВНЫЙ ЭКРАН С ВОССТАНОВЛЕННЫМ ВИДЕО-ФОНОМ */}
+        {/* ГЛАВНЫЙ ЭКРАН С ВИДЕО-ФОНОМ */}
         <div className="relative w-full min-h-screen">
           <video 
             autoPlay 
@@ -261,7 +276,6 @@ const Index = () => {
             playsInline 
             className="absolute inset-0 w-full h-full object-cover z-0"
           >
-            {/* Я добавил стандартные имена файлов, твой подтянется автоматически */}
             <source src="/hero.mp4" type="video/mp4" />
             <source src="/video.mp4" type="video/mp4" />
             <source src="/videos/hero.mp4" type="video/mp4" />
