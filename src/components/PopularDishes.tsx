@@ -36,52 +36,50 @@ const PopularDishes = () => {
         
         {/* Заголовок */}
         <div className="text-center mb-16 reveal">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#4A0E0E]/90 text-[#D4B98F] text-sm font-bold uppercase tracking-wider mb-4 shadow-lg border border-[#8A2525]/30">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#D4B98F]/40 text-[#4A3826] text-sm font-bold uppercase tracking-wider mb-4 drop-shadow-sm">
             Специальные предложения
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#2A2118] tracking-tight drop-shadow-md">
             Акции и скидки
           </h2>
           <p className="mt-4 text-lg font-medium text-[#3A2F22] max-w-2xl mx-auto drop-shadow-sm">
-            Радуем вас не только аутентичным вкусом, но и премиальной подачей
+            Радуем вас не только аутентичным вкусом, но и приятными бонусами
           </p>
         </div>
 
-        {/* Карточки акций в стиле красного глянцевого дерева */}
+        {/* Карточки акций (с чистой светлой толщиной) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {promos.map((promo) => (
+            // Внешний контейнер, создающий "толщину" блока
             <div 
               key={promo.id} 
-              className="relative group rounded-[2rem] p-2.5 sm:p-3 shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.5)] transition-all duration-500 h-[380px] md:h-[420px] cursor-pointer bg-[linear-gradient(145deg,#8A2525_0%,#4A0E0E_45%,#1A0303_80%,#3A0A0A_100%)] border border-[#2A0505]"
+              className="relative group rounded-[2.5rem] bg-white/80 backdrop-blur-xl p-2.5 sm:p-3 shadow-[0_15px_35px_rgba(0,0,0,0.1)] hover:shadow-[0_25px_50px_rgba(0,0,0,0.15)] border border-white hover:-translate-y-2 transition-all duration-500 h-[380px] md:h-[420px] cursor-pointer"
             >
-              {/* Глянцевый лакированный блик на самой деревянной раме */}
-              <div className="absolute inset-0 rounded-[2rem] pointer-events-none shadow-[inset_0_2px_8px_rgba(255,150,150,0.25)] bg-[linear-gradient(45deg,transparent_40%,rgba(255,255,255,0.06)_50%,transparent_60%)]" />
-
-              {/* Внутренний контейнер с картинкой (утоплен в дерево) */}
-              <div className="relative w-full h-full rounded-[1.3rem] overflow-hidden bg-black shadow-[inset_0_0_20px_rgba(0,0,0,0.9)]">
+              {/* Внутренний контейнер с картинкой (утоплен в светлую рамку) */}
+              <div className="relative w-full h-full rounded-[1.8rem] overflow-hidden bg-[#1A1410]">
                 
                 {/* Картинка еды */}
                 <img 
                   src={promo.image} 
                   alt={promo.title} 
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-95 group-hover:opacity-100"
                 />
                 
-                {/* Градиентное затемнение снизу для читаемости (черное) */}
-                <div className="absolute inset-x-0 bottom-0 h-[65%] bg-gradient-to-t from-black via-black/60 to-transparent z-10" />
+                {/* Мягкий градиент снизу только для читаемости текста */}
+                <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#1A1410]/90 via-[#1A1410]/50 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 z-10" />
 
-                {/* Плашка (Бейдж) в правом верхнем углу - стилизована под дерево и золото */}
-                <div className="absolute top-4 right-4 bg-[#1A0303]/80 border border-[#8A2525]/60 backdrop-blur-md text-[#D4B98F] font-bold px-4 py-1.5 rounded-full shadow-lg flex items-center gap-2 z-20 transition-transform group-hover:scale-105">
-                  <promo.icon className="w-4 h-4 stroke-[2.5]" />
-                  <span className="text-sm tracking-wide">{promo.badge}</span>
+                {/* Плашка (Бейдж) в правом верхнем углу */}
+                <div className="absolute top-5 right-5 bg-[#D4B98F]/95 backdrop-blur-sm text-[#2A2118] font-extrabold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-20">
+                  <promo.icon className="w-4 h-4 stroke-[3]" />
+                  <span>{promo.badge}</span>
                 </div>
 
                 {/* Текст снизу */}
-                <div className="absolute bottom-0 left-0 w-full p-6 translate-y-6 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
-                  <h3 className="font-serif text-2xl md:text-3xl font-bold text-[#F5F1E6] mb-3 drop-shadow-md">
+                <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
+                  <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-3 drop-shadow-md">
                     {promo.title}
                   </h3>
-                  <p className="text-[#D4B98F] text-sm leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75">
+                  <p className="text-white/90 text-sm md:text-base leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75">
                     {promo.description}
                   </p>
                 </div>
