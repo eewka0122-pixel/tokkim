@@ -102,7 +102,9 @@ const Index = () => {
     }
     const element = document.getElementById(id);
     if (element) {
-      const yOffset = -50; 
+      // ИСПРАВЛЕНИЕ: Делаем большой отступ (-220px), чтобы секции
+      // не заезжали под левое фиксированное меню и логотип
+      const yOffset = -220; 
       const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
     }
