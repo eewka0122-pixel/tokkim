@@ -110,18 +110,30 @@ const Index = () => {
 
   const bgPositionStyle = `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
 
-  // Динамические стили для кнопок и ссылок (инверсия цвета при скролле)
-  const menuButtonStyle = {
-    backgroundColor: scrollProgress > 0.5 ? 'rgba(212, 185, 143, 0.2)' : 'rgba(255, 255, 255, 0.1)',
-    color: scrollProgress > 0.5 ? '#3A3124' : '#FFFFFF',
-    borderColor: scrollProgress > 0.5 ? 'rgba(212, 185, 143, 0.3)' : 'rgba(255, 255, 255, 0.2)'
-  };
+  // --- СИНХРОННАЯ ИНТЕРПОЛЯЦИЯ ЦВЕТА ---
+  // Плавно пересчитываем цвет текста из белого (255,255,255) в темный (58,49,36)
+  const r = Math.round(255 - (255 - 58) * scrollProgress);
+  const g = Math.round(255 - (255 - 49) * scrollProgress);
+  const b = Math.round(255 - (255 - 36) * scrollProgress);
+  const syncColor = `rgb(${r}, ${g}, ${b})`;
+  // Тень плавно исчезает при скролле
+  const syncShadow = `0 2px 8px rgba(0,0,0,${(1 - scrollProgress) * 0.6})`;
 
-  const linkStyle = {
-    color: scrollProgress > 0.5 ? '#3A3124' : '#FFFFFF',
-    textShadow: scrollProgress > 0.5 ? 'none' : '0 2px 8px rgba(0,0,0,0.5)',
-    transition: 'color 0.3s ease, opacity 0.2s ease'
-  };
+  // Плавно пересчитываем фон кнопки-бургера
+  const btnR = Math.round(255 - (255 - 212) * scrollProgress);
+  const btnG = Math.round(255 - (255 - 185) * scrollProgress);
+  const btnB = Math.round(255 - (255 - 143) * scrollProgress);
+  const syncBtnBg = `rgba(${btnR}, ${btnG}, ${btnB}, ${0.1 + scrollProgress * 0.1})`;
+  const syncBtnBorder = `rgba(${btnR}, ${btnG}, ${btnB}, ${0.2 + scrollProgress * 0.1})`;
+
+  // Список ссылок для удобства
+  const navLinks = [
+    { id: "about", label: "О нас" },
+    { id: "menu", label: "Наше меню" },
+    { id: "contacts", label: "Доставка" },
+    { id: "contacts", label: "Контакты" },
+    { id: "menu", label: "Акции и скидки" },
+  ];
 
   return (
     <>
@@ -146,12 +158,12 @@ const Index = () => {
         {/* НАВИГАЦИЯ (Шапка) */}
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
           
-          {/* ЛЕВАЯ КОЛОНКА: Логотип + Ссылки столбиком */}
-          <div className="flex flex-col gap-4 md:gap-6 pointer-events-auto">
+          {/* ЛЕВАЯ КОЛОНКА: Логотип + Ссылки строго под ним */}
+          <div className="flex flex-col items-start pointer-events-auto">
             
             {/* Логотип */}
             <div 
-              className="relative flex items-center h-24 md:h-32 cursor-pointer transition-transform hover:scale-105 origin-left"
+              className="relative flex items-center h-20 md:h-24 cursor-pointer transition-transform hover:scale-105 origin-left z-10"
               onClick={() => scrollToSection("top")}
             >
               <img 
@@ -168,23 +180,18 @@ const Index = () => {
               />
             </div>
 
-            {/* Ссылки (теперь выстроены в столбик) */}
-            <div className="flex flex-col items-start gap-3 pl-2">
-              <button onClick={() => scrollToSection("about")} className="text-left font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
-                О нас
-              </button>
-              <button onClick={() => scrollToSection("menu")} className="text-left font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
-                Наше меню
-              </button>
-              <button onClick={() => scrollToSection("contacts")} className="text-left font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
-                Доставка
-              </button>
-              <button onClick={() => scrollToSection("contacts")} className="text-left font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
-                Контакты
-              </button>
-              <button onClick={() => scrollToSection("menu")} className="text-left font-bold text-sm md:text-base uppercase tracking-wider hover:opacity-70" style={linkStyle}>
-                Акции и скидки
-              </button>
+            {/* Ссылки столбиком (без зазоров) */}
+            <div className="flex flex-col items-start gap-1.5 md:gap-2 -mt-2 pl-1">
+              {navLinks.map((link, idx) => (
+                <button 
+                  key={idx}
+                  onClick={() => scrollToSection(link.id)} 
+                  className="text-left font-bold text-sm md:text-base uppercase tracking-wider transition-opacity duration-200 hover:opacity-60" 
+                  style={{ color: syncColor, textShadow: syncShadow }}
+                >
+                  {link.label}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -193,7 +200,7 @@ const Index = () => {
             <button
               onClick={() => setIsNavOpen(!isNavOpen)}
               className="w-14 h-14 rounded-full flex items-center justify-center backdrop-blur-md border shadow-lg transition-all hover:scale-105"
-              style={menuButtonStyle}
+              style={{ backgroundColor: syncBtnBg, borderColor: syncBtnBorder, color: syncColor }}
               aria-label="Меню"
             >
               {isNavOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -205,24 +212,15 @@ const Index = () => {
                 isNavOpen ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'
               }`}
             >
-              <button 
-                onClick={() => scrollToSection("menu")}
-                className="text-left px-5 py-3.5 rounded-xl font-bold text-[#3A3124] text-lg hover:bg-[#F5F1E6] hover:text-[#8C6D46] transition-colors"
-              >
-                Меню
-              </button>
-              <button 
-                onClick={() => scrollToSection("about")}
-                className="text-left px-5 py-3.5 rounded-xl font-bold text-[#3A3124] text-lg hover:bg-[#F5F1E6] hover:text-[#8C6D46] transition-colors"
-              >
-                О нас
-              </button>
-              <button 
-                onClick={() => scrollToSection("contacts")}
-                className="text-left px-5 py-3.5 rounded-xl font-bold text-[#3A3124] text-lg hover:bg-[#F5F1E6] hover:text-[#8C6D46] transition-colors"
-              >
-                Контакты
-              </button>
+              {navLinks.map((link, idx) => (
+                <button 
+                  key={`drop-${idx}`}
+                  onClick={() => scrollToSection(link.id)}
+                  className="text-left px-5 py-3.5 rounded-xl font-bold text-[#3A3124] text-lg hover:bg-[#F5F1E6] hover:text-[#8C6D46] transition-colors"
+                >
+                  {link.label}
+                </button>
+              ))}
             </div>
           </div>
         </nav>
