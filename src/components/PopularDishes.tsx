@@ -63,8 +63,8 @@ const PopularDishes = () => {
                 />
               </div>
               
-              {/* Градиентное затемнение для читаемости текста */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1A1410] via-[#1A1410]/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+              {/* ИСПРАВЛЕНО: Градиентное затемнение теперь только снизу (h-3/5), чтобы еда оставалась яркой */}
+              <div className="absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-[#1A1410]/95 via-[#1A1410]/60 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 z-10" />
 
               {/* Плашка (Бейдж) в правом верхнем углу */}
               <div className="absolute top-6 right-6 bg-[#D4B98F]/95 backdrop-blur-sm text-[#2A2118] font-extrabold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-20">
