@@ -28,7 +28,7 @@ const HeroSection = () => {
         <source src="/videos/hero-video.mp4" type="video/mp4" />
       </video>
 
-      {/* НОВЫЙ БЛОК: Киноэффект — Блюр по краям */}
+      {/* Киноэффект — Блюр по краям */}
       <div 
         className="absolute inset-0 z-0 pointer-events-none backdrop-blur-[12px]"
         style={{
@@ -38,7 +38,7 @@ const HeroSection = () => {
         }}
       />
       
-      {/* НОВЫЙ БЛОК: Легкое затемнение по углам (виньетка) для глубины кадра */}
+      {/* Легкое затемнение по углам (виньетка) для глубины кадра */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle,transparent_60%,rgba(0,0,0,0.3)_100%)]" />
 
       {/* 100% прозрачный слой (основной) */}
@@ -57,7 +57,7 @@ const HeroSection = () => {
             </p>
           </div>
           
-          {/* Блок с кнопкой (оставил только "Посмотреть меню", она автоматически встанет по центру) */}
+          {/* Блок с кнопкой */}
           <div className="flex flex-col sm:flex-row items-center justify-center mt-10 reveal-delay-100">
             <Button 
               size="lg" 
@@ -75,8 +75,8 @@ const HeroSection = () => {
         <ArrowDown className="h-8 w-8 text-[#3A3124]/80 bounce" />
       </div>
 
-      {/* Нижний градиент */}
-      <div className="absolute bottom-0 left-0 w-full h-48 bg-gradient-to-t from-[#F5F1E6] to-[#F5F1E6]/0 pointer-events-none z-20" />
+      {/* Нижний градиент (Дымка) - ИСПРАВЛЕНО: Сделал ее ниже (h-24 вместо h-48) */}
+      <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#F5F1E6] to-transparent pointer-events-none z-20" />
     </section>
   );
 };
