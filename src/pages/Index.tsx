@@ -49,8 +49,8 @@ const Index = () => {
     }
     setScrollProgress(progress);
 
-    // Определение активной секции
-    const sections = ["module-about", "module-menu", "module-contacts"];
+    // Определение активной секции (С правильным порядком для подсветки пунктов)
+    const sections = ["module-about", "module-promos", "module-menu", "module-contacts"];
     let current = "";
     for (const section of sections) {
       const element = document.getElementById(section);
@@ -147,12 +147,13 @@ const Index = () => {
   const syncColor = `rgb(${r}, ${g}, ${b})`;
   const syncShadow = scrollProgress < 0.5 ? "0 2px 8px rgba(0,0,0,0.5)" : "none";
 
+  // НОВЫЙ ПОРЯДОК КНОПОК
   const navLinks = [
     { id: "module-about", label: "О нас" },
+    { id: "module-promos", label: "Акции и скидки" },
     { id: "module-menu", label: "Наше меню" },
     { id: "module-contacts", label: "Доставка" },
     { id: "module-contacts", label: "Контакты" },
-    { id: "module-menu", label: "Акции и скидки" },
   ];
 
   return (
@@ -236,14 +237,14 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Блок 1: О НАС */}
+        {/* Блок 1: О НАС И АКЦИИ */}
         <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
           <div className="relative bg-[#F5F1E6]/60">
             {/* Идеальный блюр стыка: короткий и строго ПОД контентом (z-0) */}
             <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
             <div className="relative z-10">
               <AboutSection />
-              <PopularDishes />
+              <PopularDishes /> {/* Внутри этого компонента id="module-promos" */}
             </div>
           </div>
         </div>
