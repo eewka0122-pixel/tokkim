@@ -34,15 +34,15 @@ const PopularDishes = () => {
     <section id="module-promos" className="pt-12 pb-24 px-6 bg-transparent relative z-10">
       <div className="max-w-7xl mx-auto">
         
-        {/* Заголовок в стиле шалфей */}
+        {/* Заголовок в стиле винного акцента */}
         <div className="text-center mb-16 reveal">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-[#5D6D5A]/20 text-[#2D362C] text-sm font-bold uppercase tracking-wider mb-4">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#7A2828]/10 text-[#7A2828] text-sm font-bold uppercase tracking-wider mb-4 border border-[#7A2828]/20">
             Специальные предложения
           </span>
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#1F241E] tracking-tight">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold text-[#2A2118] tracking-tight">
             Акции и скидки
           </h2>
-          <p className="mt-4 text-lg font-medium text-[#4A5548] max-w-2xl mx-auto">
+          <p className="mt-4 text-lg font-medium text-[#5C4D42] max-w-2xl mx-auto">
             Радуем вас не только аутентичным вкусом, но и приятными бонусами
           </p>
         </div>
@@ -52,18 +52,18 @@ const PopularDishes = () => {
           {promos.map((promo) => (
             <div 
               key={promo.id} 
-              className="relative group rounded-[2rem] overflow-hidden bg-[#1F241E] shadow-[0_15px_35px_rgba(0,0,0,0.25)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.4)] hover:-translate-y-3 transition-all duration-500 h-[380px] md:h-[420px] cursor-pointer"
+              className="relative group rounded-[2rem] overflow-hidden bg-[#2A1616] shadow-[0_15px_35px_rgba(0,0,0,0.3)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)] hover:-translate-y-3 transition-all duration-500 h-[380px] md:h-[420px] cursor-pointer"
             >
               <img 
                 src={promo.image} 
                 alt={promo.title} 
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-95 group-hover:opacity-100"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
               />
               
-              <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#1F241E]/95 via-[#1F241E]/50 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+              <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#2A1616]/95 via-[#2A1616]/50 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 z-10" />
 
-              {/* Плашка Шалфей */}
-              <div className="absolute top-5 right-5 bg-[#5D6D5A]/95 backdrop-blur-sm text-[#F5F1E6] font-extrabold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-20">
+              {/* Плашка Винный акцент */}
+              <div className="absolute top-5 right-5 bg-[#7A2828]/95 backdrop-blur-sm text-[#F5F1E6] font-extrabold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-20">
                 <promo.icon className="w-4 h-4 stroke-[3]" />
                 <span>{promo.badge}</span>
               </div>
