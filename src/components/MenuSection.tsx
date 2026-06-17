@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import PocketBase from "pocketbase";
 
+// Подключение к твоей личной базе данных на сервере
 const pb = new PocketBase("http://31.57.47.98");
 
 type MenuItem = { name: string; description: string; price: string; image: string; numericPrice: number };
@@ -19,50 +20,6 @@ const MenuSection = () => {
 
   const [activeCategory, setActiveCategory] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
-  
-  const [cartCounts, setCartCounts] = useState<Record<string, number>>({});
-  const [isCartOpen, setIsCartOpen] = useState(false);
-
-  const [formData, setFormData] = useState({ 
-    name: "", 
-    email: "",
-    phone: "", 
-    deliveryMethod: "delivery",
-    address: "", 
-    intercom: "",
-    entrance: "",
-    floor: "",
-    pickupAddress: "г. Раменское, ул. БронницОтлично, спасибо за скриншот с крестиком! Теперь я точно понимаю, куда именно нужно сдвинуть начало меню, и у меня есть твое согласие на эту корректировку.
-
-Я внес ровно три изменения в интерфейс, как ты и просил:
-1. **Сдвинул кнопки и карточки влево:** Уменьшил пустой отступ (с `220px` до `140px`), чтобы всё начиналось ровно от твоей красной пометки-крестика. Текст карточек и заголовки тоже сдвинулись, чтобы всё было по одной красивой линии.
-2. **Уменьшил расстояние между кнопками:** Поменял отступ (с `gap-3` на `gap-2`). Кнопки стали стоять плотнее друг к другу.
-3. **Добавил скролл мышкой (drag-to-scroll):** Теперь всю эту полоску с категориями можно хватать левой кнопкой мыши и тянуть влево-вправо. Категория «Напитки» (и любые другие будущие) теперь легко доступна на компьютере.
-
-Держи полный код файла `MenuSection.tsx`. Просто скопируй его целиком и замени старый.
-
-```tsx
-"use client";
-
-import { useState, useEffect, useMemo, useRef } from "react";
-import { ZoomIn, ZoomOut, Plus, Minus, ShoppingBag, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import PocketBase from "pocketbase";
-
-const pb = new PocketBase("[http://31.57.47.98](http://31.57.47.98)");
-
-type MenuItem = { name: string; description: string; price: string; image: string; numericPrice: number };
-type MenuCategoryData = { label: string; items: MenuItem[] };
-
-const MenuSection = () => {
-  const [menuCategories, setMenuCategories] = useState<Record<string, MenuCategoryData>>({});
-  const [allItems, setAllItems] = useState<MenuItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const [activeCategory, setActiveCategory] = useState<string>("");
-  const [selectedItem, setSelectedItem] = useState<MenuItem null |>(null);
   
   const [cartCounts, setCartCounts] = useState<Record<string, number>>({});
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -90,12 +47,6 @@ const MenuSection = () => {
   const [clickStartPos, setClickStartPos] = useState({ x: 0, y: 0 });
 
   const cartOverlayRef = useRef<HTMLDivElement>(null);
-  
-  // Рефы и стейты для скролла категорий мышкой
-  const categoryScrollRef = useRef<HTMLDivElement>(null);
-  const [isDraggingCat, setIsDraggingCat] = useState(false);
-  const [startXCat, setStartXCat] = useState(0);
-  const [scrollLeftCat, setScrollLeftCat] = useState(0);
 
   // СКАЧИВАНИЕ МЕНЮ ИЗ БАЗЫ ДАННЫХ
   useEffect(() => {
@@ -111,6 +62,7 @@ const MenuSection = () => {
             description: record.description,
             price: `${record.price} ₽`,
             numericPrice: Number(record.price),
+            // Ссылка на картинку с твоего сервера. Если картинки нет — временная заглушка логотипа
             image: record.image ? pb.files.getUrl(record, record.image) : '/images/logo (4).png'
           };
 
@@ -140,7 +92,7 @@ const MenuSection = () => {
     fetchMenu();
   }, []);
 
-  // Блокировка стандартного скролла при открытой корзине
+  // Блокировка стандартного скролла
   useEffect(() => {
     if (isCartOpen) {
       document.body.style.overflow = "hidden";
@@ -152,7 +104,7 @@ const MenuSection = () => {
     };
   }, [isCartOpen]);
 
-  // Блокировка кастомного инерционного скролла при открытой корзине
+  // Блокировка кастомного инерционного скролла
   useEffect(() => {
     const el = cartOverlayRef.current;
     if (!el || !isCartOpen) return;
@@ -160,10 +112,8 @@ const MenuSection = () => {
     el.addEventListener("wheel", stopScrollPropagation, { passive: false });
     el.addEventListener("touchmove", stopScrollPropagation, { passive: false });
     return () => {
-      if (el) {
-        el.removeEventListener("wheel", stopScrollPropagation);
-        el.removeEventListener("touchmove", stopScrollPropagation);
-      }
+      el.removeEventListener("wheel", stopScrollPropagation);
+      el.removeEventListener("touchmove", stopScrollPropagation);
     };
   }, [isCartOpen]);
 
@@ -224,7 +174,6 @@ const MenuSection = () => {
     return Object.values(cartCounts).reduce((acc, count) => acc + count, 0);
   }, [cartCounts]);
 
-  // Логика зума картинок
   const handleMouseDown = (e: React.MouseEvent) => {
     setClickStartPos({ x: e.clientX, y: e.clientY });
     if (!isZoomed) return;
@@ -249,26 +198,11 @@ const MenuSection = () => {
     }
   };
 
-  // Логика перетаскивания (drag-to-scroll) для категорий
-  const handleCatMouseDown = (e: React.MouseEvent) => {
-    if (!categoryScrollRef.current) return;
-    setIsDraggingCat(true);
-    setStartXCat(e.pageX - categoryScrollRef.current.offsetLeft);
-    setScrollLeftCat(categoryScrollRef.current.scrollLeft);
-  };
-  const handleCatMouseLeave = () => setIsDraggingCat(false);
-  const handleCatMouseUp = () => setIsDraggingCat(false);
-  const handleCatMouseMove = (e: React.MouseEvent) => {
-    if (!isDraggingCat || !categoryScrollRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - categoryScrollRef.current.offsetLeft;
-    const walk = (x - startXCat) * 2; // Скорость прокрутки
-    categoryScrollRef.current.scrollLeft = scrollLeftCat - walk;
-  };
-
+  // ОТПРАВКА ЗАКАЗА В POCKETBASE
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Структурируем список заказанных позиций для JSON поля
     const orderedItemsList = Object.entries(cartCounts).map(([itemName, count]) => {
       const item = allItems.find(i => i.name === itemName);
       return {
@@ -279,10 +213,12 @@ const MenuSection = () => {
       };
     });
 
+    // Формируем полный красивый адрес
     const completeAddress = formData.deliveryMethod === 'pickup'
       ? `Самовывоз: ${formData.pickupAddress}`
       : `Адрес: ${formData.address}${formData.intercom ? `, Домофон: ${formData.intercom}` : ''}${formData.entrance ? `, Подъезд: ${formData.entrance}` : ''}${formData.floor ? `, Этаж: ${formData.floor}` : ''}`;
 
+    // Собираем все доп. комментарии и условия оплаты в одну строку
     const dynamicComments = `Оплата: ${formData.payment}${formData.changeFrom ? ` (Сдача с ${formData.changeFrom} ₽)` : ''} | Персон: ${formData.persons} | Примечание: ${formData.notes || 'нет'}`;
 
     const newOrder = {
@@ -302,7 +238,7 @@ const MenuSection = () => {
       setIsCartOpen(false);
     } catch (error) {
       console.error("Ошибка при создании записи заказа:", error);
-      alert("Не удалось отправить заказ.");
+      alert("Не удалось отправить заказ. Убедитесь, что коллекция 'orders' создана в PocketBase и открыты права в API Rules (Create rule).");
     }
   };
 
@@ -310,8 +246,7 @@ const MenuSection = () => {
     <>
       <section id="menu" className="pt-20 pb-16 md:pt-24 md:pb-24 bg-transparent relative min-h-screen">
         <div className="max-w-7xl mx-auto px-6">
-          
-          <div className="text-center md:text-left mb-12 reveal pl-0 md:pl-[90px] lg:pl-[140px]">
+          <div className="text-center mb-12 reveal">
             <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">
               Наше меню
             </h2>
@@ -326,22 +261,13 @@ const MenuSection = () => {
         ) : (
           <>
             <div className="sticky top-0 z-30 w-full bg-[#F5F1E6]/40 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
-              {/* Добавлены события мыши для drag-to-scroll и уменьшен gap до gap-2 */}
-              <div 
-                ref={categoryScrollRef}
-                onMouseDown={handleCatMouseDown}
-                onMouseLeave={handleCatMouseLeave}
-                onMouseUp={handleCatMouseUp}
-                onMouseMove={handleCatMouseMove}
-                className={`max-w-7xl mx-auto px-6 flex items-center overflow-x-auto gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${isDraggingCat ? 'cursor-grabbing' : 'cursor-grab'}`}
-              >
-                
-                <div className="shrink-0 w-[90px] md:w-[140px]"></div>
+              <div className="max-w-7xl mx-auto px-6 flex items-center overflow-x-auto gap-2 sm:gap-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <div className="shrink-0 w-[90px] md:w-[220px]"></div>
                 {Object.keys(menuCategories).map((key) => (
                   <button
                     key={key}
                     onClick={() => scrollToCategory(key)}
-                    className={`whitespace-nowrap rounded-full px-5 py-2 text-sm md:text-base font-semibold transition-all duration-300 ${
+                    className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm md:text-base font-semibold transition-all duration-300 ${
                       activeCategory === key
                         ? "bg-[#D4B98F] text-[#3A3124] shadow-md shadow-[#D4B98F]/40"
                         : "bg-[#F5F1E6]/80 text-[#6B5E48] hover:bg-[#D4B98F]/20 hover:text-[#3A3124]"
@@ -355,17 +281,16 @@ const MenuSection = () => {
 
             <div className="max-w-7xl mx-auto px-6 space-y-24">
               {Object.keys(menuCategories).length === 0 ? (
-                <p className="text-center text-gray-500 pl-0 md:pl-[90px] lg:pl-[140px]">Меню пока пусто.</p>
+                <p className="text-center text-gray-500">Меню пока пусто.</p>
               ) : (
                 Object.keys(menuCategories).map((key) => {
                   const categoryData = menuCategories[key];
                   return (
-                    // Карточки и заголовки категорий теперь тоже начинаются от крестика (pl-[140px])
-                    <div key={key} id={`category-${key}`} className="scroll-mt-48 pl-0 md:pl-[90px] lg:pl-[140px]">
+                    <div key={key} id={`category-${key}`} className="scroll-mt-48">
                       <h3 className="font-serif text-3xl font-bold text-[#3A3124] mb-8 pb-2 border-b border-[#D4B98F]/30 inline-block">
                         {categoryData.label}
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {categoryData.items.map((item) => (
                           <div key={item.name} onClick={() => setSelectedItem(item)} className="cursor-pointer h-full outline-none">
                             <Card className="group flex flex-col overflow-hidden rounded-3xl border-none bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
@@ -377,17 +302,17 @@ const MenuSection = () => {
                                 <p className="text-[#6B5E48] text-sm line-clamp-3 mb-4 flex-grow">{item.description}</p>
                                 <div className="mt-auto">
                                   {!cartCounts[item.name] ? (
-                                    <Button onClick="{(e)"> handleAddToCart(e, item.name)} className="w-full bg-[#F3EFE8] text-[#3A3124] hover:bg-[#EBE2D4] hover:text-[#3A3124] rounded-xl font-bold py-6 transition-colors border-none shadow-none">
+                                    <Button onClick={(e) => handleAddToCart(e, item.name)} className="w-full bg-[#F3EFE8] text-[#3A3124] hover:bg-[#EBE2D4] hover:text-[#3A3124] rounded-xl font-bold py-6 transition-colors border-none shadow-none">
                                       {item.price}
                                     </Button>
                                   ) : (
                                     <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-1 shadow-inner h-[48px]">
                                       <button onClick={(e) => handleRemoveFromCart(e, item.name)} className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
-                                        <Minus className="w-4 h-4"/>
+                                        <Minus className="w-4 h-4" />
                                       </button>
                                       <span className="font-bold text-[#3A3124] px-4">{cartCounts[item.name]}</span>
                                       <button onClick={(e) => handleAddToCart(e, item.name)} className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
-                                        <Plus className="w-4 h-4"/>
+                                        <Plus className="w-4 h-4" />
                                       </button>
                                     </div>
                                   )}
@@ -405,27 +330,27 @@ const MenuSection = () => {
           </>
         )}
 
-        
-        <Dialog onOpenChange="{(open)" open="{!!selectedItem}"> { if (!open) { setSelectedItem(null); setTimeout(() => { setIsZoomed(false); setPosition({ x: 0, y: 0 }); }, 300); } }}>
+        {/* МОДАЛЬНОЕ ОКНО ТОВАРА */}
+        <Dialog open={!!selectedItem} onOpenChange={(open) => { if (!open) { setSelectedItem(null); setTimeout(() => { setIsZoomed(false); setPosition({ x: 0, y: 0 }); }, 300); } }}>
           <DialogContent className="bg-white border-none shadow-2xl sm:max-w-[800px] rounded-[2rem] p-0 overflow-hidden flex flex-col md:flex-row gap-0">
             {selectedItem && (
               <>
                 <div className={`relative w-full md:w-[400px] h-[300px] md:h-[500px] shrink-0 overflow-hidden select-none bg-gray-50 flex items-center justify-center p-8 ${isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'}`} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave} onClick={handleImageClick}>
                   <img src={selectedItem.image} alt={selectedItem.name} draggable={false} style={{ transform: `translate(${position.x}px, ${position.y}px) scale(${isZoomed ? 2 : 1})`, transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }} className="w-full h-full object-contain origin-center" />
-                  <div className={`absolute top-4 left-4 bg-black/5 text-gray-500 p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`}><ZoomIn className="w-5 h-5"/></div>
-                  <div className={`absolute top-4 left-4 bg-[#D4B98F]/20 text-[#8C6D46] p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-100' : 'opacity-0'}`}><ZoomOut className="w-5 h-5"/></div>
+                  <div className={`absolute top-4 left-4 bg-black/5 text-gray-500 p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`}><ZoomIn className="w-5 h-5" /></div>
+                  <div className={`absolute top-4 left-4 bg-[#D4B98F]/20 text-[#8C6D46] p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-100' : 'opacity-0'}`}><ZoomOut className="w-5 h-5" /></div>
                 </div>
                 <div className="flex flex-col p-6 md:p-10 w-full md:w-[400px]">
                   <DialogTitle className="font-serif text-3xl font-bold text-[#3A3124] leading-tight mb-4">{selectedItem.name}</DialogTitle>
                   <DialogHeader className="flex-grow"><DialogDescription className="text-[#6B5E48] text-base leading-relaxed">{selectedItem.description}</DialogDescription></DialogHeader>
                   <div className="mt-8 pt-6 border-t border-gray-100">
                     {!cartCounts[selectedItem.name] ? (
-                      <Button onClick="{(e)"> handleAddToCart(e, selectedItem.name)} className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]">Добавить за {selectedItem.price}</Button>
+                      <Button onClick={(e) => handleAddToCart(e, selectedItem.name)} className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]">Добавить за {selectedItem.price}</Button>
                     ) : (
                       <div className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-2 shadow-inner h-[56px]">
-                        <button onClick={(e) => handleRemoveFromCart(e, selectedItem.name)} className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"><Minus className="w-5 h-5"/></button>
+                        <button onClick={(e) => handleRemoveFromCart(e, selectedItem.name)} className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"><Minus className="w-5 h-5" /></button>
                         <span className="font-bold text-xl text-[#3A3124] px-6">{cartCounts[selectedItem.name]}</span>
-                        <button onClick={(e) => handleAddToCart(e, selectedItem.name)} className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"><Plus className="w-5 h-5"/></button>
+                        <button onClick={(e) => handleAddToCart(e, selectedItem.name)} className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"><Plus className="w-5 h-5" /></button>
                       </div>
                     )}
                   </div>
@@ -436,30 +361,30 @@ const MenuSection = () => {
         </Dialog>
       </section>
 
-      
+      {/* ПЛАВАЮЩАЯ КНОПКА КОРЗИНЫ */}
       <div className={`fixed bottom-8 right-8 z-50 transition-all duration-500 ease-in-out ${cartItemCount > 0 && !isCartOpen ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0 pointer-events-none"}`}>
         <button onClick={() => setIsCartOpen(true)} className="group flex items-center gap-4 bg-[#3A3124] text-white px-6 py-4 rounded-full shadow-2xl shadow-black/30 hover:bg-[#2A2319] transition-all hover:scale-105">
           <div className="relative">
-            <ShoppingBag className="w-6 h-6"/>
+            <ShoppingBag className="w-6 h-6" />
             <span className="absolute -top-2 -right-3 bg-[#D4B98F] text-[#3A3124] text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-[#3A3124]">{cartItemCount}</span>
           </div>
           <span className="font-bold text-lg">{cartTotal} ₽</span>
         </button>
       </div>
 
-      
+      {/* БОКОВАЯ ПАНЕЛЬ КОРЗИНЫ */}
       <div ref={cartOverlayRef} className={`fixed inset-0 z-[60] transition-opacity duration-300 ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsCartOpen(false)} />
         <div className={`absolute top-0 right-0 h-full w-full max-w-[500px] bg-white shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isCartOpen ? "translate-x-0" : "translate-x-full"}`}>
           <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
             <h2 className="font-serif text-2xl font-bold text-[#3A3124]">Оформление заказа</h2>
-            <button onClick={() => setIsCartOpen(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors text-gray-500"><X className="w-5 h-5"/></button>
+            <button onClick={() => setIsCartOpen(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors text-gray-500"><X className="w-5 h-5" /></button>
           </div>
 
           <div className="flex-grow overflow-y-auto p-6 space-y-8 overscroll-contain">
             {Object.keys(cartCounts).length === 0 ? (
               <div className="text-center text-gray-500 mt-10">
-                <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-20"/>
+                <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-20" />
                 <p>Ваша корзина пуста</p>
               </div>
             ) : (
@@ -476,9 +401,9 @@ const MenuSection = () => {
                           <span className="font-bold text-[#D4B98F] whitespace-nowrap">{item.numericPrice * count} ₽</span>
                         </div>
                         <div className="flex items-center gap-4 bg-white w-fit rounded-lg shadow-sm border border-gray-100">
-                          <button onClick={(e) => handleRemoveFromCart(e, itemName)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black"><Minus className="w-3 h-3"/></button>
+                          <button onClick={(e) => handleRemoveFromCart(e, itemName)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black"><Minus className="w-3 h-3" /></button>
                           <span className="font-bold text-sm text-[#3A3124] w-4 text-center">{count}</span>
-                          <button onClick={(e) => handleAddToCart(e, itemName)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black"><Plus className="w-3 h-3"/></button>
+                          <button onClick={(e) => handleAddToCart(e, itemName)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black"><Plus className="w-3 h-3" /></button>
                         </div>
                       </div>
                     </div>
@@ -560,7 +485,7 @@ const MenuSection = () => {
                 <span className="text-gray-500">Итого:</span>
                 <span className="text-3xl font-bold text-[#3A3124]">{cartTotal} ₽</span>
               </div>
-              <Button className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]" form="orderForm" type="submit">Заказать доставку</Button>
+              <Button type="submit" form="orderForm" className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]">Заказать доставку</Button>
             </div>
           )}
         </div>
