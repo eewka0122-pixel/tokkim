@@ -1,8 +1,51 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Instagram, Send } from "lucide-react";
+import PocketBase from "pocketbase";
+
+const pb = new PocketBase("http://31.57.47.98");
+
+type Settings = {
+  phone: string;
+  address: string;
+  vk_link: string;
+  telegramm: string;
+  Instagramm: string;
+};
 
 const Footer = () => {
+  const [settings, setSettings] = useState<Settings>({
+    phone: "+7 (123) 456-78-90", // Значение по умолчанию, пока грузится база
+    address: "г. Раменское, ул. Бронницкая, д. 19а",
+    vk_link: "#",
+    telegramm: "#",
+    Instagramm: "#",
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        // Получаем первую запись из коллекции settings
+        const records = await pb.collection("settings").getList(1, 1);
+        if (records.items.length > 0) {
+          const data = records.items[0];
+          setSettings({
+            phone: data.phone || settings.phone,
+            address: data.address || settings.address,
+            vk_link: data.vk_link || "#",
+            telegramm: data.telegramm || "#",
+            Instagramm: data.Instagramm || "#",
+          });
+        }
+      } catch (error) {
+        console.error("Ошибка при получении настроек контактов:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
   return (
     <footer className="bg-[#3A3124] text-[#F5F1E6] px-6 py-16">
       <div className="max-w-7xl mx-auto">
@@ -32,9 +75,10 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold text-[#F5F1E6] mb-4">Контакты</h4>
             <ul className="space-y-2 text-[#9A8F7D]">
-              <li>+7 (123) 456-78-90</li>
-              <li>reservations@tokkim.com</li>
-              <li>г. Раменское, ул. Бронницкая, д. 19а</li>
+              <li>{settings.phone}</li>
+              {/* Почта оставлена статичной, так как ее не было в базе, но можно добавить */}
+              <li>reservations@tokkim.com</li> 
+              <li>{settings.address}</li>
             </ul>
           </div>
 
@@ -43,14 +87,19 @@ const Footer = () => {
             <h4 className="font-semibold text-[#F5F1E6] mb-4">Соцсети</h4>
             <div className="flex gap-4">
               {/* Instagram */}
-              <a href="#" className="w-10 h-10 rounded-full bg-[#4A453A] flex items-center justify-center hover:bg-[#D4B98F] hover:text-[#3A3124] transition-colors">
+              <a 
+                href={settings.Instagramm !== "#" ? settings.Instagramm : "#"} 
+                target={settings.Instagramm !== "#" ? "_blank" : "_self"}
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-[#4A453A] flex items-center justify-center hover:bg-[#D4B98F] hover:text-[#3A3124] transition-colors"
+              >
                 <Instagram className="h-5 w-5" />
               </a>
               
               {/* VK */}
               <a 
-                href="https://vk.com/club238902574" 
-                target="_blank"
+                href={settings.vk_link !== "#" ? settings.vk_link : "#"} 
+                target={settings.vk_link !== "#" ? "_blank" : "_self"}
                 rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-[#4A453A] flex items-center justify-center hover:bg-[#D4B98F] hover:text-[#3A3124] transition-colors"
               >
@@ -60,7 +109,12 @@ const Footer = () => {
               </a>
 
               {/* Telegram */}
-              <a href="#" className="w-10 h-10 rounded-full bg-[#4A453A] flex items-center justify-center hover:bg-[#D4B98F] hover:text-[#3A3124] transition-colors">
+              <a 
+                href={settings.telegramm !== "#" ? settings.telegramm : "#"}
+                target={settings.telegramm !== "#" ? "_blank" : "_self"}
+                rel="noopener noreferrer" 
+                className="w-10 h-10 rounded-full bg-[#4A453A] flex items-center justify-center hover:bg-[#D4B98F] hover:text-[#3A3124] transition-colors"
+              >
                 <Send className="h-5 w-5 -ml-0.5 mt-0.5" />
               </a>
             </div>
