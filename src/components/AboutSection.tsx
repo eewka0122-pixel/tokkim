@@ -20,10 +20,10 @@ const AboutSection = () => {
         if (records.items.length > 0) {
           const d = records.items[0];
           setData({
-            subtitle: d.subtitle || data.subtitle,
-            title: d.title || data.title,
-            text: d.text || data.text,
-            // Если картинка загружена в базу, получаем на неё ссылку. Иначе оставляем старую картинку.
+            // Заменил || на проверку undefined, чтобы пустая строка из базы стирала текст на сайте
+            subtitle: d.subtitle !== undefined ? d.subtitle : data.subtitle,
+            title: d.title !== undefined ? d.title : data.title,
+            text: d.text !== undefined ? d.text : data.text,
             image: d.image ? pb.files.getUrl(d, d.image) : data.image
           });
         }
@@ -60,9 +60,13 @@ const AboutSection = () => {
             />
           </div>
           <div className="space-y-6 reveal-delay-100">
-            <h3 className="font-serif text-3xl font-bold text-[#281C15]">
-              {data.title}
-            </h3>
+            {/* Рендерим заголовок только если он не пустой */}
+            {data.title && (
+              <h3 className="font-serif text-3xl font-bold text-[#281C15]">
+                {data.title}
+              </h3>
+            )}
+            
             {/* Обертка для Rich Editor, чтобы сохранить исходные стили параграфов */}
             <div 
               className="text-[#423124] font-medium text-lg leading-relaxed space-y-6"
