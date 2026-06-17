@@ -47,13 +47,11 @@ const MenuSection = () => {
 
   const cartOverlayRef = useRef<HTMLDivElement>(null);
   
-  // Рефы и стейты для скролла категорий мышкой
   const categoryScrollRef = useRef<HTMLDivElement>(null);
   const [isDraggingCat, setIsDraggingCat] = useState(false);
   const [startXCat, setStartXCat] = useState(0);
   const [scrollLeftCat, setScrollLeftCat] = useState(0);
 
-  // СКАЧИВАНИЕ МЕНЮ ИЗ БАЗЫ ДАННЫХ
   useEffect(() => {
     const fetchMenu = async () => {
       try {
@@ -96,7 +94,6 @@ const MenuSection = () => {
     fetchMenu();
   }, []);
 
-  // Блокировка стандартного скролла при открытой корзине
   useEffect(() => {
     if (isCartOpen) {
       document.body.style.overflow = "hidden";
@@ -108,7 +105,6 @@ const MenuSection = () => {
     };
   }, [isCartOpen]);
 
-  // Блокировка кастомного инерционного скролла при открытой корзине
   useEffect(() => {
     const el = cartOverlayRef.current;
     if (!el || !isCartOpen) return;
@@ -123,7 +119,6 @@ const MenuSection = () => {
     };
   }, [isCartOpen]);
 
-  // Логика отслеживания скролла (Scroll Spy)
   useEffect(() => {
     const handleScroll = () => {
       const sections = Object.keys(menuCategories);
@@ -180,7 +175,6 @@ const MenuSection = () => {
     return Object.values(cartCounts).reduce((acc, count) => acc + count, 0);
   }, [cartCounts]);
 
-  // Логика зума картинок
   const handleMouseDown = (e: React.MouseEvent) => {
     setClickStartPos({ x: e.clientX, y: e.clientY });
     if (!isZoomed) return;
@@ -205,7 +199,6 @@ const MenuSection = () => {
     }
   };
 
-  // Логика перетаскивания (drag-to-scroll) для категорий
   const handleCatMouseDown = (e: React.MouseEvent) => {
     if (!categoryScrollRef.current) return;
     setIsDraggingCat(true);
@@ -218,7 +211,7 @@ const MenuSection = () => {
     if (!isDraggingCat || !categoryScrollRef.current) return;
     e.preventDefault();
     const x = e.pageX - categoryScrollRef.current.offsetLeft;
-    const walk = (x - startXCat) * 2; // Скорость прокрутки
+    const walk = (x - startXCat) * 2; 
     categoryScrollRef.current.scrollLeft = scrollLeftCat - walk;
   };
 
@@ -265,8 +258,7 @@ const MenuSection = () => {
   return (
     <>
       <section id="menu" className="pt-20 pb-16 md:pt-24 md:pb-24 bg-transparent relative min-h-screen">
-        <div className="max-w-7xl mx-auto px-6">
-          {/* Вернули заголовок в центр, убрав отступы pl */}
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-12 reveal">
             <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">
               Наше меню
@@ -281,22 +273,22 @@ const MenuSection = () => {
           </div>
         ) : (
           <>
-            <div className="sticky top-0 z-30 w-full bg-[#F5F1E6]/40 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
-              {/* Лента категорий (остается с отступом до крестика) */}
+            <div className="sticky top-0 z-30 w-full bg-[#F5F1E6]/40 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-8 md:mb-12 shadow-sm shadow-[#D4B98F]/10">
               <div 
                 ref={categoryScrollRef}
                 onMouseDown={handleCatMouseDown}
                 onMouseLeave={handleCatMouseLeave}
                 onMouseUp={handleCatMouseUp}
                 onMouseMove={handleCatMouseMove}
-                className={`max-w-7xl mx-auto px-6 flex items-center overflow-x-auto gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${isDraggingCat ? 'cursor-grabbing' : 'cursor-grab'}`}
+                className={`max-w-7xl mx-auto px-4 md:px-6 flex items-center overflow-x-auto gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${isDraggingCat ? 'cursor-grabbing' : 'cursor-grab'}`}
               >
-                <div className="shrink-0 w-[90px] md:w-[140px]"></div>
+                {/* Отступ до крестика только для ПК. На мобилках начинается с нуля для чистоты */}
+                <div className="shrink-0 w-0 md:w-[140px]"></div>
                 {Object.keys(menuCategories).map((key) => (
                   <button
                     key={key}
                     onClick={() => scrollToCategory(key)}
-                    className={`whitespace-nowrap rounded-full px-5 py-2 text-sm md:text-base font-semibold transition-all duration-300 ${
+                    className={`whitespace-nowrap rounded-full px-4 py-1.5 md:px-5 md:py-2 text-xs md:text-base font-semibold transition-all duration-300 ${
                       activeCategory === key
                         ? "bg-[#D4B98F] text-[#3A3124] shadow-md shadow-[#D4B98F]/40"
                         : "bg-[#F5F1E6]/80 text-[#6B5E48] hover:bg-[#D4B98F]/20 hover:text-[#3A3124]"
@@ -308,41 +300,45 @@ const MenuSection = () => {
               </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 space-y-24">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 space-y-16 md:space-y-24">
               {Object.keys(menuCategories).length === 0 ? (
-                <p className="text-center text-gray-500 pl-0 md:pl-[90px] lg:pl-[140px]">Меню пока пусто.</p>
+                <p className="text-center text-gray-500 md:pl-[140px]">Меню пока пусто.</p>
               ) : (
                 Object.keys(menuCategories).map((key) => {
                   const categoryData = menuCategories[key];
                   return (
-                    // Карточки и заголовки категорий (остаются с отступом)
-                    <div key={key} id={`category-${key}`} className="scroll-mt-48 pl-0 md:pl-[90px] lg:pl-[140px]">
-                      <h3 className="font-serif text-3xl font-bold text-[#3A3124] mb-8 pb-2 border-b border-[#D4B98F]/30 inline-block">
+                    <div key={key} id={`category-${key}`} className="scroll-mt-32 md:scroll-mt-48 pl-0 md:pl-[140px]">
+                      <h3 className="font-serif text-2xl md:text-3xl font-bold text-[#3A3124] mb-6 md:mb-8 pb-2 border-b border-[#D4B98F]/30 inline-block">
                         {categoryData.label}
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      
+                      {/* grid-cols-2 на мобилке для идеального выравнивания карточек в два ряда */}
+                      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
                         {categoryData.items.map((item) => (
                           <div key={item.name} onClick={() => setSelectedItem(item)} className="cursor-pointer h-full outline-none">
-                            <Card className="group flex flex-col overflow-hidden rounded-3xl border-none bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
-                              <div className="relative h-48 sm:h-56 overflow-hidden bg-gray-50 p-4">
+                            <Card className="group flex flex-col overflow-hidden rounded-2xl md:rounded-3xl border-none bg-white shadow-sm hover:shadow-xl transition-all duration-300 h-full">
+                              
+                              {/* Высота картинки оптимизирована: h-32 на мобилке, h-56 на ПК */}
+                              <div className="relative h-32 sm:h-44 md:h-56 overflow-hidden bg-gray-50 p-2 md:p-4">
                                 <img src={item.image} alt={item.name} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
                               </div>
-                              <CardContent className="p-5 flex flex-col flex-grow bg-white">
-                                <h3 className="font-bold text-[#3A3124] text-lg mb-2 leading-tight">{item.name}</h3>
-                                <p className="text-[#6B5E48] text-sm line-clamp-3 mb-4 flex-grow">{item.description}</p>
+                              
+                              <CardContent className="p-3 md:p-5 flex flex-col flex-grow bg-white">
+                                <h3 className="font-bold text-[#3A3124] text-sm md:text-lg mb-1 md:mb-2 leading-tight line-clamp-1">{item.name}</h3>
+                                <p className="text-[#6B5E48] text-[11px] md:text-sm line-clamp-2 md:line-clamp-3 mb-3 flex-grow">{item.description}</p>
                                 <div className="mt-auto">
                                   {!cartCounts[item.name] ? (
-                                    <Button onClick={(e) => handleAddToCart(e, item.name)} className="w-full bg-[#F3EFE8] text-[#3A3124] hover:bg-[#EBE2D4] hover:text-[#3A3124] rounded-xl font-bold py-6 transition-colors border-none shadow-none">
+                                    <Button onClick={(e) => handleAddToCart(e, item.name)} className="w-full bg-[#F3EFE8] text-[#3A3124] hover:bg-[#EBE2D4] hover:text-[#3A3124] rounded-lg md:rounded-xl font-bold py-4 md:py-6 h-9 md:h-12 text-xs md:text-base transition-colors border-none shadow-none">
                                       {item.price}
                                     </Button>
                                   ) : (
-                                    <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-1 shadow-inner h-[48px]">
-                                      <button onClick={(e) => handleRemoveFromCart(e, item.name)} className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
-                                        <Minus className="w-4 h-4" />
+                                    <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-between bg-[#F5F1E6] rounded-lg md:rounded-xl p-0.5 md:p-1 shadow-inner h-9 md:h-12">
+                                      <button onClick={(e) => handleRemoveFromCart(e, item.name)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-md md:rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
+                                        <Minus className="w-3 h-3 md:w-4 md:h-4" />
                                       </button>
-                                      <span className="font-bold text-[#3A3124] px-4">{cartCounts[item.name]}</span>
-                                      <button onClick={(e) => handleAddToCart(e, item.name)} className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
-                                        <Plus className="w-4 h-4" />
+                                      <span className="font-bold text-xs md:text-base text-[#3A3124] px-2 md:px-4">{cartCounts[item.name]}</span>
+                                      <button onClick={(e) => handleAddToCart(e, item.name)} className="w-8 h-8 md:w-10 md:h-10 flex items-center justify-center rounded-md md:rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
+                                        <Plus className="w-3 h-3 md:w-4 md:h-4" />
                                       </button>
                                     </div>
                                   )}
@@ -365,22 +361,22 @@ const MenuSection = () => {
           <DialogContent className="bg-white border-none shadow-2xl sm:max-w-[800px] rounded-[2rem] p-0 overflow-hidden flex flex-col md:flex-row gap-0">
             {selectedItem && (
               <>
-                <div className={`relative w-full md:w-[400px] h-[300px] md:h-[500px] shrink-0 overflow-hidden select-none bg-gray-50 flex items-center justify-center p-8 ${isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'}`} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave} onClick={handleImageClick}>
+                <div className={`relative w-full md:w-[400px] h-[280px] md:h-[500px] shrink-0 overflow-hidden select-none bg-gray-50 flex items-center justify-center p-6 md:p-8 ${isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'}`} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave} onClick={handleImageClick}>
                   <img src={selectedItem.image} alt={selectedItem.name} draggable={false} style={{ transform: `translate(${position.x}px, ${position.y}px) scale(${isZoomed ? 2 : 1})`, transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }} className="w-full h-full object-contain origin-center" />
                   <div className={`absolute top-4 left-4 bg-black/5 text-gray-500 p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`}><ZoomIn className="w-5 h-5" /></div>
                   <div className={`absolute top-4 left-4 bg-[#D4B98F]/20 text-[#8C6D46] p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-100' : 'opacity-0'}`}><ZoomOut className="w-5 h-5" /></div>
                 </div>
                 <div className="flex flex-col p-6 md:p-10 w-full md:w-[400px]">
-                  <DialogTitle className="font-serif text-3xl font-bold text-[#3A3124] leading-tight mb-4">{selectedItem.name}</DialogTitle>
-                  <DialogHeader className="flex-grow"><DialogDescription className="text-[#6B5E48] text-base leading-relaxed">{selectedItem.description}</DialogDescription></DialogHeader>
-                  <div className="mt-8 pt-6 border-t border-gray-100">
+                  <DialogTitle className="font-serif text-2xl md:text-3xl font-bold text-[#3A3124] leading-tight mb-2 md:mb-4">{selectedItem.name}</DialogTitle>
+                  <DialogHeader className="flex-grow"><DialogDescription className="text-[#6B5E48] text-sm md:text-base leading-relaxed">{selectedItem.description}</DialogDescription></DialogHeader>
+                  <div className="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-gray-100">
                     {!cartCounts[selectedItem.name] ? (
-                      <Button onClick={(e) => handleAddToCart(e, selectedItem.name)} className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]">Добавить за {selectedItem.price}</Button>
+                      <Button onClick={(e) => handleAddToCart(e, selectedItem.name)} className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-5 md:py-7 h-12 md:h-14 font-bold text-base md:text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]">Добавить за {selectedItem.price}</Button>
                     ) : (
-                      <div className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-2 shadow-inner h-[56px]">
-                        <button onClick={(e) => handleRemoveFromCart(e, selectedItem.name)} className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"><Minus className="w-5 h-5" /></button>
-                        <span className="font-bold text-xl text-[#3A3124] px-6">{cartCounts[selectedItem.name]}</span>
-                        <button onClick={(e) => handleAddToCart(e, selectedItem.name)} className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"><Plus className="w-5 h-5" /></button>
+                      <div className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-1.5 md:p-2 shadow-inner h-12 md:h-14">
+                        <button onClick={(e) => handleRemoveFromCart(e, selectedItem.name)} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"><Minus className="w-4 h-4 md:w-5 md:h-5" /></button>
+                        <span className="font-bold text-lg md:text-xl text-[#3A3124] px-4 md:px-6">{cartCounts[selectedItem.name]}</span>
+                        <button onClick={(e) => handleAddToCart(e, selectedItem.name)} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"><Plus className="w-4 h-4 md:w-5 md:h-5" /></button>
                       </div>
                     )}
                   </div>
@@ -392,13 +388,13 @@ const MenuSection = () => {
       </section>
 
       {/* ПЛАВАЮЩАЯ КНОПКА КОРЗИНЫ */}
-      <div className={`fixed bottom-8 right-8 z-50 transition-all duration-500 ease-in-out ${cartItemCount > 0 && !isCartOpen ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0 pointer-events-none"}`}>
-        <button onClick={() => setIsCartOpen(true)} className="group flex items-center gap-4 bg-[#3A3124] text-white px-6 py-4 rounded-full shadow-2xl shadow-black/30 hover:bg-[#2A2319] transition-all hover:scale-105">
+      <div className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 transition-all duration-500 ease-in-out ${cartItemCount > 0 && !isCartOpen ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0 pointer-events-none"}`}>
+        <button onClick={() => setIsCartOpen(true)} className="group flex items-center gap-3 md:gap-4 bg-[#3A3124] text-white px-5 py-3.5 md:px-6 md:py-4 rounded-full shadow-2xl shadow-black/30 hover:bg-[#2A2319] transition-all hover:scale-105">
           <div className="relative">
-            <ShoppingBag className="w-6 h-6" />
-            <span className="absolute -top-2 -right-3 bg-[#D4B98F] text-[#3A3124] text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-[#3A3124]">{cartItemCount}</span>
+            <ShoppingBag className="w-5 h-5 md:w-6 h-6" />
+            <span className="absolute -top-2 -right-3 bg-[#D4B98F] text-[#3A3124] text-[10px] md:text-xs font-bold w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full border-2 border-[#3A3124]">{cartItemCount}</span>
           </div>
-          <span className="font-bold text-lg">{cartTotal} ₽</span>
+          <span className="font-bold text-base md:text-lg">{cartTotal} ₽</span>
         </button>
       </div>
 
