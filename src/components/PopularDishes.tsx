@@ -1,35 +1,103 @@
 "use client";
 
-import { Percent, Gift, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Percent, Gift, Clock, LucideIcon } from "lucide-react";
+import PocketBase from "pocketbase";
 
-const promos = [
-  {
-    id: 1,
-    title: "Скидка на самовывоз",
-    description: "Оформите заказ с собой и получите приятную скидку 10% на весь чек. Заходите к нам в гости!",
-    badge: "-10%",
-    icon: Percent,
-    image: "/images/Кимпаб с говядиной.jpeg", 
-  },
-  {
-    id: 2,
-    title: "Счастливые часы",
-    description: "Каждый будний день с 12:00 до 16:00 действует скидка 15% на все супы и горячие блюда вок.",
-    badge: "12:00 - 16:00",
-    icon: Clock,
-    image: "/images/Рамен с морепродуктами.jpeg",
-  },
-  {
-    id: 3,
-    title: "Подарок к заказу",
-    description: "При заказе доставки на сумму от 2000 ₽ дарим порцию хрустящих эноки с беконом.",
-    badge: "Подарок",
-    icon: Gift,
-    image: "/images/Эноки с беконом.jpeg",
-  }
-];
+// Подключение к твоей базе данных PocketBase
+const pb = new PocketBase("http://31.57.47.98");
+
+type PromotionItem = {
+  id: string;
+  title: string;
+  description: string;
+  badge: string;
+  icon: LucideIcon;
+  mediaUrl: string;
+  isVideo: boolean;
+};
 
 const PopularDishes = () => {
+  const [promos, setPromos] = useState<PromotionItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  // Автоматический определитель иконок и плашек на основе ключевых слов в заголовке акции
+  const getPromoMetadata = (title: string, index: number) => {
+    const lowerTitle = title.toLowerCase();
+    
+    if (lowerTitle.includes("самовывоз") || lowerTitle.includes("скидк") || lowerTitle.includes("%")) {
+      return { icon: Percent, badge: "-10%" };
+    }
+    if (lowerTitle.includes("час") || lowerTitle.includes("время") || lowerTitle.includes("будн")) {
+      return { icon: Clock, badge: "12:00 - 16:00" };
+    }
+    if (lowerTitle.includes("подарок") || lowerTitle.includes("дарим") || lowerTitle.includes("бесплат")) {
+      return { icon: Gift, badge: "Подарок" };
+    }
+    
+    // Красивые запасные варианты по умолчанию, если совпадений нет
+    const fallbacks = [
+      { icon: Percent, badge: "Акция" },
+      { icon: Clock, badge: "Ограничено" },
+      { icon: Gift, badge: "Бонус" }
+    ];
+    return fallbacks[index % fallbacks.length];
+  };
+
+  useEffect(() => {
+    const fetchPromotions = async () => {
+      try {
+        // Скачиваем список всех акций, отсортированных по дате создания
+        const records = await pb.collection("promotions").getFullList({
+          sort: "created",
+        });
+
+        const formattedPromos = records.map((record, index) => {
+          // Получаем имя файла из поля media
+          const fileName = record.media || "";
+          
+          // Проверяем расширение файла (видео или картинка)
+          const isVideo = /\.(mp4|webm|mov|avi)$/i.test(fileName);
+          
+          // Формируем прямую ссылку на медиафайл на твоем сервере
+          const mediaUrl = fileName 
+            ? pb.files.getUrl(record, fileName)
+            : "/images/Кимпаб с говядиной.jpeg"; // Заглушка на случай отсутствия медиа
+
+          // Получаем иконку и плашку
+          const metadata = getPromoMetadata(record.title, index);
+
+          return {
+            id: record.id,
+            title: record.title,
+            description: record.description,
+            badge: metadata.badge,
+            icon: metadata.icon,
+            mediaUrl: mediaUrl,
+            isVideo: isVideo
+          };
+        });
+
+        setPromos(formattedPromos);
+      } catch (error) {
+        console.error("Ошибка при загрузке акций из PocketBase:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPromotions();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <section id="module-promos" className="pt-12 pb-24 px-6 bg-transparent relative z-10 flex flex-col items-center justify-center min-h-[400px]">
+        <div className="w-12 h-12 border-4 border-[#7A2828]/20 border-t-[#7A2828] rounded-full animate-spin mb-4"></div>
+        <p className="text-[#5C4D42] font-medium">Загружаем специальные предложения...</p>
+      </section>
+    );
+  }
+
   return (
     <section id="module-promos" className="pt-12 pb-24 px-6 bg-transparent relative z-10">
       <div className="max-w-7xl mx-auto">
@@ -49,35 +117,51 @@ const PopularDishes = () => {
 
         {/* Карточки акций */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {promos.map((promo) => (
-            <div 
-              key={promo.id} 
-              className="relative group rounded-[2rem] overflow-hidden bg-[#2A1616] shadow-[0_15px_35px_rgba(0,0,0,0.3)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)] hover:-translate-y-3 transition-all duration-500 h-[380px] md:h-[420px] cursor-pointer"
-            >
-              <img 
-                src={promo.image} 
-                alt={promo.title} 
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
-              />
-              
-              <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#2A1616]/95 via-[#2A1616]/50 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 z-10" />
+          {promos.length === 0 ? (
+            <p className="text-center text-[#5C4D42] col-span-1 md:col-span-3">На данный момент нет действующих акций.</p>
+          ) : (
+            promos.map((promo) => (
+              <div 
+                key={promo.id} 
+                className="relative group rounded-[2rem] overflow-hidden bg-[#2A1616] shadow-[0_15px_35px_rgba(0,0,0,0.3)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.5)] hover:-translate-y-3 transition-all duration-500 h-[380px] md:h-[420px] cursor-pointer"
+              >
+                {/* Умный вывод медиа: если видео — запускаем плеер, если фото — выводим картинку */}
+                {promo.isVideo ? (
+                  <video 
+                    src={promo.mediaUrl}
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                  />
+                ) : (
+                  <img 
+                    src={promo.mediaUrl} 
+                    alt={promo.title} 
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                  />
+                )}
+                
+                <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-[#2A1616]/95 via-[#2A1616]/50 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500 z-10" />
 
-              {/* Плашка Винный акцент */}
-              <div className="absolute top-5 right-5 bg-[#7A2828]/95 backdrop-blur-sm text-[#F5F1E6] font-extrabold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-20">
-                <promo.icon className="w-4 h-4 stroke-[3]" />
-                <span>{promo.badge}</span>
-              </div>
+                {/* Плашка Винный акцент */}
+                <div className="absolute top-5 right-5 bg-[#7A2828]/95 backdrop-blur-sm text-[#F5F1E6] font-extrabold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-20">
+                  <promo.icon className="w-4 h-4 stroke-[3]" />
+                  <span>{promo.badge}</span>
+                </div>
 
-              <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
-                <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-3">
-                  {promo.title}
-                </h3>
-                <p className="text-white/90 text-sm md:text-base leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75">
-                  {promo.description}
-                </p>
+                <div className="absolute bottom-0 left-0 w-full p-6 md:p-8 translate-y-8 group-hover:translate-y-0 transition-transform duration-500 ease-out z-20">
+                  <h3 className="font-serif text-2xl md:text-3xl font-bold text-white mb-3">
+                    {promo.title}
+                  </h3>
+                  <p className="text-white/90 text-sm md:text-base leading-relaxed opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-75">
+                    {promo.description}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </section>
