@@ -7,7 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import PocketBase from "pocketbase";
 
-// Подключение к твоей личной базе данных на сервере
 const pb = new PocketBase("http://31.57.47.98");
 
 type MenuItem = { name: string; description: string; price: string; image: string; numericPrice: number };
@@ -47,6 +46,12 @@ const MenuSection = () => {
   const [clickStartPos, setClickStartPos] = useState({ x: 0, y: 0 });
 
   const cartOverlayRef = useRef<HTMLDivElement>(null);
+  
+  // Рефы и стейты для скролла категорий мышкой
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  const [isDraggingCat, setIsDraggingCat] = useState(false);
+  const [startXCat, setStartXCat] = useState(0);
+  const [scrollLeftCat, setScrollLeftCat] = useState(0);
 
   // СКАЧИВАНИЕ МЕНЮ ИЗ БАЗЫ ДАННЫХ
   useEffect(() => {
@@ -62,7 +67,6 @@ const MenuSection = () => {
             description: record.description,
             price: `${record.price} ₽`,
             numericPrice: Number(record.price),
-            // Ссылка на картинку с твоего сервера. Если картинки нет — временная заглушка логотипа
             image: record.image ? pb.files.getUrl(record, record.image) : '/images/logo (4).png'
           };
 
@@ -92,7 +96,7 @@ const MenuSection = () => {
     fetchMenu();
   }, []);
 
-  // Блокировка стандартного скролла
+  // Блокировка стандартного скролла при открытой корзине
   useEffect(() => {
     if (isCartOpen) {
       document.body.style.overflow = "hidden";
@@ -104,7 +108,7 @@ const MenuSection = () => {
     };
   }, [isCartOpen]);
 
-  // Блокировка кастомного инерционного скролла
+  // Блокировка кастомного инерционного скролла при открытой корзине
   useEffect(() => {
     const el = cartOverlayRef.current;
     if (!el || !isCartOpen) return;
@@ -112,8 +116,10 @@ const MenuSection = () => {
     el.addEventListener("wheel", stopScrollPropagation, { passive: false });
     el.addEventListener("touchmove", stopScrollPropagation, { passive: false });
     return () => {
-      el.removeEventListener("wheel", stopScrollPropagation);
-      el.removeEventListener("touchmove", stopScrollPropagation);
+      if (el) {
+        el.removeEventListener("wheel", stopScrollPropagation);
+        el.removeEventListener("touchmove", stopScrollPropagation);
+      }
     };
   }, [isCartOpen]);
 
@@ -174,6 +180,7 @@ const MenuSection = () => {
     return Object.values(cartCounts).reduce((acc, count) => acc + count, 0);
   }, [cartCounts]);
 
+  // Логика зума картинок
   const handleMouseDown = (e: React.MouseEvent) => {
     setClickStartPos({ x: e.clientX, y: e.clientY });
     if (!isZoomed) return;
@@ -198,11 +205,26 @@ const MenuSection = () => {
     }
   };
 
-  // ОТПРАВКА ЗАКАЗА В POCKETBASE
+  // Логика перетаскивания (drag-to-scroll) для категорий
+  const handleCatMouseDown = (e: React.MouseEvent) => {
+    if (!categoryScrollRef.current) return;
+    setIsDraggingCat(true);
+    setStartXCat(e.pageX - categoryScrollRef.current.offsetLeft);
+    setScrollLeftCat(categoryScrollRef.current.scrollLeft);
+  };
+  const handleCatMouseLeave = () => setIsDraggingCat(false);
+  const handleCatMouseUp = () => setIsDraggingCat(false);
+  const handleCatMouseMove = (e: React.MouseEvent) => {
+    if (!isDraggingCat || !categoryScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - categoryScrollRef.current.offsetLeft;
+    const walk = (x - startXCat) * 2; // Скорость прокрутки
+    categoryScrollRef.current.scrollLeft = scrollLeftCat - walk;
+  };
+
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Структурируем список заказанных позиций для JSON поля
     const orderedItemsList = Object.entries(cartCounts).map(([itemName, count]) => {
       const item = allItems.find(i => i.name === itemName);
       return {
@@ -213,12 +235,10 @@ const MenuSection = () => {
       };
     });
 
-    // Формируем полный красивый адрес
     const completeAddress = formData.deliveryMethod === 'pickup'
       ? `Самовывоз: ${formData.pickupAddress}`
       : `Адрес: ${formData.address}${formData.intercom ? `, Домофон: ${formData.intercom}` : ''}${formData.entrance ? `, Подъезд: ${formData.entrance}` : ''}${formData.floor ? `, Этаж: ${formData.floor}` : ''}`;
 
-    // Собираем все доп. комментарии и условия оплаты в одну строку
     const dynamicComments = `Оплата: ${formData.payment}${formData.changeFrom ? ` (Сдача с ${formData.changeFrom} ₽)` : ''} | Персон: ${formData.persons} | Примечание: ${formData.notes || 'нет'}`;
 
     const newOrder = {
@@ -238,7 +258,7 @@ const MenuSection = () => {
       setIsCartOpen(false);
     } catch (error) {
       console.error("Ошибка при создании записи заказа:", error);
-      alert("Не удалось отправить заказ. Убедитесь, что коллекция 'orders' создана в PocketBase и открыты права в API Rules (Create rule).");
+      alert("Не удалось отправить заказ.");
     }
   };
 
@@ -246,7 +266,8 @@ const MenuSection = () => {
     <>
       <section id="menu" className="pt-20 pb-16 md:pt-24 md:pb-24 bg-transparent relative min-h-screen">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12 reveal">
+          {/* Сдвигаем главный заголовок до уровня крестика (pl-[140px]) */}
+          <div className="text-center md:text-left mb-12 reveal pl-0 md:pl-[90px] lg:pl-[140px]">
             <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">
               Наше меню
             </h2>
@@ -261,13 +282,22 @@ const MenuSection = () => {
         ) : (
           <>
             <div className="sticky top-0 z-30 w-full bg-[#F5F1E6]/40 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
-              <div className="max-w-7xl mx-auto px-6 flex items-center overflow-x-auto gap-2 sm:gap-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                <div className="shrink-0 w-[90px] md:w-[220px]"></div>
+              {/* Добавлены события мыши для drag-to-scroll и уменьшен gap до gap-2 */}
+              <div 
+                ref={categoryScrollRef}
+                onMouseDown={handleCatMouseDown}
+                onMouseLeave={handleCatMouseLeave}
+                onMouseUp={handleCatMouseUp}
+                onMouseMove={handleCatMouseMove}
+                className={`max-w-7xl mx-auto px-6 flex items-center overflow-x-auto gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${isDraggingCat ? 'cursor-grabbing' : 'cursor-grab'}`}
+              >
+                {/* Отступ до крестика (140px) */}
+                <div className="shrink-0 w-[90px] md:w-[140px]"></div>
                 {Object.keys(menuCategories).map((key) => (
                   <button
                     key={key}
                     onClick={() => scrollToCategory(key)}
-                    className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm md:text-base font-semibold transition-all duration-300 ${
+                    className={`whitespace-nowrap rounded-full px-5 py-2 text-sm md:text-base font-semibold transition-all duration-300 ${
                       activeCategory === key
                         ? "bg-[#D4B98F] text-[#3A3124] shadow-md shadow-[#D4B98F]/40"
                         : "bg-[#F5F1E6]/80 text-[#6B5E48] hover:bg-[#D4B98F]/20 hover:text-[#3A3124]"
@@ -281,16 +311,17 @@ const MenuSection = () => {
 
             <div className="max-w-7xl mx-auto px-6 space-y-24">
               {Object.keys(menuCategories).length === 0 ? (
-                <p className="text-center text-gray-500">Меню пока пусто.</p>
+                <p className="text-center text-gray-500 pl-0 md:pl-[90px] lg:pl-[140px]">Меню пока пусто.</p>
               ) : (
                 Object.keys(menuCategories).map((key) => {
                   const categoryData = menuCategories[key];
                   return (
-                    <div key={key} id={`category-${key}`} className="scroll-mt-48">
+                    // Карточки и заголовки категорий теперь тоже начинаются от крестика (pl-[140px])
+                    <div key={key} id={`category-${key}`} className="scroll-mt-48 pl-0 md:pl-[90px] lg:pl-[140px]">
                       <h3 className="font-serif text-3xl font-bold text-[#3A3124] mb-8 pb-2 border-b border-[#D4B98F]/30 inline-block">
                         {categoryData.label}
                       </h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                         {categoryData.items.map((item) => (
                           <div key={item.name} onClick={() => setSelectedItem(item)} className="cursor-pointer h-full outline-none">
                             <Card className="group flex flex-col overflow-hidden rounded-3xl border-none bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
@@ -485,7 +516,7 @@ const MenuSection = () => {
                 <span className="text-gray-500">Итого:</span>
                 <span className="text-3xl font-bold text-[#3A3124]">{cartTotal} ₽</span>
               </div>
-              <Button type="submit" form="orderForm" className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]">Заказать доставку</Button>
+              <Button className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]" form="orderForm" type="submit">Заказать доставку</Button>
             </div>
           )}
         </div>
