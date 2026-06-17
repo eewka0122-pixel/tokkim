@@ -292,14 +292,14 @@ const Index = () => {
           </button>
         </nav>
 
-        {/* ГЛАВНЫЙ ЭКРАН С РЫБКАМИ (100dvh для идеального размера на телефоне) */}
+        {/* ГЛАВНЫЙ ЭКРАН С РЫБКАМИ (object-contain для мобилок, чтобы не обрезалось по бокам) */}
         <div className="relative w-full h-[100dvh] overflow-hidden bg-black">
           <video 
             autoPlay 
             loop 
             muted 
             playsInline 
-            className="absolute inset-0 w-full h-full object-cover object-center z-0"
+            className="absolute inset-0 w-full h-full object-contain md:object-cover object-center z-0"
           >
             <source src="/hero.mp4" type="video/mp4" />
             <source src="/video.mp4" type="video/mp4" />
@@ -314,7 +314,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Блок 1: О НАС И АКЦИИ (Убрано размытие, чтобы корзина не ломалась) */}
+        {/* Блок 1: О НАС И АКЦИИ */}
         <div 
           id="module-about" 
           style={{ 
@@ -333,7 +333,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Блок 2: НАШЕ МЕНЮ (Убрано размытие, чтобы корзина не ломалась) */}
+        {/* Блок 2: НАШЕ МЕНЮ */}
         <div 
           id="module-menu" 
           style={{ 
