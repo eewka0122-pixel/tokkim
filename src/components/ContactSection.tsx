@@ -1,14 +1,51 @@
 "use client";
-import { MapPin, Clock, Phone, Mail } from "lucide-react";
 
-const contactDetails = [
-  { icon: MapPin, label: "Адрес", value: "123 Корейская улица, Сеул, Южная Корея" },
-  { icon: Clock, label: "Часы", value: "Пн‑Вс, 11:00 – 23:00" },
-  { icon: Phone, label: "Телефон", value: "+7 (123) 456‑78‑90" },
-  { icon: Mail, label: "Email", value: "reservations@tokkim.com" },
-];
+import { useState, useEffect } from "react";
+import { MapPin, Clock, Phone, Mail } from "lucide-react";
+import PocketBase from "pocketbase";
+
+// Подключение к твоей базе данных PocketBase
+const pb = new PocketBase("http://31.57.47.98");
 
 const ContactSection = () => {
+  // Изначально загружаем старые данные как заглушки, пока база отвечает
+  const [contactData, setContactData] = useState({
+    address: "123 Корейская улица, Сеул, Южная Корея",
+    work_hours: "Пн‑Вс, 11:00 – 23:00",
+    phone: "+7 (123) 456‑78‑90",
+    email: "reservations@tokkim.com" 
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        // Получаем первую запись из коллекции settings
+        const records = await pb.collection("settings").getList(1, 1);
+        if (records.items.length > 0) {
+          const data = records.items[0];
+          setContactData({
+            address: data.address || contactData.address,
+            work_hours: data.work_hours || contactData.work_hours,
+            phone: data.phone || contactData.phone,
+            email: "reservations@tokkim.com" // Пока статично, если не добавишь в БД
+          });
+        }
+      } catch (error) {
+        console.error("Ошибка при получении контактов из PocketBase:", error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  // Динамический массив контактов (обновляется, когда приходят данные из базы)
+  const contactDetails = [
+    { icon: MapPin, label: "Адрес", value: contactData.address },
+    { icon: Clock, label: "Часы работы", value: contactData.work_hours },
+    { icon: Phone, label: "Телефон", value: contactData.phone },
+    { icon: Mail, label: "Email", value: contactData.email },
+  ];
+
   return (
     <section id="contact" className="relative py-24 md:py-32 px-6 bg-stone-50">
       {/* Background shapes */}
