@@ -13,20 +13,58 @@ const pb = new PocketBase("http://31.57.47.98");
 type MenuItem = { name: string; description: string; price: string; image: string; numericPrice: number };
 type MenuCategoryData = { label: string; items: MenuItem[] };
 
+// Массив для автоматического переноса всех блюд в базу данных
+const backupItems = [
+  { "title": "Кимпаб с говядиной", "description": "Мраморная говядина пулькоги, маринованный дайкон, шпинат, морковь, омлет и рис, завернутые в хрустящий лист нори.", "price": 430, "category": "Кимпаб" },
+  { "title": "Кимпаб с курицей", "description": "Нежное филе курицы, свежие овощи, рис и фирменный соус в листе нори.", "price": 360, "category": "Кимпаб" },
+  { "title": "Кимпаб с лососем", "description": "Слабосоленый лосось, сливочный сыр, свежий авокадо, огурец и рис.", "price": 450, "category": "Кимпаб" },
+  { "title": "Кимпаб с овощами", "description": "Легкий ролл со свежими сезонными овощами, маринованным дайконом и кунжутом.", "price": 310, "category": "Кимпаб" },
+  { "title": "Пибимпаб с говядиной", "description": "Горячий рис, обжаренная говядина, сезонные овощи, глазунья и кочуджан.", "price": 450, "category": "Пибимпаб" },
+  { "title": "Пибимпаб с курицей", "description": "Куриное филе, рис, шпинат, морковь, грибы, яйцо и пикантный соус.", "price": 300, "category": "Пибимпаб" },
+  { "title": "Пибимпаб с лососем", "description": "Свежий лосось, овощи, рис, водоросли нори и специальный соус.", "price": 599, "category": "Пибимпаб" },
+  { "title": "Пибимпаб с креветкой", "description": "Тигровые креветки гриль, рис, свежие овощи, бобовые ростки и яйцо.", "price": 400, "category": "Пибимпаб" },
+  { "title": "Пибимпаб с овощами", "description": "Традиционный корейский рис со свежими овощами, грибами, яйцом и пикантным соусом кочуджан.", "price": 400, "category": "Пибимпаб" },
+  { "title": "Рамен с курицей", "description": "Насыщенный бульон, лапша, ломтики курицы, яйцо, зеленый лук и нори.", "price": 300, "category": "Рамен" },
+  { "title": "Рамен с креветками", "description": "Ароматный бульон, лапша, тигровые креветки, яйцо и овощи.", "price": 550, "category": "Рамен" },
+  { "title": "Рамен с морепродуктами", "description": "Креветки, мидии, кальмары, бульон на основе морепродуктов, лапша.", "price": 550, "category": "Рамен" },
+  { "title": "Кимчи тиге", "description": "Густой, согревающий суп из ферментированной капусты кимчи, свинины и тофу.", "price": 300, "category": "Супы" },
+  { "title": "Том ям с креветкой", "description": "Тайский кисло-острый суп на кокосовом молоке с тигровыми креветками.", "price": 300, "category": "Супы" },
+  { "title": "Юкедян", "description": "Острый корейский суп с говядиной, папоротником, зеленым луком и яйцом.", "price": 300, "category": "Супы" },
+  { "title": "куксу", "description": "Традиционный суп с тонкой лапшой, бульоном, овощами и мясом.", "price": 510, "category": "Супы" },
+  { "title": "Вок с курицей", "description": "Обжаренная лапша с нежным филе курицы, овощами и соусом терияки.", "price": 450, "category": "Вок и Горячее" },
+  { "title": "Вок с морепродуктами", "description": "Пшеничная лапша, креветки, кальмары, мидии и овощи в устричном соусе.", "price": 550, "category": "Вок и Горячее" },
+  { "title": "Курица ян нем", "description": "Кусочки хрустящей жареной курицы в сладком и пикантном соусе яннём.", "price": 300, "category": "Вок и Горячее" },
+  { "title": "Креветки томям с рисом", "description": "Тигровые креветки в соусе том ям, подаются с порцией белого риса.", "price": 550, "category": "Вок и Горячее" },
+  { "title": "Топпаб пулькоги", "description": "Традиционный корейский рис с маринованной мраморной говядиной пулькоги.", "price": 550, "category": "Вок и Горячее" },
+  { "title": "Бургерким с говядиной", "description": "Сочная говяжья котлета в корейском стиле, булочка, свежие овощи и фирменный соус.", "price": 450, "category": "Бургеры" },
+  { "title": "Бургерким с лососем", "description": "Нежное филе лосося, хрустящий салат и соус тартар в мягкой булочке.", "price": 490, "category": "Бургеры" },
+  { "title": "Онигири с крабом", "description": "Нежный рис с начинкой из снежного краба под спайси соусом.", "price": 180, "category": "Онигири" },
+  { "title": "Онигири с лососем", "description": "Рисовый треугольник с начинкой из слабосоленого лосося в хрустящем нори.", "price": 230, "category": "Онигири" },
+  { "title": "Корндог с сосиской и сыром", "description": "Сосиска и тянущийся сыр моцарелла в хрустящей панировке.", "price": 300, "category": "Закуски" },
+  { "title": "Токпоки в остром соусе", "description": "Жевательные рисовые клецки в густом, сладко-остром соусе кочуджан.", "price": 300, "category": "Закуски" },
+  { "title": "ток поки карбонара", "description": "Рисовые клецки в нежном сливочном соусе карбонара с беконом.", "price": 340, "category": "Закуски" },
+  { "title": "Эноки с беконом", "description": "Грибы эноки, обернутые ломтиками бекона и обжаренные до хруста.", "price": 350, "category": "Закуски" },
+  { "title": "пегодя", "description": "Корейские паровые пирожки с сочной мясо-капустной начинкой.", "price": 200, "category": "Закуски" },
+  { "title": "Пунопан", "description": "Сладкие корейские пирожки в форме рыбок с начинкой из красной фасоли.", "price": 150, "category": "Закуски" },
+  { "title": "рис", "description": "Порция идеального парового корейского риса.", "price": 100, "category": "Закуски" },
+  { "title": "Кимчи", "description": "Традиционная острая ферментированная пекинская капуста.", "price": 100, "category": "Салаты" },
+  { "title": "Морковка по корейски", "description": "Хрустящая морковь с чесноком, кориандром и набором специй.", "price": 100, "category": "Салаты" },
+  { "title": "салат с битыми огурцами", "description": "Свежие огурцы в пикантном маринаде с чесноком и кунжутным маслом.", "price": 150, "category": "Салаты" },
+  { "title": "Салат с грибами моэр", "description": "Древесные грибы моэр с овощами в легкой заправке.", "price": 100, "category": "Салаты" },
+  { "title": "Салат со шпинатом", "description": "Бланшированный шпинат с кунжутным маслом и соевым соусом.", "price": 100, "category": "Салаты" }
+];
+
 const MenuSection = () => {
-  // ДИНАМИЧЕСКИЕ ДАННЫЕ ИЗ БАЗЫ
   const [menuCategories, setMenuCategories] = useState<Record<string, MenuCategoryData>>({});
   const [allItems, setAllItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [activeCategory, setActiveCategory] = useState<string>("");
+  const [activeCategory, setActiveCategory] = useState<string>("kimpap");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   
-  // Локальное состояние корзины
   const [cartCounts, setCartCounts] = useState<Record<string, number>>({});
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Детальные состояния для формы заказа
   const [formData, setFormData] = useState({ 
     name: "", 
     email: "",
@@ -43,7 +81,6 @@ const MenuSection = () => {
     notes: ""
   });
 
-  // Состояния для зума картинки
   const [isZoomed, setIsZoomed] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -52,14 +89,27 @@ const MenuSection = () => {
 
   const cartOverlayRef = useRef<HTMLDivElement>(null);
 
-  // ЗАГРУЗКА МЕНЮ ИЗ POCKETBASE
+  // ФУНКЦИЯ ДЛЯ АВТОМАТИЧЕСКОГО ИМПОРТА ВСЕХ БЛЮД ПРИ ЗАГРУЗКЕ
   useEffect(() => {
-    const fetchMenu = async () => {
+    const runMigrationAndFetch = async () => {
       try {
-        const records = await pb.collection('menu_items').getFullList({
-          sort: 'created', // Сортируем по порядку добавления
-        });
+        // Проверяем, пустая ли база данных
+        const currentRecords = await pb.collection('menu_items').getList(1, 1);
+        
+        // Если в базе меньше 5 элементов (значит там только наш тестовый кимпаб), запускаем перенос
+        if (currentRecords.totalItems < 5) {
+          console.log("Запуск автоматического импорта блюд в PocketBase...");
+          for (const item of backupItems) {
+            // Чтобы не дублировать уже созданный руками кимпаб
+            if (item.title === "Кимпаб с говядиной" && currentRecords.totalItems > 0) continue;
+            
+            await pb.collection('menu_items').create(item);
+          }
+          alert("🔥 Магия сработала! Все 37 блюд успешно перенесены в твою базу данных сервера!");
+        }
 
+        // После успешного импорта скачиваем актуальные данные для отображения
+        const records = await pb.collection('menu_items').getFullList({ sort: 'created' });
         const newCategories: Record<string, MenuCategoryData> = {};
         const newAllItems: MenuItem[] = [];
 
@@ -69,11 +119,9 @@ const MenuSection = () => {
             description: record.description,
             price: `${record.price} ₽`,
             numericPrice: Number(record.price),
-            // Берем картинку с сервера, если ее нет — ставим заглушку
             image: record.image ? pb.files.getUrl(record, record.image) : '/images/logo (4).png'
           };
 
-          // Автоматическая генерация категорий из базы
           const catLabel = (record.category || "Другое").trim();
           const catKey = catLabel.toLowerCase().replace(/\s+/g, '_').replace(/[^a-zа-яё0-9_]/gi, '');
 
@@ -91,13 +139,13 @@ const MenuSection = () => {
         if (firstCategory) setActiveCategory(firstCategory);
 
       } catch (error) {
-        console.error("Ошибка при загрузке меню:", error);
+        console.error("Ошибка при работе с базой данных:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchMenu();
+    runMigrationAndFetch();
   }, []);
 
   // Блокировка стандартного скролла
@@ -112,18 +160,13 @@ const MenuSection = () => {
     };
   }, [isCartOpen]);
 
-  // ПЕРЕХВАТЧИК: Блокировка кастомного инерционного скролла из Index.tsx
+  // Блокировка кастомного инерционного скролла
   useEffect(() => {
     const el = cartOverlayRef.current;
     if (!el || !isCartOpen) return;
-
-    const stopScrollPropagation = (e: Event) => {
-      e.stopPropagation();
-    };
-
+    const stopScrollPropagation = (e: Event) => e.stopPropagation();
     el.addEventListener("wheel", stopScrollPropagation, { passive: false });
     el.addEventListener("touchmove", stopScrollPropagation, { passive: false });
-
     return () => {
       el.removeEventListener("wheel", stopScrollPropagation);
       el.removeEventListener("touchmove", stopScrollPropagation);
@@ -135,21 +178,16 @@ const MenuSection = () => {
     const handleScroll = () => {
       const sections = Object.keys(menuCategories);
       if (sections.length === 0) return;
-
       let currentSection = sections[0];
-
       for (const section of sections) {
         const element = document.getElementById(`category-${section}`);
         if (element) {
           const rect = element.getBoundingClientRect();
-          if (rect.top <= window.innerHeight / 2.5) {
-            currentSection = section;
-          }
+          if (rect.top <= window.innerHeight / 2.5) currentSection = section;
         }
       }
       setActiveCategory(currentSection);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [menuCategories]);
@@ -181,7 +219,6 @@ const MenuSection = () => {
     });
   };
 
-  // Вычисление итогов корзины
   const cartTotal = useMemo(() => {
     return Object.entries(cartCounts).reduce((total, [itemName, count]) => {
       const item = allItems.find(i => i.name === itemName);
@@ -193,7 +230,6 @@ const MenuSection = () => {
     return Object.values(cartCounts).reduce((acc, count) => acc + count, 0);
   }, [cartCounts]);
 
-  // Обработчики мыши для зума в модалке
   const handleMouseDown = (e: React.MouseEvent) => {
     setClickStartPos({ x: e.clientX, y: e.clientY });
     if (!isZoomed) return;
@@ -222,7 +258,6 @@ const MenuSection = () => {
     e.preventDefault();
     const orderData = { items: cartCounts, total: cartTotal, ...formData };
     console.log("Формирование и отправка заказа:", orderData);
-    
     alert(`Заказ на сумму ${cartTotal} ₽ успешно оформлен и передан в работу!`);
     setCartCounts({});
     setIsCartOpen(false);
@@ -231,8 +266,6 @@ const MenuSection = () => {
   return (
     <>
       <section id="menu" className="pt-20 pb-16 md:pt-24 md:pb-24 bg-transparent relative min-h-screen">
-        
-        {/* Заголовок блока */}
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12 reveal">
             <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">
@@ -241,202 +274,100 @@ const MenuSection = () => {
           </div>
         </div>
 
-        {/* Анимация загрузки */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center mt-20">
             <div className="w-12 h-12 border-4 border-[#D4B98F]/30 border-t-[#D4B98F] rounded-full animate-spin mb-4"></div>
-            <p className="text-[#3A3124] font-medium">Загружаем меню с сервера...</p>
+            <p className="text-[#3A3124] font-medium">Синхронизируем базу данных...</p>
           </div>
         ) : (
           <>
-            {/* ПРИЛИПАЮЩЕЕ МЕНЮ КАТЕГОРИЙ */}
             <div className="sticky top-0 z-30 w-full bg-[#F5F1E6]/40 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
               <div className="max-w-7xl mx-auto px-6 flex items-center overflow-x-auto gap-2 sm:gap-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <div className="shrink-0 w-[90px] md:w-[220px]"></div>
-
-                {Object.keys(menuCategories).map((key) => {
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => scrollToCategory(key)}
-                      className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm md:text-base font-semibold transition-all duration-300 ${
-                        activeCategory === key
-                          ? "bg-[#D4B98F] text-[#3A3124] shadow-md shadow-[#D4B98F]/40"
-                          : "bg-[#F5F1E6]/80 text-[#6B5E48] hover:bg-[#D4B98F]/20 hover:text-[#3A3124]"
-                      }`}
-                    >
-                      {menuCategories[key].label}
-                    </button>
-                  );
-                })}
+                {Object.keys(menuCategories).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => scrollToCategory(key)}
+                    className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm md:text-base font-semibold transition-all duration-300 ${
+                      activeCategory === key
+                        ? "bg-[#D4B98F] text-[#3A3124] shadow-md shadow-[#D4B98F]/40"
+                        : "bg-[#F5F1E6]/80 text-[#6B5E48] hover:bg-[#D4B98F]/20 hover:text-[#3A3124]"
+                    }`}
+                  >
+                    {menuCategories[key].label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* ВЫВОД ВСЕХ КАТЕГОРИЙ СПИСКОМ */}
             <div className="max-w-7xl mx-auto px-6 space-y-24">
-              {Object.keys(menuCategories).length === 0 ? (
-                <p className="text-center text-gray-500">Меню пока пусто. Добавьте блюда в панели управления PocketBase.</p>
-              ) : (
-                Object.keys(menuCategories).map((key) => {
-                  const categoryData = menuCategories[key];
-
-                  return (
-                    <div key={key} id={`category-${key}`} className="scroll-mt-48">
-                      <h3 className="font-serif text-3xl font-bold text-[#3A3124] mb-8 pb-2 border-b border-[#D4B98F]/30 inline-block">
-                        {categoryData.label}
-                      </h3>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {categoryData.items.map((item) => (
-                          <div 
-                            key={item.name}
-                            onClick={() => setSelectedItem(item)}
-                            className="cursor-pointer h-full outline-none"
-                          >
-                            <Card className="group flex flex-col overflow-hidden rounded-3xl border-none bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
-                              {/* Фото блюда */}
-                              <div className="relative h-48 sm:h-56 overflow-hidden bg-gray-50 p-4">
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                  className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                                />
+              {Object.keys(menuCategories).map((key) => {
+                const categoryData = menuCategories[key];
+                return (
+                  <div key={key} id={`category-${key}`} className="scroll-mt-48">
+                    <h3 className="font-serif text-3xl font-bold text-[#3A3124] mb-8 pb-2 border-b border-[#D4B98F]/30 inline-block">
+                      {categoryData.label}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {categoryData.items.map((item) => (
+                        <div key={item.name} onClick={() => setSelectedItem(item)} className="cursor-pointer h-full outline-none">
+                          <Card className="group flex flex-col overflow-hidden rounded-3xl border-none bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
+                            <div className="relative h-48 sm:h-56 overflow-hidden bg-gray-50 p-4">
+                              <img src={item.image} alt={item.name} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
+                            </div>
+                            <CardContent className="p-5 flex flex-col flex-grow bg-white">
+                              <h3 className="font-bold text-[#3A3124] text-lg mb-2 leading-tight">{item.name}</h3>
+                              <p className="text-[#6B5E48] text-sm line-clamp-3 mb-4 flex-grow">{item.description}</p>
+                              <div className="mt-auto">
+                                {!cartCounts[item.name] ? (
+                                  <Button onClick={(e) => handleAddToCart(e, item.name)} className="w-full bg-[#F3EFE8] text-[#3A3124] hover:bg-[#EBE2D4] hover:text-[#3A3124] rounded-xl font-bold py-6 transition-colors border-none shadow-none">
+                                    {item.price}
+                                  </Button>
+                                ) : (
+                                  <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-1 shadow-inner h-[48px]">
+                                    <button onClick={(e) => handleRemoveFromCart(e, item.name)} className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
+                                      <Minus className="w-4 h-4" />
+                                    </button>
+                                    <span className="font-bold text-[#3A3124] px-4">{cartCounts[item.name]}</span>
+                                    <button onClick={(e) => handleAddToCart(e, item.name)} className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
+                                      <Plus className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                )}
                               </div>
-                              
-                              {/* Описание блюда */}
-                              <CardContent className="p-5 flex flex-col flex-grow bg-white">
-                                <h3 className="font-bold text-[#3A3124] text-lg mb-2 leading-tight">
-                                  {item.name}
-                                </h3>
-                                <p className="text-[#6B5E48] text-sm line-clamp-3 mb-4 flex-grow">
-                                  {item.description}
-                                </p>
-                                
-                                {/* Интерактивная кнопка / Счетчик */}
-                                <div className="mt-auto">
-                                  {!cartCounts[item.name] ? (
-                                    <Button 
-                                      onClick={(e) => handleAddToCart(e, item.name)}
-                                      className="w-full bg-[#F3EFE8] text-[#3A3124] hover:bg-[#EBE2D4] hover:text-[#3A3124] rounded-xl font-bold py-6 transition-colors border-none shadow-none"
-                                    >
-                                      {item.price}
-                                    </Button>
-                                  ) : (
-                                    <div 
-                                      onClick={(e) => e.stopPropagation()} 
-                                      className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-1 shadow-inner h-[48px]"
-                                    >
-                                      <button 
-                                        onClick={(e) => handleRemoveFromCart(e, item.name)}
-                                        className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors"
-                                      >
-                                        <Minus className="w-4 h-4" />
-                                      </button>
-                                      <span className="font-bold text-[#3A3124] px-4">
-                                        {cartCounts[item.name]}
-                                      </span>
-                                      <button 
-                                        onClick={(e) => handleAddToCart(e, item.name)}
-                                        className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors"
-                                      >
-                                        <Plus className="w-4 h-4" />
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                              </CardContent>
-                            </Card>
-                          </div>
-                        ))}
-                      </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+                      ))}
                     </div>
-                  );
-                })
-              )}
+                  </div>
+                );
+              })}
             </div>
           </>
         )}
 
         {/* МОДАЛЬНОЕ ОКНО ТОВАРА */}
-        <Dialog 
-          open={!!selectedItem} 
-          onOpenChange={(open) => { 
-            if (!open) {
-              setSelectedItem(null);
-              setTimeout(() => {
-                setIsZoomed(false);
-                setPosition({ x: 0, y: 0 });
-              }, 300);
-            } 
-          }}
-        >
+        <Dialog open={!!selectedItem} onOpenChange={(open) => { if (!open) { setSelectedItem(null); setTimeout(() => { setIsZoomed(false); setPosition({ x: 0, y: 0 }); }, 300); } }}>
           <DialogContent className="bg-white border-none shadow-2xl sm:max-w-[800px] rounded-[2rem] p-0 overflow-hidden flex flex-col md:flex-row gap-0">
             {selectedItem && (
               <>
-                <div 
-                  className={`relative w-full md:w-[400px] h-[300px] md:h-[500px] shrink-0 overflow-hidden select-none bg-gray-50 flex items-center justify-center p-8 ${
-                    isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'
-                  }`}
-                  onMouseDown={handleMouseDown}
-                  onMouseMove={handleMouseMove}
-                  onMouseUp={handleMouseUp}
-                  onMouseLeave={handleMouseLeave}
-                  onClick={handleImageClick}
-                >
-                  <img
-                    src={selectedItem.image}
-                    alt={selectedItem.name}
-                    draggable={false}
-                    style={{
-                      transform: `translate(${position.x}px, ${position.y}px) scale(${isZoomed ? 2 : 1})`,
-                      transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
-                    }}
-                    className="w-full h-full object-contain origin-center"
-                  />
-                  <div className={`absolute top-4 left-4 bg-black/5 text-gray-500 p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`}>
-                    <ZoomIn className="w-5 h-5" />
-                  </div>
-                  <div className={`absolute top-4 left-4 bg-[#D4B98F]/20 text-[#8C6D46] p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-100' : 'opacity-0'}`}>
-                    <ZoomOut className="w-5 h-5" />
-                  </div>
+                <div className={`relative w-full md:w-[400px] h-[300px] md:h-[500px] shrink-0 overflow-hidden select-none bg-gray-50 flex items-center justify-center p-8 ${isZoomed ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-zoom-in'}`} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseLeave} onClick={handleImageClick}>
+                  <img src={selectedItem.image} alt={selectedItem.name} draggable={false} style={{ transform: `translate(${position.x}px, ${position.y}px) scale(${isZoomed ? 2 : 1})`, transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)' }} className="w-full h-full object-contain origin-center" />
+                  <div className={`absolute top-4 left-4 bg-black/5 text-gray-500 p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-0' : 'opacity-100'}`}><ZoomIn className="w-5 h-5" /></div>
+                  <div className={`absolute top-4 left-4 bg-[#D4B98F]/20 text-[#8C6D46] p-2 rounded-full pointer-events-none transition-all duration-300 ${isZoomed ? 'opacity-100' : 'opacity-0'}`}><ZoomOut className="w-5 h-5" /></div>
                 </div>
-                
                 <div className="flex flex-col p-6 md:p-10 w-full md:w-[400px]">
-                  <DialogTitle className="font-serif text-3xl font-bold text-[#3A3124] leading-tight mb-4">
-                    {selectedItem.name}
-                  </DialogTitle>
-                  
-                  <DialogHeader className="flex-grow">
-                    <DialogDescription className="text-[#6B5E48] text-base leading-relaxed">
-                      {selectedItem.description}
-                    </DialogDescription>
-                  </DialogHeader>
-                  
+                  <DialogTitle className="font-serif text-3xl font-bold text-[#3A3124] leading-tight mb-4">{selectedItem.name}</DialogTitle>
+                  <DialogHeader className="flex-grow"><DialogDescription className="text-[#6B5E48] text-base leading-relaxed">{selectedItem.description}</DialogDescription></DialogHeader>
                   <div className="mt-8 pt-6 border-t border-gray-100">
                     {!cartCounts[selectedItem.name] ? (
-                      <Button 
-                        onClick={(e) => handleAddToCart(e, selectedItem.name)}
-                        className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]"
-                      >
-                        Добавить за {selectedItem.price}
-                      </Button>
+                      <Button onClick={(e) => handleAddToCart(e, selectedItem.name)} className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]">Добавить за {selectedItem.price}</Button>
                     ) : (
                       <div className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-2 shadow-inner h-[56px]">
-                        <button 
-                          onClick={(e) => handleRemoveFromCart(e, selectedItem.name)}
-                          className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"
-                        >
-                          <Minus className="w-5 h-5" />
-                        </button>
-                        <span className="font-bold text-xl text-[#3A3124] px-6">
-                          {cartCounts[selectedItem.name]}
-                        </span>
-                        <button 
-                          onClick={(e) => handleAddToCart(e, selectedItem.name)}
-                          className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"
-                        >
-                          <Plus className="w-5 h-5" />
-                        </button>
+                        <button onClick={(e) => handleRemoveFromCart(e, selectedItem.name)} className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"><Minus className="w-5 h-5" /></button>
+                        <span className="font-bold text-xl text-[#3A3124] px-6">{cartCounts[selectedItem.name]}</span>
+                        <button onClick={(e) => handleAddToCart(e, selectedItem.name)} className="w-12 h-12 flex items-center justify-center rounded-xl bg-white text-[#3A3124] shadow hover:bg-gray-50 transition-colors"><Plus className="w-5 h-5" /></button>
                       </div>
                     )}
                   </div>
@@ -448,48 +379,26 @@ const MenuSection = () => {
       </section>
 
       {/* ПЛАВАЮЩАЯ КНОПКА КОРЗИНЫ */}
-      <div 
-        className={`fixed bottom-8 right-8 z-50 transition-all duration-500 ease-in-out ${
-          cartItemCount > 0 && !isCartOpen ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0 pointer-events-none"
-        }`}
-      >
-        <button 
-          onClick={() => setIsCartOpen(true)}
-          className="group flex items-center gap-4 bg-[#3A3124] text-white px-6 py-4 rounded-full shadow-2xl shadow-black/30 hover:bg-[#2A2319] transition-all hover:scale-105"
-        >
+      <div className={`fixed bottom-8 right-8 z-50 transition-all duration-500 ease-in-out ${cartItemCount > 0 && !isCartOpen ? "translate-y-0 opacity-100" : "translate-y-24 opacity-0 pointer-events-none"}`}>
+        <button onClick={() => setIsCartOpen(true)} className="group flex items-center gap-4 bg-[#3A3124] text-white px-6 py-4 rounded-full shadow-2xl shadow-black/30 hover:bg-[#2A2319] transition-all hover:scale-105">
           <div className="relative">
             <ShoppingBag className="w-6 h-6" />
-            <span className="absolute -top-2 -right-3 bg-[#D4B98F] text-[#3A3124] text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-[#3A3124]">
-              {cartItemCount}
-            </span>
+            <span className="absolute -top-2 -right-3 bg-[#D4B98F] text-[#3A3124] text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-[#3A3124]">{cartItemCount}</span>
           </div>
           <span className="font-bold text-lg">{cartTotal} ₽</span>
         </button>
       </div>
 
-      {/* БОКОВАЯ ПАНЕЛЬ КОРЗИНЫ (DRAWER) */}
+      {/* БОКОВАЯ ПАНЕЛЬ КОРЗИНЫ */}
       <div ref={cartOverlayRef} className={`fixed inset-0 z-[60] transition-opacity duration-300 ${isCartOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-        {/* Overlay */}
-        <div 
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
-          onClick={() => setIsCartOpen(false)}
-        />
-        
-        {/* Sidebar */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsCartOpen(false)} />
         <div className={`absolute top-0 right-0 h-full w-full max-w-[500px] bg-white shadow-2xl transition-transform duration-500 ease-out flex flex-col ${isCartOpen ? "translate-x-0" : "translate-x-full"}`}>
           <div className="flex items-center justify-between p-6 border-b border-gray-100 shrink-0">
             <h2 className="font-serif text-2xl font-bold text-[#3A3124]">Оформление заказа</h2>
-            <button 
-              onClick={() => setIsCartOpen(false)}
-              className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors text-gray-500"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <button onClick={() => setIsCartOpen(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors text-gray-500"><X className="w-5 h-5" /></button>
           </div>
 
           <div className="flex-grow overflow-y-auto p-6 space-y-8 overscroll-contain">
-            
-            {/* БЛОК ТОВАРОВ */}
             {Object.keys(cartCounts).length === 0 ? (
               <div className="text-center text-gray-500 mt-10">
                 <ShoppingBag className="w-16 h-16 mx-auto mb-4 opacity-20" />
@@ -500,7 +409,6 @@ const MenuSection = () => {
                 {Object.entries(cartCounts).map(([itemName, count]) => {
                   const item = allItems.find(i => i.name === itemName);
                   if (!item) return null;
-                  
                   return (
                     <div key={itemName} className="flex gap-4 bg-gray-50 p-3 rounded-2xl">
                       <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-xl bg-white" />
@@ -510,13 +418,9 @@ const MenuSection = () => {
                           <span className="font-bold text-[#D4B98F] whitespace-nowrap">{item.numericPrice * count} ₽</span>
                         </div>
                         <div className="flex items-center gap-4 bg-white w-fit rounded-lg shadow-sm border border-gray-100">
-                          <button onClick={(e) => handleRemoveFromCart(e, itemName)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black">
-                            <Minus className="w-3 h-3" />
-                          </button>
+                          <button onClick={(e) => handleRemoveFromCart(e, itemName)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black"><Minus className="w-3 h-3" /></button>
                           <span className="font-bold text-sm text-[#3A3124] w-4 text-center">{count}</span>
-                          <button onClick={(e) => handleAddToCart(e, itemName)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black">
-                            <Plus className="w-3 h-3" />
-                          </button>
+                          <button onClick={(e) => handleAddToCart(e, itemName)} className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-black"><Plus className="w-3 h-3" /></button>
                         </div>
                       </div>
                     </div>
@@ -525,129 +429,68 @@ const MenuSection = () => {
               </div>
             )}
 
-            {/* ФОРМА ОФОРМЛЕНИЯ ЗАКАЗА */}
             {Object.keys(cartCounts).length > 0 && (
               <form id="orderForm" onSubmit={handleSubmitOrder} className="space-y-6 pt-2">
-                
-                {/* 1. Личная информация */}
                 <div className="space-y-4">
                   <div className="flex items-center text-xs font-bold uppercase tracking-widest text-gray-400">
                     <span className="flex-shrink-0 mr-3">Личная информация</span>
                     <div className="flex-grow border-t border-gray-100"></div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input 
-                      required type="text" placeholder="Ваше имя *" 
-                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
-                      value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    />
-                    <input 
-                      type="email" placeholder="Эл. почта" 
-                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
-                      value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    />
-                    <input 
-                      required type="tel" placeholder="Телефон *" 
-                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm sm:col-span-2"
-                      value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                    />
+                    <input required type="text" placeholder="Ваше имя *" className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} />
+                    <input type="email" placeholder="Эл. почта" className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
+                    <input required type="tel" placeholder="Телефон *" className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm sm:col-span-2" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
                   </div>
                 </div>
 
-                {/* 2. Способ доставки */}
                 <div className="space-y-4">
                   <div className="flex items-center text-xs font-bold uppercase tracking-widest text-gray-400">
                     <span className="flex-shrink-0 mr-3">Способ доставки</span>
                     <div className="flex-grow border-t border-gray-100"></div>
                   </div>
-                  <select 
-                    className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm cursor-pointer"
-                    value={formData.deliveryMethod} onChange={(e) => setFormData({...formData, deliveryMethod: e.target.value})}
-                  >
+                  <select className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm cursor-pointer" value={formData.deliveryMethod} onChange={(e) => setFormData({...formData, deliveryMethod: e.target.value})}>
                     <option value="delivery">Доставка курьером</option>
                     <option value="pickup">Самовывоз</option>
                   </select>
                 </div>
 
-                {/* 3. Адрес */}
                 <div className="space-y-4">
                   <div className="flex items-center text-xs font-bold uppercase tracking-widest text-gray-400">
-                    <span className="flex-shrink-0 mr-3">
-                      {formData.deliveryMethod === 'pickup' ? 'Адрес самовывоза' : 'Адрес доставки'}
-                    </span>
+                    <span className="flex-shrink-0 mr-3">{formData.deliveryMethod === 'pickup' ? 'Адрес самовывоза' : 'Адрес доставки'}</span>
                     <div className="flex-grow border-t border-gray-100"></div>
                   </div>
                   {formData.deliveryMethod === 'pickup' ? (
-                    <select 
-                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm cursor-pointer"
-                      value={formData.pickupAddress} onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}
-                    >
+                    <select className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm cursor-pointer" value={formData.pickupAddress} onChange={(e) => setFormData({...formData, pickupAddress: e.target.value})}>
                       <option value="г. Раменское, ул. Бронницкая, д. 19а">г. Раменское, ул. Бронницкая, д. 19а</option>
                       <option value="г. Москва, Новый Арбат, д. 15">г. Москва, Новый Арбат, д. 15</option>
                     </select>
                   ) : (
                     <div className="space-y-3">
-                      <input 
-                        required type="text" placeholder="Улица, дом, квартира *" 
-                        className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
-                        value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})}
-                      />
+                      <input required type="text" placeholder="Улица, дом, квартира *" className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm" value={formData.address} onChange={(e) => setFormData({...formData, address: e.target.value})} />
                       <div className="grid grid-cols-3 gap-3">
-                        <input 
-                          type="text" placeholder="Домофон" 
-                          className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
-                          value={formData.intercom} onChange={(e) => setFormData({...formData, intercom: e.target.value})}
-                        />
-                        <input 
-                          type="text" placeholder="Подъезд" 
-                          className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
-                          value={formData.entrance} onChange={(e) => setFormData({...formData, entrance: e.target.value})}
-                        />
-                        <input 
-                          type="text" placeholder="Этаж" 
-                          className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
-                          value={formData.floor} onChange={(e) => setFormData({...formData, floor: e.target.value})}
-                        />
+                        <input type="text" placeholder="Домофон" className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm" value={formData.intercom} onChange={(e) => setFormData({...formData, intercom: e.target.value})} />
+                        <input type="text" placeholder="Подъезд" className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm" value={formData.entrance} onChange={(e) => setFormData({...formData, entrance: e.target.value})} />
+                        <input type="text" placeholder="Этаж" className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm" value={formData.floor} onChange={(e) => setFormData({...formData, floor: e.target.value})} />
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* 4. Дополнительная информация */}
                 <div className="space-y-4">
                   <div className="flex items-center text-xs font-bold uppercase tracking-widest text-gray-400">
                     <span className="flex-shrink-0 mr-3">Дополнительная информация</span>
                     <div className="flex-grow border-t border-gray-100"></div>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <select 
-                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm cursor-pointer"
-                      value={formData.payment} onChange={(e) => setFormData({...formData, payment: e.target.value})}
-                    >
+                    <select className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm cursor-pointer" value={formData.payment} onChange={(e) => setFormData({...formData, payment: e.target.value})}>
                       <option value="card">Картой курьеру</option>
                       <option value="cash">Наличными</option>
                       <option value="online">Онлайн</option>
                     </select>
-                    
-                    <input 
-                      type="text" placeholder="Сдача с" 
-                      disabled={formData.payment !== 'cash'}
-                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm disabled:opacity-50 disabled:bg-gray-100"
-                      value={formData.changeFrom} onChange={(e) => setFormData({...formData, changeFrom: e.target.value})}
-                    />
-                    
-                    <input 
-                      type="number" min="1" placeholder="Персон" 
-                      className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm"
-                      value={formData.persons} onChange={(e) => setFormData({...formData, persons: e.target.value})}
-                    />
+                    <input type="text" placeholder="Сдача с" disabled={formData.payment !== 'cash'} className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm disabled:opacity-50 disabled:bg-gray-100" value={formData.changeFrom} onChange={(e) => setFormData({...formData, changeFrom: e.target.value})} />
+                    <input type="number" min="1" placeholder="Персон" className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm" value={formData.persons} onChange={(e) => setFormData({...formData, persons: e.target.value})} />
                   </div>
-                  
-                  <textarea 
-                    placeholder="Примечание к заказу" rows={2}
-                    className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm resize-none"
-                    value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                  />
+                  <textarea placeholder="Примечание к заказу" rows={2} className="w-full p-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#D4B98F]/50 text-sm resize-none" value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})} />
                 </div>
               </form>
             )}
@@ -659,12 +502,7 @@ const MenuSection = () => {
                 <span className="text-gray-500">Итого:</span>
                 <span className="text-3xl font-bold text-[#3A3124]">{cartTotal} ₽</span>
               </div>
-              <Button 
-                type="submit" form="orderForm"
-                className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]"
-              >
-                Заказать доставку
-              </Button>
+              <Button type="submit" form="orderForm" className="w-full bg-[#D4B98F] text-[#3A3124] hover:bg-[#C3A87E] rounded-xl py-7 font-bold text-lg shadow-lg shadow-[#D4B98F]/40 transition-all hover:scale-[1.02]">Заказать доставку</Button>
             </div>
           )}
         </div>
