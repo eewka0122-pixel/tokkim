@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MapPin, Phone, Mail, Clock, Truck, CreditCard } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Truck, CreditCard, Store } from "lucide-react";
 import PocketBase from "pocketbase";
 
 const pb = new PocketBase("http://31.57.47.98");
@@ -16,17 +16,17 @@ interface DeliveryZone {
 }
 
 const ReservationSection = () => {
-  // Состояние для основных настроек (контакты и оплата)
+  // Состояние для основных настроек
   const [data, setData] = useState({
     address: "Загрузка...",
     phone: "Загрузка...",
     email: "reservations@tokkim.com",
     work_hours: "Загрузка...",
+    pickup_info: "Загрузка...",
     payment_info: "Информация об оплате загружается..."
   });
 
   // Состояние для зон доставки
-  // Оставляем пустой массив, чтобы пока данные грузятся, ничего лишнего не выводилось
   const [zones, setZones] = useState<DeliveryZone[]>([]);
   const [loadingZones, setLoadingZones] = useState(true);
 
@@ -42,13 +42,15 @@ const ReservationSection = () => {
             phone: d.phone || "Телефон не указан",
             email: "reservations@tokkim.com",
             work_hours: d.work_hours || "Часы не указаны",
+            // Если поле самовывоза пустое, берем основной адрес
+            pickup_info: d.pickup_info || d.address || "Адрес самовывоза не указан",
             payment_info: d.payment_info || "Способы оплаты не указаны"
           });
         }
 
         // 2. Получаем зоны доставки из коллекции delivery_zones
         const zonesRecords = await pb.collection("delivery_zones").getFullList({
-          sort: 'created', // Сортируем по порядку создания
+          sort: 'created', 
         });
         
         if (zonesRecords.length > 0) {
@@ -133,7 +135,7 @@ const ReservationSection = () => {
             
             <div className="space-y-8">
               
-              {/* Стоимость доставки (Динамический вывод из базы) */}
+              {/* Стоимость доставки */}
               <div className="flex items-start gap-6">
                 <div className="w-14 h-14 bg-[#F5F1E6] rounded-full flex items-center justify-center text-[#8C6D46] shrink-0 transition-transform hover:scale-110 mt-1">
                   <Truck className="w-6 h-6" />
@@ -147,18 +149,15 @@ const ReservationSection = () => {
                     <ul className="space-y-4 text-[#6B5E48]">
                       {zones.map((zone) => (
                         <li key={zone.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
-                          {/* Город */}
                           {zone.city && (
                             <span className="font-bold text-[#3A3124] block mb-1">{zone.city}</span>
                           )}
                           
-                          {/* Минимальный заказ и стоимость доставки (на одной строке) */}
                           {zone.min_order} 
                           {zone.delivery_cost && (
                             <span className="text-[#8C6D46] font-medium ml-1">{zone.delivery_cost}</span>
                           )}
                           
-                          {/* Бесплатная доставка (с новой строки, если есть) */}
                           {zone.free_order && (
                             <>
                               <br />
@@ -174,7 +173,20 @@ const ReservationSection = () => {
                 </div>
               </div>
 
-              {/* Способы оплаты (из коллекции settings) */}
+              {/* Самовывоз */}
+              <div className="flex items-start gap-6">
+                <div className="w-14 h-14 bg-[#F5F1E6] rounded-full flex items-center justify-center text-[#8C6D46] shrink-0 transition-transform hover:scale-110">
+                  <Store className="w-6 h-6" />
+                </div>
+                <div className="w-full">
+                  <h3 className="font-bold text-[#3A3124] text-lg mb-1">Самовывоз</h3>
+                  <p className="text-[#6B5E48] leading-relaxed">
+                    {data.pickup_info}
+                  </p>
+                </div>
+              </div>
+
+              {/* Способы оплаты */}
               <div className="flex items-start gap-6">
                 <div className="w-14 h-14 bg-[#F5F1E6] rounded-full flex items-center justify-center text-[#8C6D46] shrink-0 transition-transform hover:scale-110">
                   <CreditCard className="w-6 h-6" />
