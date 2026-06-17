@@ -13,53 +13,12 @@ const pb = new PocketBase("http://31.57.47.98");
 type MenuItem = { name: string; description: string; price: string; image: string; numericPrice: number };
 type MenuCategoryData = { label: string; items: MenuItem[] };
 
-// Массив для автоматического переноса всех блюд в базу данных
-const backupItems = [
-  { "title": "Кимпаб с говядиной", "description": "Мраморная говядина пулькоги, маринованный дайкон, шпинат, морковь, омлет и рис, завернутые в хрустящий лист нори.", "price": 430, "category": "Кимпаб" },
-  { "title": "Кимпаб с курицей", "description": "Нежное филе курицы, свежие овощи, рис и фирменный соус в листе нори.", "price": 360, "category": "Кимпаб" },
-  { "title": "Кимпаб с лососем", "description": "Слабосоленый лосось, сливочный сыр, свежий авокадо, огурец и рис.", "price": 450, "category": "Кимпаб" },
-  { "title": "Кимпаб с овощами", "description": "Легкий ролл со свежими сезонными овощами, маринованным дайконом и кунжутом.", "price": 310, "category": "Кимпаб" },
-  { "title": "Пибимпаб с говядиной", "description": "Горячий рис, обжаренная говядина, сезонные овощи, глазунья и кочуджан.", "price": 450, "category": "Пибимпаб" },
-  { "title": "Пибимпаб с курицей", "description": "Куриное филе, рис, шпинат, морковь, грибы, яйцо и пикантный соус.", "price": 300, "category": "Пибимпаб" },
-  { "title": "Пибимпаб с лососем", "description": "Свежий лосось, овощи, рис, водоросли нори и специальный соус.", "price": 599, "category": "Пибимпаб" },
-  { "title": "Пибимпаб с креветкой", "description": "Тигровые креветки гриль, рис, свежие овощи, бобовые ростки и яйцо.", "price": 400, "category": "Пибимпаб" },
-  { "title": "Пибимпаб с овощами", "description": "Традиционный корейский рис со свежими овощами, грибами, яйцом и пикантным соусом кочуджан.", "price": 400, "category": "Пибимпаб" },
-  { "title": "Рамен с курицей", "description": "Насыщенный бульон, лапша, ломтики курицы, яйцо, зеленый лук и нори.", "price": 300, "category": "Рамен" },
-  { "title": "Рамен с креветками", "description": "Ароматный бульон, лапша, тигровые креветки, яйцо и овощи.", "price": 550, "category": "Рамен" },
-  { "title": "Рамен с морепродуктами", "description": "Креветки, мидии, кальмары, бульон на основе морепродуктов, лапша.", "price": 550, "category": "Рамен" },
-  { "title": "Кимчи тиге", "description": "Густой, согревающий суп из ферментированной капусты кимчи, свинины и тофу.", "price": 300, "category": "Супы" },
-  { "title": "Том ям с креветкой", "description": "Тайский кисло-острый суп на кокосовом молоке с тигровыми креветками.", "price": 300, "category": "Супы" },
-  { "title": "Юкедян", "description": "Острый корейский суп с говядиной, папоротником, зеленым луком и яйцом.", "price": 300, "category": "Супы" },
-  { "title": "куксу", "description": "Традиционный суп с тонкой лапшой, бульоном, овощами и мясом.", "price": 510, "category": "Супы" },
-  { "title": "Вок с курицей", "description": "Обжаренная лапша с нежным филе курицы, овощами и соусом терияки.", "price": 450, "category": "Вок и Горячее" },
-  { "title": "Вок с морепродуктами", "description": "Пшеничная лапша, креветки, кальмары, мидии и овощи в устричном соусе.", "price": 550, "category": "Вок и Горячее" },
-  { "title": "Курица ян нем", "description": "Кусочки хрустящей жареной курицы в сладком и пикантном соусе яннём.", "price": 300, "category": "Вок и Горячее" },
-  { "title": "Креветки томям с рисом", "description": "Тигровые креветки в соусе том ям, подаются с порцией белого риса.", "price": 550, "category": "Вок и Горячее" },
-  { "title": "Топпаб пулькоги", "description": "Традиционный корейский рис с маринованной мраморной говядиной пулькоги.", "price": 550, "category": "Вок и Горячее" },
-  { "title": "Бургерким с говядиной", "description": "Сочная говяжья котлета в корейском стиле, булочка, свежие овощи и фирменный соус.", "price": 450, "category": "Бургеры" },
-  { "title": "Бургерким с лососем", "description": "Нежное филе лосося, хрустящий салат и соус тартар в мягкой булочке.", "price": 490, "category": "Бургеры" },
-  { "title": "Онигири с крабом", "description": "Нежный рис с начинкой из снежного краба под спайси соусом.", "price": 180, "category": "Онигири" },
-  { "title": "Онигири с лососем", "description": "Рисовый треугольник с начинкой из слабосоленого лосося в хрустящем нори.", "price": 230, "category": "Онигири" },
-  { "title": "Корндог с сосиской и сыром", "description": "Сосиска и тянущийся сыр моцарелла в хрустящей панировке.", "price": 300, "category": "Закуски" },
-  { "title": "Токпоки в остром соусе", "description": "Жевательные рисовые клецки в густом, сладко-остром соусе кочуджан.", "price": 300, "category": "Закуски" },
-  { "title": "ток поки карбонара", "description": "Рисовые клецки в нежном сливочном соусе карбонара с беконом.", "price": 340, "category": "Закуски" },
-  { "title": "Эноки с беконом", "description": "Грибы эноки, обернутые ломтиками бекона и обжаренные до хруста.", "price": 350, "category": "Закуски" },
-  { "title": "пегодя", "description": "Корейские паровые пирожки с сочной мясо-капустной начинкой.", "price": 200, "category": "Закуски" },
-  { "title": "Пунопан", "description": "Сладкие корейские пирожки в форме рыбок с начинкой из красной фасоли.", "price": 150, "category": "Закуски" },
-  { "title": "рис", "description": "Порция идеального парового корейского риса.", "price": 100, "category": "Закуски" },
-  { "title": "Кимчи", "description": "Традиционная острая ферментированная пекинская капуста.", "price": 100, "category": "Салаты" },
-  { "title": "Морковка по корейски", "description": "Хрустящая морковь с чесноком, кориандром и набором специй.", "price": 100, "category": "Салаты" },
-  { "title": "салат с битыми огурцами", "description": "Свежие огурцы в пикантном маринаде с чесноком и кунжутным маслом.", "price": 150, "category": "Салаты" },
-  { "title": "Салат с грибами моэр", "description": "Древесные грибы моэр с овощами в легкой заправке.", "price": 100, "category": "Салаты" },
-  { "title": "Салат со шпинатом", "description": "Бланшированный шпинат с кунжутным маслом и соевым соусом.", "price": 100, "category": "Салаты" }
-];
-
 const MenuSection = () => {
   const [menuCategories, setMenuCategories] = useState<Record<string, MenuCategoryData>>({});
   const [allItems, setAllItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [activeCategory, setActiveCategory] = useState<string>("kimpap");
+  const [activeCategory, setActiveCategory] = useState<string>("");
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   
   const [cartCounts, setCartCounts] = useState<Record<string, number>>({});
@@ -89,26 +48,10 @@ const MenuSection = () => {
 
   const cartOverlayRef = useRef<HTMLDivElement>(null);
 
-  // ФУНКЦИЯ ДЛЯ АВТОМАТИЧЕСКОГО ИМПОРТА ВСЕХ БЛЮД ПРИ ЗАГРУЗКЕ
+  // СКАЧИВАНИЕ МЕНЮ ИЗ БАЗЫ ДАННЫХ
   useEffect(() => {
-    const runMigrationAndFetch = async () => {
+    const fetchMenu = async () => {
       try {
-        // Проверяем, пустая ли база данных
-        const currentRecords = await pb.collection('menu_items').getList(1, 1);
-        
-        // Если в базе меньше 5 элементов (значит там только наш тестовый кимпаб), запускаем перенос
-        if (currentRecords.totalItems < 5) {
-          console.log("Запуск автоматического импорта блюд в PocketBase...");
-          for (const item of backupItems) {
-            // Чтобы не дублировать уже созданный руками кимпаб
-            if (item.title === "Кимпаб с говядиной" && currentRecords.totalItems > 0) continue;
-            
-            await pb.collection('menu_items').create(item);
-          }
-          alert("🔥 Магия сработала! Все 37 блюд успешно перенесены в твою базу данных сервера!");
-        }
-
-        // После успешного импорта скачиваем актуальные данные для отображения
         const records = await pb.collection('menu_items').getFullList({ sort: 'created' });
         const newCategories: Record<string, MenuCategoryData> = {};
         const newAllItems: MenuItem[] = [];
@@ -119,6 +62,7 @@ const MenuSection = () => {
             description: record.description,
             price: `${record.price} ₽`,
             numericPrice: Number(record.price),
+            // Ссылка на картинку с твоего сервера. Если картинки нет — временная заглушка логотипа
             image: record.image ? pb.files.getUrl(record, record.image) : '/images/logo (4).png'
           };
 
@@ -139,13 +83,13 @@ const MenuSection = () => {
         if (firstCategory) setActiveCategory(firstCategory);
 
       } catch (error) {
-        console.error("Ошибка при работе с базой данных:", error);
+        console.error("Ошибка при получении меню:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    runMigrationAndFetch();
+    fetchMenu();
   }, []);
 
   // Блокировка стандартного скролла
@@ -254,13 +198,48 @@ const MenuSection = () => {
     }
   };
 
-  const handleSubmitOrder = (e: React.FormEvent) => {
+  // ОТПРАВКА ЗАКАЗА В POCKETBASE
+  const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
-    const orderData = { items: cartCounts, total: cartTotal, ...formData };
-    console.log("Формирование и отправка заказа:", orderData);
-    alert(`Заказ на сумму ${cartTotal} ₽ успешно оформлен и передан в работу!`);
-    setCartCounts({});
-    setIsCartOpen(false);
+    
+    // Структурируем список заказанных позиций для JSON поля
+    const orderedItemsList = Object.entries(cartCounts).map(([itemName, count]) => {
+      const item = allItems.find(i => i.name === itemName);
+      return {
+        name: itemName,
+        quantity: count,
+        price: item ? item.numericPrice : 0,
+        sum: (item ? item.numericPrice : 0) * count
+      };
+    });
+
+    // Формируем полный красивый адрес
+    const completeAddress = formData.deliveryMethod === 'pickup'
+      ? `Самовывоз: ${formData.pickupAddress}`
+      : `Адрес: ${formData.address}${formData.intercom ? `, Домофон: ${formData.intercom}` : ''}${formData.entrance ? `, Подъезд: ${formData.entrance}` : ''}${formData.floor ? `, Этаж: ${formData.floor}` : ''}`;
+
+    // Собираем все доп. комментарии и условия оплаты в одну строку
+    const dynamicComments = `Оплата: ${formData.payment}${formData.changeFrom ? ` (Сдача с ${formData.changeFrom} ₽)` : ''} | Персон: ${formData.persons} | Примечание: ${formData.notes || 'нет'}`;
+
+    const newOrder = {
+      client_name: formData.name,
+      phone: formData.phone,
+      delivery_method: formData.deliveryMethod,
+      address: completeAddress,
+      total_price: cartTotal,
+      order_items: orderedItemsList,
+      comments: dynamicComments
+    };
+
+    try {
+      await pb.collection('orders').create(newOrder);
+      alert(`🎉 Заказ на сумму ${cartTotal} ₽ успешно оформлен и передан на кухню!`);
+      setCartCounts({});
+      setIsCartOpen(false);
+    } catch (error) {
+      console.error("Ошибка при создании записи заказа:", error);
+      alert("Не удалось отправить заказ. Убедитесь, что коллекция 'orders' создана в PocketBase и открыты права в API Rules (Create rule).");
+    }
   };
 
   return (
@@ -277,7 +256,7 @@ const MenuSection = () => {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center mt-20">
             <div className="w-12 h-12 border-4 border-[#D4B98F]/30 border-t-[#D4B98F] rounded-full animate-spin mb-4"></div>
-            <p className="text-[#3A3124] font-medium">Синхронизируем базу данных...</p>
+            <p className="text-[#3A3124] font-medium">Загружаем свежее меню...</p>
           </div>
         ) : (
           <>
@@ -301,48 +280,52 @@ const MenuSection = () => {
             </div>
 
             <div className="max-w-7xl mx-auto px-6 space-y-24">
-              {Object.keys(menuCategories).map((key) => {
-                const categoryData = menuCategories[key];
-                return (
-                  <div key={key} id={`category-${key}`} className="scroll-mt-48">
-                    <h3 className="font-serif text-3xl font-bold text-[#3A3124] mb-8 pb-2 border-b border-[#D4B98F]/30 inline-block">
-                      {categoryData.label}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      {categoryData.items.map((item) => (
-                        <div key={item.name} onClick={() => setSelectedItem(item)} className="cursor-pointer h-full outline-none">
-                          <Card className="group flex flex-col overflow-hidden rounded-3xl border-none bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
-                            <div className="relative h-48 sm:h-56 overflow-hidden bg-gray-50 p-4">
-                              <img src={item.image} alt={item.name} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-                            </div>
-                            <CardContent className="p-5 flex flex-col flex-grow bg-white">
-                              <h3 className="font-bold text-[#3A3124] text-lg mb-2 leading-tight">{item.name}</h3>
-                              <p className="text-[#6B5E48] text-sm line-clamp-3 mb-4 flex-grow">{item.description}</p>
-                              <div className="mt-auto">
-                                {!cartCounts[item.name] ? (
-                                  <Button onClick={(e) => handleAddToCart(e, item.name)} className="w-full bg-[#F3EFE8] text-[#3A3124] hover:bg-[#EBE2D4] hover:text-[#3A3124] rounded-xl font-bold py-6 transition-colors border-none shadow-none">
-                                    {item.price}
-                                  </Button>
-                                ) : (
-                                  <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-1 shadow-inner h-[48px]">
-                                    <button onClick={(e) => handleRemoveFromCart(e, item.name)} className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
-                                      <Minus className="w-4 h-4" />
-                                    </button>
-                                    <span className="font-bold text-[#3A3124] px-4">{cartCounts[item.name]}</span>
-                                    <button onClick={(e) => handleAddToCart(e, item.name)} className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
-                                      <Plus className="w-4 h-4" />
-                                    </button>
-                                  </div>
-                                )}
+              {Object.keys(menuCategories).length === 0 ? (
+                <p className="text-center text-gray-500">Меню пока пусто.</p>
+              ) : (
+                Object.keys(menuCategories).map((key) => {
+                  const categoryData = menuCategories[key];
+                  return (
+                    <div key={key} id={`category-${key}`} className="scroll-mt-48">
+                      <h3 className="font-serif text-3xl font-bold text-[#3A3124] mb-8 pb-2 border-b border-[#D4B98F]/30 inline-block">
+                        {categoryData.label}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {categoryData.items.map((item) => (
+                          <div key={item.name} onClick={() => setSelectedItem(item)} className="cursor-pointer h-full outline-none">
+                            <Card className="group flex flex-col overflow-hidden rounded-3xl border-none bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
+                              <div className="relative h-48 sm:h-56 overflow-hidden bg-gray-50 p-4">
+                                <img src={item.image} alt={item.name} className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
                               </div>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      ))}
+                              <CardContent className="p-5 flex flex-col flex-grow bg-white">
+                                <h3 className="font-bold text-[#3A3124] text-lg mb-2 leading-tight">{item.name}</h3>
+                                <p className="text-[#6B5E48] text-sm line-clamp-3 mb-4 flex-grow">{item.description}</p>
+                                <div className="mt-auto">
+                                  {!cartCounts[item.name] ? (
+                                    <Button onClick={(e) => handleAddToCart(e, item.name)} className="w-full bg-[#F3EFE8] text-[#3A3124] hover:bg-[#EBE2D4] hover:text-[#3A3124] rounded-xl font-bold py-6 transition-colors border-none shadow-none">
+                                      {item.price}
+                                    </Button>
+                                  ) : (
+                                    <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-between bg-[#F5F1E6] rounded-xl p-1 shadow-inner h-[48px]">
+                                      <button onClick={(e) => handleRemoveFromCart(e, item.name)} className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
+                                        <Minus className="w-4 h-4" />
+                                      </button>
+                                      <span className="font-bold text-[#3A3124] px-4">{cartCounts[item.name]}</span>
+                                      <button onClick={(e) => handleAddToCart(e, item.name)} className="w-10 h-10 flex items-center justify-center rounded-lg bg-white text-[#3A3124] shadow-sm hover:bg-gray-50 transition-colors">
+                                        <Plus className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </>
         )}
