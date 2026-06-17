@@ -266,8 +266,8 @@ const MenuSection = () => {
     <>
       <section id="menu" className="pt-20 pb-16 md:pt-24 md:pb-24 bg-transparent relative min-h-screen">
         <div className="max-w-7xl mx-auto px-6">
-          {/* Сдвигаем главный заголовок до уровня крестика (pl-[140px]) */}
-          <div className="text-center md:text-left mb-12 reveal pl-0 md:pl-[90px] lg:pl-[140px]">
+          {/* Вернули заголовок в центр, убрав отступы pl */}
+          <div className="text-center mb-12 reveal">
             <h2 className="font-serif text-4xl md:text-5xl font-medium text-[#3A3124] tracking-tight">
               Наше меню
             </h2>
@@ -282,7 +282,7 @@ const MenuSection = () => {
         ) : (
           <>
             <div className="sticky top-0 z-30 w-full bg-[#F5F1E6]/40 backdrop-blur-md py-4 md:py-5 border-b border-[#D4B98F]/30 mb-12 shadow-sm shadow-[#D4B98F]/10">
-              {/* Добавлены события мыши для drag-to-scroll и уменьшен gap до gap-2 */}
+              {/* Лента категорий (остается с отступом до крестика) */}
               <div 
                 ref={categoryScrollRef}
                 onMouseDown={handleCatMouseDown}
@@ -291,7 +291,6 @@ const MenuSection = () => {
                 onMouseMove={handleCatMouseMove}
                 className={`max-w-7xl mx-auto px-6 flex items-center overflow-x-auto gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] ${isDraggingCat ? 'cursor-grabbing' : 'cursor-grab'}`}
               >
-                {/* Отступ до крестика (140px) */}
                 <div className="shrink-0 w-[90px] md:w-[140px]"></div>
                 {Object.keys(menuCategories).map((key) => (
                   <button
@@ -316,7 +315,7 @@ const MenuSection = () => {
                 Object.keys(menuCategories).map((key) => {
                   const categoryData = menuCategories[key];
                   return (
-                    // Карточки и заголовки категорий теперь тоже начинаются от крестика (pl-[140px])
+                    // Карточки и заголовки категорий (остаются с отступом)
                     <div key={key} id={`category-${key}`} className="scroll-mt-48 pl-0 md:pl-[90px] lg:pl-[140px]">
                       <h3 className="font-serif text-3xl font-bold text-[#3A3124] mb-8 pb-2 border-b border-[#D4B98F]/30 inline-block">
                         {categoryData.label}
