@@ -6,36 +6,69 @@ import PocketBase from "pocketbase";
 
 const pb = new PocketBase("http://31.57.47.98");
 
+// Описываем структуру данных для зоны доставки
+interface DeliveryZone {
+  id: string;
+  city: string;
+  min_order: string;
+  delivery_cost: string;
+  free_order: string;
+}
+
 const ReservationSection = () => {
+  // Состояние для основных настроек (контакты и оплата)
   const [data, setData] = useState({
-    address: "г. Раменское, ул. Бронницкая, д. 19а",
-    phone: "+7 (123) 456-78-90",
+    address: "Загрузка...",
+    phone: "Загрузка...",
     email: "reservations@tokkim.com",
-    work_hours: "Пн-Вс: 11:00 — 23:00",
-    delivery_info: "Информация о доставке загружается...",
-    payment_info: "Оплатить заказ можно наличными или банковской картой курьеру при получении."
+    work_hours: "Загрузка...",
+    payment_info: "Информация об оплате загружается..."
   });
 
+  // Состояние для зон доставки
+  // Оставляем пустой массив, чтобы пока данные грузятся, ничего лишнего не выводилось
+  const [zones, setZones] = useState<DeliveryZone[]>([]);
+  const [loadingZones, setLoadingZones] = useState(true);
+
   useEffect(() => {
-    const fetchSettings = async () => {
+    const fetchData = async () => {
       try {
-        const records = await pb.collection("settings").getList(1, 1);
-        if (records.items.length > 0) {
-          const d = records.items[0];
+        // 1. Получаем основные настройки из коллекции settings
+        const settingsRecords = await pb.collection("settings").getList(1, 1);
+        if (settingsRecords.items.length > 0) {
+          const d = settingsRecords.items[0];
           setData({
-            address: d.address || data.address,
-            phone: d.phone || data.phone,
+            address: d.address || "Адрес не указан",
+            phone: d.phone || "Телефон не указан",
             email: "reservations@tokkim.com",
-            work_hours: d.work_hours || data.work_hours,
-            delivery_info: d.delivery_info || data.delivery_info,
-            payment_info: d.payment_info || data.payment_info,
+            work_hours: d.work_hours || "Часы не указаны",
+            payment_info: d.payment_info || "Способы оплаты не указаны"
           });
         }
+
+        // 2. Получаем зоны доставки из коллекции delivery_zones
+        const zonesRecords = await pb.collection("delivery_zones").getFullList({
+          sort: 'created', // Сортируем по порядку создания
+        });
+        
+        if (zonesRecords.length > 0) {
+          const mappedZones = zonesRecords.map(r => ({
+            id: r.id,
+            city: r.city || "",
+            min_order: r.min_order || "",
+            delivery_cost: r.delivery_cost || "",
+            free_order: r.free_order || ""
+          }));
+          setZones(mappedZones);
+        }
       } catch (e) {
-        console.error("Ошибка загрузки из PocketBase:", e);
+        console.error("Ошибка загрузки данных из PocketBase:", e);
+      } finally {
+        setLoadingZones(false);
       }
     };
-    fetchSettings();
+    
+    fetchData();
   }, []);
 
   return (
@@ -99,19 +132,49 @@ const ReservationSection = () => {
             </h2>
             
             <div className="space-y-8">
+              
+              {/* Стоимость доставки (Динамический вывод из базы) */}
               <div className="flex items-start gap-6">
                 <div className="w-14 h-14 bg-[#F5F1E6] rounded-full flex items-center justify-center text-[#8C6D46] shrink-0 transition-transform hover:scale-110 mt-1">
                   <Truck className="w-6 h-6" />
                 </div>
                 <div className="w-full">
                   <h3 className="font-bold text-[#3A3124] text-lg mb-3">Стоимость доставки</h3>
-                  <div 
-                    className="bg-white p-5 rounded-xl border border-gray-100 shadow-sm text-[#6B5E48] leading-relaxed prose prose-sm prose-stone max-w-none"
-                    dangerouslySetInnerHTML={{ __html: data.delivery_info }}
-                  />
+                  
+                  {loadingZones ? (
+                    <p className="text-[#6B5E48]">Загрузка информации о доставке...</p>
+                  ) : zones.length > 0 ? (
+                    <ul className="space-y-4 text-[#6B5E48]">
+                      {zones.map((zone) => (
+                        <li key={zone.id} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                          {/* Город */}
+                          {zone.city && (
+                            <span className="font-bold text-[#3A3124] block mb-1">{zone.city}</span>
+                          )}
+                          
+                          {/* Минимальный заказ и стоимость доставки (на одной строке) */}
+                          {zone.min_order} 
+                          {zone.delivery_cost && (
+                            <span className="text-[#8C6D46] font-medium ml-1">{zone.delivery_cost}</span>
+                          )}
+                          
+                          {/* Бесплатная доставка (с новой строки, если есть) */}
+                          {zone.free_order && (
+                            <>
+                              <br />
+                              {zone.free_order} <span className="text-green-600 font-bold">(бесплатно)</span>
+                            </>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-[#6B5E48]">Информация о доставке временно недоступна.</p>
+                  )}
                 </div>
               </div>
 
+              {/* Способы оплаты (из коллекции settings) */}
               <div className="flex items-start gap-6">
                 <div className="w-14 h-14 bg-[#F5F1E6] rounded-full flex items-center justify-center text-[#8C6D46] shrink-0 transition-transform hover:scale-110">
                   <CreditCard className="w-6 h-6" />
@@ -124,6 +187,7 @@ const ReservationSection = () => {
                   />
                 </div>
               </div>
+              
             </div>
           </div>
 
