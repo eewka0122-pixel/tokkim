@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { Menu, X } from "lucide-react";
 import LoadingScreen from "@/components/LoadingScreen";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
@@ -14,6 +15,9 @@ const Index = () => {
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
+  
+  // Стейт для мобильного меню
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Единый источник правды для инерционного скролла
   const scrollState = useRef({
@@ -32,6 +36,18 @@ const Index = () => {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
+
+  // Блокировка скролла, когда открыто мобильное меню
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
 
   // Функция плавной анимации скролла
   const updateScroll = () => {
@@ -117,25 +133,23 @@ const Index = () => {
       setScrollProgress(window.scrollY > window.innerHeight - 100 ? 1 : 0);
     };
 
-    // НОВОЕ: Глобальный перехватчик кликов
+    // Глобальный перехватчик кликов
     const handleGlobalClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const anchor = target.closest("a");
       
-      // Если кликнули по ссылке вида href="#module-menu"
       if (anchor) {
         const href = anchor.getAttribute("href");
         if (href && href.startsWith("#")) {
           const id = href.substring(1);
           if (document.getElementById(id)) {
-            e.preventDefault(); // Вырубаем стандартный кривой скролл
-            scrollToSection(id); // Вызываем наш идеальный скролл
+            e.preventDefault(); 
+            scrollToSection(id); 
           }
         }
       }
     };
 
-    // Делаем функцию доступной глобально на всякий случай
     (window as any).customScrollTo = scrollToSection;
 
     scrollState.current.targetY = window.scrollY;
@@ -166,6 +180,7 @@ const Index = () => {
   const b = Math.round(255 - (255 - 36) * scrollProgress);
   const syncColor = `rgb(${r}, ${g}, ${b})`;
   const syncShadow = scrollProgress < 0.5 ? "0 2px 8px rgba(0,0,0,0.5)" : "none";
+  const iconShadow = scrollProgress < 0.5 ? "drop-shadow(0 2px 4px rgba(0,0,0,0.8))" : "none";
 
   const navLinks = [
     { id: "module-about", label: "О нас" },
@@ -199,7 +214,7 @@ const Index = () => {
         <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
           <div className="flex flex-col items-start pointer-events-auto">
             <div 
-              className="relative flex items-center h-20 md:h-24 cursor-pointer transition-transform hover:scale-105 origin-left z-10"
+              className="relative flex items-center h-16 md:h-24 cursor-pointer transition-transform hover:scale-105 origin-left z-10"
               onClick={() => scrollToSection("top")}
             >
               <img 
@@ -216,7 +231,8 @@ const Index = () => {
               />
             </div>
 
-            <div className="flex flex-col items-start gap-1 md:gap-1.5 mt-2 pl-1">
+            {/* ДЕСКТОПНОЕ МЕНЮ (скрыто на мобильных экранах) */}
+            <div className="hidden md:flex flex-col items-start gap-1 md:gap-1.5 mt-2 pl-1">
               {navLinks.map((link, idx) => (
                 <button 
                   key={idx}
@@ -231,7 +247,45 @@ const Index = () => {
               ))}
             </div>
           </div>
+
+          {/* КНОПКА МОБИЛЬНОГО МЕНЮ (скрыта на ПК) */}
+          <button 
+            className="md:hidden pointer-events-auto mt-2 transition-transform active:scale-95"
+            onClick={() => setIsMobileMenuOpen(true)}
+            style={{ color: syncColor, filter: iconShadow }}
+          >
+            <Menu className="w-9 h-9" />
+          </button>
         </nav>
+
+        {/* МОБИЛЬНОЕ МЕНЮ (ОВЕРЛЕЙ) */}
+        <div className={`fixed inset-0 z-[110] bg-[#F5F1E6] flex flex-col items-center justify-center transition-all duration-400 ease-in-out md:hidden ${isMobileMenuOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-12 pointer-events-none"}`}>
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="absolute top-6 right-6 text-[#3A3124] p-3 bg-white rounded-full shadow-md active:scale-95 transition-transform"
+          >
+            <X className="w-7 h-7" />
+          </button>
+          
+          <img src="/images/logo (4).png" alt="ТОККИМ" className="h-24 w-auto mb-12 object-contain" />
+          
+          <div className="flex flex-col items-center gap-8">
+            {navLinks.map((link, idx) => (
+              <button 
+                key={idx}
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setTimeout(() => scrollToSection(link.id), 300); // Небольшая задержка, чтобы меню успело красиво закрыться
+                }} 
+                className={`font-serif text-3xl font-bold uppercase tracking-widest transition-colors ${
+                  activeSection === link.id ? "text-[#D4B98F]" : "text-[#3A3124]"
+                }`} 
+              >
+                {link.label}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* ГЛАВНЫЙ ЭКРАН С ВИДЕО-ФОНОМ */}
         <div className="relative w-full min-h-screen">
