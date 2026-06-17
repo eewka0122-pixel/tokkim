@@ -15,19 +15,27 @@ const Index = () => {
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
-  
-  // Стейт для мобильного меню
+  const [isMobile, setIsMobile] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Единый источник правды для инерционного скролла
   const scrollState = useRef({
     targetY: 0,
     currentY: 0,
     isScrolling: false
   });
 
-  // Микро-параллакс фона
+  // Проверка размера экрана для отключения тяжелых ПК-эффектов на мобилках
   useEffect(() => {
+    const checkDevice = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkDevice();
+    window.addEventListener("resize", checkDevice);
+    return () => window.removeEventListener("resize", checkDevice);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) return;
     const handleMouseMove = (e: MouseEvent) => {
       const x = (e.clientX / window.innerWidth) - 0.5;
       const y = (e.clientY / window.innerHeight) - 0.5;
@@ -35,9 +43,8 @@ const Index = () => {
     };
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  }, [isMobile]);
 
-  // Блокировка скролла, когда открыто мобильное меню
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -49,17 +56,13 @@ const Index = () => {
     };
   }, [isMobileMenuOpen]);
 
-  // Функция плавной анимации скролла
   const updateScroll = () => {
     const state = scrollState.current;
     state.currentY += (state.targetY - state.currentY) * 0.08;
     
     window.scrollTo(0, state.currentY);
-
-    // Цвет меняется строго после прохождения видео
     setScrollProgress(state.currentY > window.innerHeight - 100 ? 1 : 0);
 
-    // Определение активной секции
     const sections = ["module-about", "module-promos", "module-menu", "module-contacts"];
     let current = "";
     for (const section of sections) {
@@ -73,7 +76,6 @@ const Index = () => {
     }
     setActiveSection(current);
 
-    // Продолжаем анимацию, пока не достигнем цели
     if (Math.abs(state.targetY - state.currentY) > 0.5) {
       requestAnimationFrame(updateScroll);
     } else {
@@ -81,7 +83,6 @@ const Index = () => {
     }
   };
 
-  // Скролл по клику: Исходная логика с точными отступами
   const scrollToSection = (id: string) => {
     if (id === "top") {
       scrollState.current.targetY = 0;
@@ -95,7 +96,6 @@ const Index = () => {
     const element = document.getElementById(id);
     if (element) {
       const yOffset = window.innerWidth >= 768 ? 96 : 80; 
-      
       const elementPosition = element.getBoundingClientRect().top + window.scrollY;
       const offsetPosition = elementPosition + yOffset;
 
@@ -109,13 +109,11 @@ const Index = () => {
     }
   };
 
-  // Скролл колесом мыши и глобальный перехватчик ссылок
   useEffect(() => {
     if (loading) return;
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
-      
       scrollState.current.targetY += e.deltaY * 0.55;
       scrollState.current.targetY = Math.max(0, Math.min(scrollState.current.targetY, document.documentElement.scrollHeight - window.innerHeight));
       
@@ -133,11 +131,9 @@ const Index = () => {
       setScrollProgress(window.scrollY > window.innerHeight - 100 ? 1 : 0);
     };
 
-    // Глобальный перехватчик кликов
     const handleGlobalClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const anchor = target.closest("a");
-      
       if (anchor) {
         const href = anchor.getAttribute("href");
         if (href && href.startsWith("#")) {
@@ -166,15 +162,15 @@ const Index = () => {
       document.removeEventListener("click", handleGlobalClick);
       delete (window as any).customScrollTo;
     };
-  }, [loading]);
+  }, [loading, isMobile]);
 
   if (loading) {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  const bgPositionStyle = `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
+  // На мобильных отключаем параллакс смещения, картинка просто стоит по центру ровно и четко
+  const bgPositionStyle = isMobile ? "center" : `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
 
-  // Интерполяция цвета шапки и меню
   const r = Math.round(255 - (255 - 58) * scrollProgress);
   const g = Math.round(255 - (255 - 49) * scrollProgress);
   const b = Math.round(255 - (255 - 36) * scrollProgress);
@@ -231,7 +227,6 @@ const Index = () => {
               />
             </div>
 
-            {/* ДЕСКТОПНОЕ МЕНЮ (скрыто на мобильных экранах) */}
             <div className="hidden md:flex flex-col items-start gap-1 md:gap-1.5 mt-2 pl-1">
               {navLinks.map((link, idx) => (
                 <button 
@@ -248,17 +243,16 @@ const Index = () => {
             </div>
           </div>
 
-          {/* КНОПКА МОБИЛЬНОГО МЕНЮ (скрыта на ПК) */}
           <button 
-            className="md:hidden pointer-events-auto mt-2 transition-transform active:scale-95"
+            className="md:hidden pointer-events-auto mt-2 transition-transform active:scale-95 p-2 bg-black/10 backdrop-blur-sm rounded-full"
             onClick={() => setIsMobileMenuOpen(true)}
             style={{ color: syncColor, filter: iconShadow }}
           >
-            <Menu className="w-9 h-9" />
+            <Menu className="w-8 h-8" />
           </button>
         </nav>
 
-        {/* МОБИЛЬНОЕ МЕНЮ (ОВЕРЛЕЙ) */}
+        {/* МОБИЛЬНОЕ МЕНЮ */}
         <div className={`fixed inset-0 z-[110] bg-[#F5F1E6] flex flex-col items-center justify-center transition-all duration-400 ease-in-out md:hidden ${isMobileMenuOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-12 pointer-events-none"}`}>
           <button 
             onClick={() => setIsMobileMenuOpen(false)} 
@@ -275,7 +269,7 @@ const Index = () => {
                 key={idx}
                 onClick={() => {
                   setIsMobileMenuOpen(false);
-                  setTimeout(() => scrollToSection(link.id), 300); // Небольшая задержка, чтобы меню успело красиво закрыться
+                  setTimeout(() => scrollToSection(link.id), 300);
                 }} 
                 className={`font-serif text-3xl font-bold uppercase tracking-widest transition-colors ${
                   activeSection === link.id ? "text-[#D4B98F]" : "text-[#3A3124]"
@@ -288,13 +282,13 @@ const Index = () => {
         </div>
 
         {/* ГЛАВНЫЙ ЭКРАН С ВИДЕО-ФОНОМ */}
-        <div className="relative w-full min-h-screen">
+        <div className="relative w-full min-h-screen overflow-hidden bg-black">
           <video 
             autoPlay 
             loop 
             muted 
             playsInline 
-            className="absolute inset-0 w-full h-full object-cover z-0"
+            className="absolute inset-0 w-full h-full object-cover object-center z-0 scale-105"
           >
             <source src="/hero.mp4" type="video/mp4" />
             <source src="/video.mp4" type="video/mp4" />
@@ -302,14 +296,25 @@ const Index = () => {
             <source src="/bg.mp4" type="video/mp4" />
           </video>
           
+          {/* Полупрозрачная благородная вуаль поверх рыбок, чтобы текст читалcя безупречно */}
+          <div className="absolute inset-0 bg-black/25 md:bg-black/10 z-0" />
+          
           <div className="relative z-10 w-full h-full">
             <HeroSection />
           </div>
         </div>
 
         {/* Блок 1: О НАС И АКЦИИ */}
-        <div id="module-about" style={{ backgroundImage: "url('/images/bg1.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
-          <div className="relative bg-[#F5F1E6]/60">
+        <div 
+          id="module-about" 
+          style={{ 
+            backgroundImage: "url('/images/bg1.jpeg')", 
+            backgroundAttachment: isMobile ? "scroll" : "fixed", 
+            backgroundSize: "cover", 
+            backgroundPosition: bgPositionStyle 
+          }}
+        >
+          <div className="relative bg-[#F5F1E6]/75 backdrop-blur-[2px] md:backdrop-blur-none">
             <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
             <div className="relative z-10">
               <AboutSection />
@@ -319,8 +324,16 @@ const Index = () => {
         </div>
 
         {/* Блок 2: НАШЕ МЕНЮ */}
-        <div id="module-menu" style={{ backgroundImage: "url('/images/bg2.jpeg')", backgroundAttachment: "fixed", backgroundSize: "cover", backgroundPosition: bgPositionStyle, transition: "background-position 0.2s ease-out" }}>
-          <div className="relative bg-[#F5F1E6]/60">
+        <div 
+          id="module-menu" 
+          style={{ 
+            backgroundImage: "url('/images/bg2.jpeg')", 
+            backgroundAttachment: isMobile ? "scroll" : "fixed", 
+            backgroundSize: "cover", 
+            backgroundPosition: bgPositionStyle 
+          }}
+        >
+          <div className="relative bg-[#F5F1E6]/75 backdrop-blur-[2px] md:backdrop-blur-none">
             <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
             <div className="relative z-10">
               <MenuSection />
