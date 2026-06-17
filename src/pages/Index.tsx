@@ -16,6 +16,8 @@ const Index = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Стейт мобильного меню
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const scrollState = useRef({
@@ -24,7 +26,7 @@ const Index = () => {
     isScrolling: false
   });
 
-  // Проверка размера экрана для отключения тяжелых ПК-эффектов на мобилках
+  // Определение мобильного устройства
   useEffect(() => {
     const checkDevice = () => {
       setIsMobile(window.innerWidth < 768);
@@ -34,6 +36,7 @@ const Index = () => {
     return () => window.removeEventListener("resize", checkDevice);
   }, []);
 
+  // Параллакс
   useEffect(() => {
     if (isMobile) return;
     const handleMouseMove = (e: MouseEvent) => {
@@ -45,6 +48,7 @@ const Index = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isMobile]);
 
+  // Блокировка скролла при открытом меню
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -56,6 +60,7 @@ const Index = () => {
     };
   }, [isMobileMenuOpen]);
 
+  // Анимация скролла
   const updateScroll = () => {
     const state = scrollState.current;
     state.currentY += (state.targetY - state.currentY) * 0.08;
@@ -109,6 +114,7 @@ const Index = () => {
     }
   };
 
+  // Перехват скролла и кликов
   useEffect(() => {
     if (loading) return;
 
@@ -168,7 +174,6 @@ const Index = () => {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
   }
 
-  // На мобильных отключаем параллакс смещения, картинка просто стоит по центру ровно и четко
   const bgPositionStyle = isMobile ? "center" : `calc(50% + ${mouseOffset.x * 30}px) calc(50% + ${mouseOffset.y * 30}px)`;
 
   const r = Math.round(255 - (255 - 58) * scrollProgress);
@@ -231,6 +236,7 @@ const Index = () => {
               {navLinks.map((link, idx) => (
                 <button 
                   key={idx}
+                  type="button"
                   onClick={() => scrollToSection(link.id)} 
                   className={`text-left font-bold text-sm md:text-base uppercase tracking-wider transition-all duration-200 px-2 py-0.5 -ml-2 rounded-sm ${
                     activeSection === link.id ? "border border-[#3A3124]" : "border border-transparent hover:opacity-60"
@@ -243,31 +249,54 @@ const Index = () => {
             </div>
           </div>
 
+          {/* ЖЕЛЕЗОБЕТОННАЯ КНОПКА ГАМБУРГЕРА */}
           <button 
-            className="md:hidden pointer-events-auto mt-2 transition-transform active:scale-95 p-2 bg-black/10 backdrop-blur-sm rounded-full"
-            onClick={() => setIsMobileMenuOpen(true)}
+            type="button"
+            className="relative z-[9999] md:hidden pointer-events-auto mt-2 transition-transform active:scale-95 p-2 bg-black/20 backdrop-blur-md rounded-xl cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsMobileMenuOpen(true);
+            }}
             style={{ color: syncColor, filter: iconShadow }}
           >
             <Menu className="w-8 h-8" />
           </button>
         </nav>
 
-        {/* МОБИЛЬНОЕ МЕНЮ */}
-        <div className={`fixed inset-0 z-[110] bg-[#F5F1E6] flex flex-col items-center justify-center transition-all duration-400 ease-in-out md:hidden ${isMobileMenuOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-12 pointer-events-none"}`}>
+        {/* ЖЕЛЕЗОБЕТОННОЕ МОБИЛЬНОЕ МЕНЮ (ОВЕРЛЕЙ) */}
+        <div 
+          className="fixed inset-0 bg-[#F5F1E6] flex flex-col items-center justify-center md:hidden pointer-events-auto"
+          style={{ 
+            zIndex: 99999, 
+            opacity: isMobileMenuOpen ? 1 : 0, 
+            visibility: isMobileMenuOpen ? "visible" : "hidden",
+            transition: "all 0.3s ease-in-out",
+            transform: isMobileMenuOpen ? "translateY(0)" : "translateY(-20px)"
+          }}
+        >
           <button 
-            onClick={() => setIsMobileMenuOpen(false)} 
-            className="absolute top-6 right-6 text-[#3A3124] p-3 bg-white rounded-full shadow-md active:scale-95 transition-transform"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsMobileMenuOpen(false);
+            }} 
+            className="absolute top-8 right-8 text-[#3A3124] p-3 bg-white/80 backdrop-blur-md rounded-full shadow-lg active:scale-95 transition-transform cursor-pointer"
           >
-            <X className="w-7 h-7" />
+            <X className="w-8 h-8" />
           </button>
           
-          <img src="/images/logo (4).png" alt="ТОККИМ" className="h-24 w-auto mb-12 object-contain" />
+          <img src="/images/logo (4).png" alt="ТОККИМ" className="h-28 w-auto mb-12 object-contain drop-shadow-sm" />
           
           <div className="flex flex-col items-center gap-8">
             {navLinks.map((link, idx) => (
               <button 
                 key={idx}
-                onClick={() => {
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   setIsMobileMenuOpen(false);
                   setTimeout(() => scrollToSection(link.id), 300);
                 }} 
@@ -296,7 +325,6 @@ const Index = () => {
             <source src="/bg.mp4" type="video/mp4" />
           </video>
           
-          {/* Полупрозрачная благородная вуаль поверх рыбок, чтобы текст читалcя безупречно */}
           <div className="absolute inset-0 bg-black/25 md:bg-black/10 z-0" />
           
           <div className="relative z-10 w-full h-full">
