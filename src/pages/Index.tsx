@@ -209,6 +209,39 @@ const Index = () => {
         }
       `}} />
 
+      {/* ЖЕЛЕЗОБЕТОННОЕ МОБИЛЬНОЕ МЕНЮ (Монтируется поверх всего сайта) */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-[999999] bg-[#F5F1E6] flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-200">
+          <button 
+            type="button"
+            onClick={() => setIsMobileMenuOpen(false)} 
+            className="absolute top-6 right-6 text-[#3A3124] p-3 bg-white rounded-full shadow-lg active:scale-95 transition-transform"
+          >
+            <X className="w-8 h-8" />
+          </button>
+          
+          <img src="/images/logo (4).png" alt="ТОККИМ" className="h-28 w-auto mb-12 object-contain drop-shadow-sm" />
+          
+          <div className="flex flex-col items-center gap-8">
+            {navLinks.map((link, idx) => (
+              <button 
+                key={idx}
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setTimeout(() => scrollToSection(link.id), 100);
+                }} 
+                className={`font-serif text-3xl font-bold uppercase tracking-widest transition-colors ${
+                  activeSection === link.id ? "text-[#D4B98F]" : "text-[#3A3124]"
+                }`} 
+              >
+                {link.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       <main className="min-h-screen text-[#3A3124]">
 
         {/* НАВИГАЦИЯ */}
@@ -249,75 +282,24 @@ const Index = () => {
             </div>
           </div>
 
-          {/* ЖЕЛЕЗОБЕТОННАЯ КНОПКА ГАМБУРГЕРА */}
           <button 
             type="button"
-            className="relative z-[9999] md:hidden pointer-events-auto mt-2 transition-transform active:scale-95 p-2 bg-black/20 backdrop-blur-md rounded-xl cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsMobileMenuOpen(true);
-            }}
+            className="md:hidden pointer-events-auto mt-2 p-2 bg-black/20 backdrop-blur-md rounded-xl active:scale-95"
+            onClick={() => setIsMobileMenuOpen(true)}
             style={{ color: syncColor, filter: iconShadow }}
           >
             <Menu className="w-8 h-8" />
           </button>
         </nav>
 
-        {/* ЖЕЛЕЗОБЕТОННОЕ МОБИЛЬНОЕ МЕНЮ (ОВЕРЛЕЙ) */}
-        <div 
-          className="fixed inset-0 bg-[#F5F1E6] flex flex-col items-center justify-center md:hidden pointer-events-auto"
-          style={{ 
-            zIndex: 99999, 
-            opacity: isMobileMenuOpen ? 1 : 0, 
-            visibility: isMobileMenuOpen ? "visible" : "hidden",
-            transition: "all 0.3s ease-in-out",
-            transform: isMobileMenuOpen ? "translateY(0)" : "translateY(-20px)"
-          }}
-        >
-          <button 
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsMobileMenuOpen(false);
-            }} 
-            className="absolute top-8 right-8 text-[#3A3124] p-3 bg-white/80 backdrop-blur-md rounded-full shadow-lg active:scale-95 transition-transform cursor-pointer"
-          >
-            <X className="w-8 h-8" />
-          </button>
-          
-          <img src="/images/logo (4).png" alt="ТОККИМ" className="h-28 w-auto mb-12 object-contain drop-shadow-sm" />
-          
-          <div className="flex flex-col items-center gap-8">
-            {navLinks.map((link, idx) => (
-              <button 
-                key={idx}
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsMobileMenuOpen(false);
-                  setTimeout(() => scrollToSection(link.id), 300);
-                }} 
-                className={`font-serif text-3xl font-bold uppercase tracking-widest transition-colors ${
-                  activeSection === link.id ? "text-[#D4B98F]" : "text-[#3A3124]"
-                }`} 
-              >
-                {link.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ГЛАВНЫЙ ЭКРАН С ВИДЕО-ФОНОМ */}
-        <div className="relative w-full min-h-screen overflow-hidden bg-black">
+        {/* ГЛАВНЫЙ ЭКРАН С РЫБКАМИ (100dvh для идеального размера на телефоне) */}
+        <div className="relative w-full h-[100dvh] overflow-hidden bg-black">
           <video 
             autoPlay 
             loop 
             muted 
             playsInline 
-            className="absolute inset-0 w-full h-full object-cover object-center z-0 scale-105"
+            className="absolute inset-0 w-full h-full object-cover object-center z-0"
           >
             <source src="/hero.mp4" type="video/mp4" />
             <source src="/video.mp4" type="video/mp4" />
@@ -325,14 +307,14 @@ const Index = () => {
             <source src="/bg.mp4" type="video/mp4" />
           </video>
           
-          <div className="absolute inset-0 bg-black/25 md:bg-black/10 z-0" />
+          <div className="absolute inset-0 bg-black/20 md:bg-black/10 z-0" />
           
-          <div className="relative z-10 w-full h-full">
+          <div className="relative z-10 w-full h-full flex flex-col justify-center">
             <HeroSection />
           </div>
         </div>
 
-        {/* Блок 1: О НАС И АКЦИИ */}
+        {/* Блок 1: О НАС И АКЦИИ (Убрано размытие, чтобы корзина не ломалась) */}
         <div 
           id="module-about" 
           style={{ 
@@ -342,7 +324,7 @@ const Index = () => {
             backgroundPosition: bgPositionStyle 
           }}
         >
-          <div className="relative bg-[#F5F1E6]/75 backdrop-blur-[2px] md:backdrop-blur-none">
+          <div className="relative bg-[#F5F1E6]/95 md:bg-[#F5F1E6]/75">
             <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
             <div className="relative z-10">
               <AboutSection />
@@ -351,7 +333,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Блок 2: НАШЕ МЕНЮ */}
+        {/* Блок 2: НАШЕ МЕНЮ (Убрано размытие, чтобы корзина не ломалась) */}
         <div 
           id="module-menu" 
           style={{ 
@@ -361,7 +343,7 @@ const Index = () => {
             backgroundPosition: bgPositionStyle 
           }}
         >
-          <div className="relative bg-[#F5F1E6]/75 backdrop-blur-[2px] md:backdrop-blur-none">
+          <div className="relative bg-[#F5F1E6]/95 md:bg-[#F5F1E6]/75">
             <div className="absolute top-0 left-0 w-full h-24 md:h-32 bg-gradient-to-b from-[#F5F1E6] via-[#F5F1E6]/90 to-transparent pointer-events-none z-0" />
             <div className="relative z-10">
               <MenuSection />
