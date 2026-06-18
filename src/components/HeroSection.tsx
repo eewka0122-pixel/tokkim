@@ -14,19 +14,9 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="hero-section relative flex items-center justify-center overflow-hidden min-h-screen">
+    <section className="hero-section relative flex items-center justify-center overflow-hidden min-h-screen w-full">
       
-      {/* Видео на фоне */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        className="absolute inset-0 w-full h-full object-cover object-[50%_100%] z-0"
-        poster="/images/hero-bg.jpg"
-      >
-        <source src="/videos/hero-video.mp4" type="video/mp4" />
-      </video>
+      {/* ВИДЕО БЫЛО ЗДЕСЬ. Мы его удалили, чтобы оно не перекрывало адаптивные видео из Index.tsx */}
 
       {/* Киноэффект — Блюр по краям */}
       <div 
@@ -75,7 +65,7 @@ const HeroSection = () => {
         <ArrowDown className="h-8 w-8 text-[#3A3124]/80 bounce" />
       </div>
 
-      {/* Нижний градиент (Дымка) - ИСПРАВЛЕНО: Сделал ее ниже (h-24 вместо h-48) */}
+      {/* Нижний градиент (Дымка) */}
       <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#F5F1E6] to-transparent pointer-events-none z-20" />
     </section>
   );
