@@ -15,9 +15,8 @@ const Index = () => {
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
-  
-  // По умолчанию ставим false, но useEffect быстро это исправит
   const [isMobile, setIsMobile] = useState(false);
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const scrollState = useRef({
@@ -26,12 +25,11 @@ const Index = () => {
     isScrolling: false
   });
 
-  // Жесткое определение устройства сразу при загрузке
   useEffect(() => {
     const checkDevice = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    checkDevice(); // Проверяем сразу
+    checkDevice();
     window.addEventListener("resize", checkDevice);
     return () => window.removeEventListener("resize", checkDevice);
   }, []);
@@ -164,7 +162,7 @@ const Index = () => {
       document.removeEventListener("click", handleGlobalClick);
       delete (window as any).customScrollTo;
     };
-  }, [loading]);
+  }, [loading, isMobile]);
 
   if (loading) {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
@@ -310,22 +308,20 @@ const Index = () => {
           </div>
         </nav>
 
-        {/* ГЛАВНЫЙ ЭКРАН С ЖЕЛЕЗОБЕТОННЫМ ПЕРЕКЛЮЧЕНИЕМ ВИДЕО ЧЕРЕЗ REACT */}
         <div className="relative w-full h-[100dvh] overflow-hidden bg-black flex items-center">
           
           <video 
-            key={isMobile ? "mobile-video" : "desktop-video"} // Это заставит React ПЕРЕЗАГРУЗИТЬ плеер
+            key={isMobile ? "mobile-video" : "desktop-video"} 
             autoPlay 
             loop 
             muted 
             playsInline 
             className="absolute inset-0 w-full h-full object-cover object-center z-0"
           >
-            {/* Меняем ссылку физически, а не прячем блоки */}
             <source src={isMobile ? "/videos/hero-mobile.mp4" : "/videos/hero-video.mp4"} type="video/mp4" />
           </video>
           
-          <div className="absolute inset-0 bg-black/20 z-0" />
+          {/* ПОЛНОСТЬЮ УДАЛЕНО ЗАТЕМНЕНИЕ ОТСЮДА */}
           
           <div className="relative z-10 w-full flex flex-col justify-center pt-16 md:pt-0">
             <HeroSection />
