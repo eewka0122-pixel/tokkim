@@ -15,7 +15,17 @@ const HeroSection = () => {
   return (
     <section className="hero-section relative flex items-center justify-center overflow-hidden min-h-screen w-full">
       
-      {/* ПОЛНОСТЬЮ УДАЛЕНА ВИНЬЕТКА И ЗАТЕМНЕНИЕ УГЛОВ ОТСЮДА */}
+      {/* Киноэффект — Блюр по краям (ТОЛЬКО ДЛЯ ПК - hidden md:block) */}
+      <div 
+        className="hidden md:block absolute inset-0 z-0 pointer-events-none backdrop-blur-[12px]"
+        style={{
+          maskImage: "radial-gradient(circle, transparent 50%, black 100%)",
+          WebkitMaskImage: "radial-gradient(circle, transparent 50%, black 100%)"
+        }}
+      />
+      
+      {/* Легкое затемнение по углам (виньетка) (ТОЛЬКО ДЛЯ ПК - hidden md:block) */}
+      <div className="hidden md:block absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle,transparent_60%,rgba(0,0,0,0.3)_100%)]" />
 
       {/* 100% прозрачный слой (основной) */}
       <div className="absolute inset-0 bg-transparent z-0 pointer-events-none" />
