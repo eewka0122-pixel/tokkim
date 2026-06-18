@@ -15,8 +15,9 @@ const Index = () => {
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
-  const [isMobile, setIsMobile] = useState(false);
   
+  // По умолчанию ставим false, но useEffect быстро это исправит
+  const [isMobile, setIsMobile] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const scrollState = useRef({
@@ -25,11 +26,12 @@ const Index = () => {
     isScrolling: false
   });
 
+  // Жесткое определение устройства сразу при загрузке
   useEffect(() => {
     const checkDevice = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    checkDevice();
+    checkDevice(); // Проверяем сразу
     window.addEventListener("resize", checkDevice);
     return () => window.removeEventListener("resize", checkDevice);
   }, []);
@@ -162,7 +164,7 @@ const Index = () => {
       document.removeEventListener("click", handleGlobalClick);
       delete (window as any).customScrollTo;
     };
-  }, [loading, isMobile]);
+  }, [loading]);
 
   if (loading) {
     return <LoadingScreen onComplete={() => setLoading(false)} />;
@@ -308,29 +310,19 @@ const Index = () => {
           </div>
         </nav>
 
-        {/* ГЛАВНЫЙ ЭКРАН С АДАПТИВНЫМ ВИДЕО */}
+        {/* ГЛАВНЫЙ ЭКРАН С ЖЕЛЕЗОБЕТОННЫМ ПЕРЕКЛЮЧЕНИЕМ ВИДЕО ЧЕРЕЗ REACT */}
         <div className="relative w-full h-[100dvh] overflow-hidden bg-black flex items-center">
           
-          {/* Видео для ПК (object-cover - заполняет весь экран монитора) */}
           <video 
+            key={isMobile ? "mobile-video" : "desktop-video"} // Это заставит React ПЕРЕЗАГРУЗИТЬ плеер
             autoPlay 
             loop 
             muted 
             playsInline 
-            className="hidden md:block absolute inset-0 w-full h-full object-cover object-center z-0"
+            className="absolute inset-0 w-full h-full object-cover object-center z-0"
           >
-            <source src="/videos/hero-video.mp4" type="video/mp4" />
-          </video>
-
-          {/* Видео для мобилок (object-contain - вмещает видео на 100% без обрезки краев) */}
-          <video 
-            autoPlay 
-            loop 
-            muted 
-            playsInline 
-            className="md:hidden absolute inset-0 w-full h-full object-contain object-center z-0 bg-black"
-          >
-            <source src="/videos/hero-mobile.mp4" type="video/mp4" />
+            {/* Меняем ссылку физически, а не прячем блоки */}
+            <source src={isMobile ? "/videos/hero-mobile.mp4" : "/videos/hero-video.mp4"} type="video/mp4" />
           </video>
           
           <div className="absolute inset-0 bg-black/20 z-0" />
