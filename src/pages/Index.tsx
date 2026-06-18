@@ -311,7 +311,7 @@ const Index = () => {
         {/* ГЛАВНЫЙ ЭКРАН С АДАПТИВНЫМ ВИДЕО */}
         <div className="relative w-full h-[100dvh] overflow-hidden bg-black flex items-center">
           
-          {/* Видео для ПК */}
+          {/* Видео для ПК с правильным путем */}
           <video 
             autoPlay 
             loop 
@@ -319,10 +319,10 @@ const Index = () => {
             playsInline 
             className="hidden md:block absolute inset-0 w-full h-full object-cover object-center z-0"
           >
-            <source src="/hero.mp4" type="video/mp4" />
+            <source src="/videos/hero-video.mp4" type="video/mp4" />
           </video>
 
-          {/* Видео для мобилок (твое новое вертикальное) */}
+          {/* Видео для мобилок с правильным путем */}
           <video 
             autoPlay 
             loop 
@@ -330,7 +330,7 @@ const Index = () => {
             playsInline 
             className="md:hidden absolute inset-0 w-full h-full object-cover object-center z-0"
           >
-            <source src="/hero-mobile.mp4" type="video/mp4" />
+            <source src="/videos/hero-mobile.mp4" type="video/mp4" />
           </video>
           
           <div className="absolute inset-0 bg-black/20 z-0" />
