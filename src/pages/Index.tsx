@@ -321,7 +321,8 @@ const Index = () => {
             <source src={isMobile ? "/videos/hero-mobile.mp4" : "/videos/hero-video.mp4"} type="video/mp4" />
           </video>
           
-          {/* ПОЛНОСТЬЮ УДАЛЕНО ЗАТЕМНЕНИЕ ОТСЮДА */}
+          {/* Легкое затемнение ТОЛЬКО ДЛЯ ПК (скрыто на мобильном) */}
+          <div className="hidden md:block absolute inset-0 bg-black/20 z-0" />
           
           <div className="relative z-10 w-full flex flex-col justify-center pt-16 md:pt-0">
             <HeroSection />
