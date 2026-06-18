@@ -311,7 +311,7 @@ const Index = () => {
         {/* ГЛАВНЫЙ ЭКРАН С АДАПТИВНЫМ ВИДЕО */}
         <div className="relative w-full h-[100dvh] overflow-hidden bg-black flex items-center">
           
-          {/* Видео для ПК с правильным путем */}
+          {/* Видео для ПК (object-cover - заполняет весь экран монитора) */}
           <video 
             autoPlay 
             loop 
@@ -322,13 +322,13 @@ const Index = () => {
             <source src="/videos/hero-video.mp4" type="video/mp4" />
           </video>
 
-          {/* Видео для мобилок с правильным путем */}
+          {/* Видео для мобилок (object-contain - вмещает видео на 100% без обрезки краев) */}
           <video 
             autoPlay 
             loop 
             muted 
             playsInline 
-            className="md:hidden absolute inset-0 w-full h-full object-cover object-center z-0"
+            className="md:hidden absolute inset-0 w-full h-full object-contain object-center z-0 bg-black"
           >
             <source src="/videos/hero-mobile.mp4" type="video/mp4" />
           </video>
