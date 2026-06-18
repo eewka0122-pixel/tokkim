@@ -17,7 +17,6 @@ const Index = () => {
   const [activeSection, setActiveSection] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   
-  // Стейт мобильного меню
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const scrollState = useRef({
@@ -26,7 +25,6 @@ const Index = () => {
     isScrolling: false
   });
 
-  // Определение мобильного устройства
   useEffect(() => {
     const checkDevice = () => {
       setIsMobile(window.innerWidth < 768);
@@ -36,7 +34,6 @@ const Index = () => {
     return () => window.removeEventListener("resize", checkDevice);
   }, []);
 
-  // Параллакс
   useEffect(() => {
     if (isMobile) return;
     const handleMouseMove = (e: MouseEvent) => {
@@ -48,7 +45,6 @@ const Index = () => {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [isMobile]);
 
-  // Блокировка скролла при открытом меню
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = "hidden";
@@ -60,7 +56,6 @@ const Index = () => {
     };
   }, [isMobileMenuOpen]);
 
-  // Анимация скролла
   const updateScroll = () => {
     const state = scrollState.current;
     state.currentY += (state.targetY - state.currentY) * 0.08;
@@ -114,7 +109,6 @@ const Index = () => {
     }
   };
 
-  // Перехват скролла и кликов
   useEffect(() => {
     if (loading) return;
 
@@ -181,7 +175,6 @@ const Index = () => {
   const b = Math.round(255 - (255 - 36) * scrollProgress);
   const syncColor = `rgb(${r}, ${g}, ${b})`;
   const syncShadow = scrollProgress < 0.5 ? "0 2px 8px rgba(0,0,0,0.5)" : "none";
-  const iconShadow = scrollProgress < 0.5 ? "drop-shadow(0 2px 4px rgba(0,0,0,0.8))" : "none";
 
   const navLinks = [
     { id: "module-about", label: "О нас" },
@@ -209,9 +202,11 @@ const Index = () => {
         }
       `}} />
 
-      {/* ЖЕЛЕЗОБЕТОННОЕ МОБИЛЬНОЕ МЕНЮ (Монтируется поверх всего сайта) */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[999999] bg-[#F5F1E6] flex flex-col items-center justify-center animate-in fade-in zoom-in-95 duration-200">
+        <div 
+          className="fixed inset-0 bg-[#F5F1E6] flex flex-col items-center justify-center animate-in fade-in duration-200"
+          style={{ zIndex: 999999 }}
+        >
           <button 
             type="button"
             onClick={() => setIsMobileMenuOpen(false)} 
@@ -242,13 +237,43 @@ const Index = () => {
         </div>
       )}
 
+      <div 
+        className="md:hidden fixed top-0 left-0 w-full p-4 flex justify-between items-start"
+        style={{ zIndex: 99999 }} 
+      >
+        <div 
+          className="cursor-pointer transition-transform hover:scale-105 active:scale-95 bg-white/10 p-2 rounded-xl backdrop-blur-sm"
+          onClick={() => scrollToSection("top")}
+        >
+          <img 
+            src="/images/logo (4).png" 
+            alt="ТОККИМ" 
+            className="h-12 w-auto object-contain drop-shadow-md invert brightness-0" 
+          />
+        </div>
+
+        <button 
+          type="button"
+          className="p-3 bg-black/40 backdrop-blur-md rounded-xl shadow-lg active:scale-95 transition-transform"
+          onClick={(e) => {
+            e.preventDefault();
+            setIsMobileMenuOpen(true);
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            setIsMobileMenuOpen(true);
+          }}
+        >
+          <Menu className="w-8 h-8 text-white" />
+        </button>
+      </div>
+
       <main className="min-h-screen text-[#3A3124]">
 
-        {/* НАВИГАЦИЯ */}
-        <nav className="fixed top-0 left-0 w-full z-[100] p-6 md:p-8 flex items-start justify-between pointer-events-none">
+        <nav className="hidden md:flex fixed top-0 left-0 w-full z-[100] p-8 items-start justify-between pointer-events-none">
           <div className="flex flex-col items-start pointer-events-auto">
             <div 
-              className="relative flex items-center h-16 md:h-24 cursor-pointer transition-transform hover:scale-105 origin-left z-10"
+              className="relative flex items-center h-24 cursor-pointer transition-transform hover:scale-105 origin-left z-10"
               onClick={() => scrollToSection("top")}
             >
               <img 
@@ -265,13 +290,13 @@ const Index = () => {
               />
             </div>
 
-            <div className="hidden md:flex flex-col items-start gap-1 md:gap-1.5 mt-2 pl-1">
+            <div className="flex flex-col items-start gap-1.5 mt-2 pl-1">
               {navLinks.map((link, idx) => (
                 <button 
                   key={idx}
                   type="button"
                   onClick={() => scrollToSection(link.id)} 
-                  className={`text-left font-bold text-sm md:text-base uppercase tracking-wider transition-all duration-200 px-2 py-0.5 -ml-2 rounded-sm ${
+                  className={`text-left font-bold text-base uppercase tracking-wider transition-all duration-200 px-2 py-0.5 -ml-2 rounded-sm ${
                     activeSection === link.id ? "border border-[#3A3124]" : "border border-transparent hover:opacity-60"
                   }`} 
                   style={{ color: syncColor, textShadow: syncShadow }}
@@ -281,40 +306,40 @@ const Index = () => {
               ))}
             </div>
           </div>
-
-          <button 
-            type="button"
-            className="md:hidden pointer-events-auto mt-2 p-2 bg-black/20 backdrop-blur-md rounded-xl active:scale-95"
-            onClick={() => setIsMobileMenuOpen(true)}
-            style={{ color: syncColor, filter: iconShadow }}
-          >
-            <Menu className="w-8 h-8" />
-          </button>
         </nav>
 
-        {/* ГЛАВНЫЙ ЭКРАН С РЫБКАМИ (object-contain для мобилок, чтобы не обрезалось по бокам) */}
-        <div className="relative w-full h-[100dvh] overflow-hidden bg-black">
+        {/* ГЛАВНЫЙ ЭКРАН С АДАПТИВНЫМ ВИДЕО */}
+        <div className="relative w-full h-[100dvh] overflow-hidden bg-black flex items-center">
+          
+          {/* Видео для ПК */}
           <video 
             autoPlay 
             loop 
             muted 
             playsInline 
-            className="absolute inset-0 w-full h-full object-contain md:object-cover object-center z-0"
+            className="hidden md:block absolute inset-0 w-full h-full object-cover object-center z-0"
           >
             <source src="/hero.mp4" type="video/mp4" />
-            <source src="/video.mp4" type="video/mp4" />
-            <source src="/videos/hero.mp4" type="video/mp4" />
-            <source src="/bg.mp4" type="video/mp4" />
+          </video>
+
+          {/* Видео для мобилок (твое новое вертикальное) */}
+          <video 
+            autoPlay 
+            loop 
+            muted 
+            playsInline 
+            className="md:hidden absolute inset-0 w-full h-full object-cover object-center z-0"
+          >
+            <source src="/hero-mobile.mp4" type="video/mp4" />
           </video>
           
-          <div className="absolute inset-0 bg-black/20 md:bg-black/10 z-0" />
+          <div className="absolute inset-0 bg-black/20 z-0" />
           
-          <div className="relative z-10 w-full h-full flex flex-col justify-center">
+          <div className="relative z-10 w-full flex flex-col justify-center pt-16 md:pt-0">
             <HeroSection />
           </div>
         </div>
 
-        {/* Блок 1: О НАС И АКЦИИ */}
         <div 
           id="module-about" 
           style={{ 
@@ -333,7 +358,6 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Блок 2: НАШЕ МЕНЮ */}
         <div 
           id="module-menu" 
           style={{ 
@@ -351,7 +375,6 @@ const Index = () => {
           </div>
         </div>
         
-        {/* Блок 3: КОНТАКТЫ И ДОСТАВКА */}
         <div id="module-contacts" className="bg-[#F5F1E6] relative z-20 pt-10 pb-10">
           <ReservationSection />
           <Footer />
