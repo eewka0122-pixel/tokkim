@@ -16,19 +16,7 @@ const HeroSection = () => {
   return (
     <section className="hero-section relative flex items-center justify-center overflow-hidden min-h-screen w-full">
       
-      {/* ВИДЕО БЫЛО ЗДЕСЬ. Мы его удалили, чтобы оно не перекрывало адаптивные видео из Index.tsx */}
-
-      {/* Киноэффект — Блюр по краям */}
-      <div 
-        className="absolute inset-0 z-0 pointer-events-none backdrop-blur-[12px]"
-        style={{
-          // Радиальная маска: 50% в центре - прозрачно (без блюра), к краям плавно размывается
-          maskImage: "radial-gradient(circle, transparent 50%, black 100%)",
-          WebkitMaskImage: "radial-gradient(circle, transparent 50%, black 100%)"
-        }}
-      />
-      
-      {/* Легкое затемнение по углам (виньетка) для глубины кадра */}
+      {/* Легкое затемнение по углам (виньетка) для глубины кадра и читаемости текста. Блюр полностью удален! */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle,transparent_60%,rgba(0,0,0,0.3)_100%)]" />
 
       {/* 100% прозрачный слой (основной) */}
