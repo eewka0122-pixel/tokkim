@@ -4,7 +4,6 @@ import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const HeroSection = () => {
-  // Функция, которая перехватывает клик и отправляет его в наш идеальный алгоритм скролла из Index.tsx
   const scrollToModule = (id: string) => {
     if (typeof window !== "undefined" && typeof (window as any).customScrollTo === "function") {
       (window as any).customScrollTo(id);
@@ -16,8 +15,7 @@ const HeroSection = () => {
   return (
     <section className="hero-section relative flex items-center justify-center overflow-hidden min-h-screen w-full">
       
-      {/* Легкое затемнение по углам (виньетка) для глубины кадра и читаемости текста. Блюр полностью удален! */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle,transparent_60%,rgba(0,0,0,0.3)_100%)]" />
+      {/* ПОЛНОСТЬЮ УДАЛЕНА ВИНЬЕТКА И ЗАТЕМНЕНИЕ УГЛОВ ОТСЮДА */}
 
       {/* 100% прозрачный слой (основной) */}
       <div className="absolute inset-0 bg-transparent z-0 pointer-events-none" />
@@ -53,7 +51,7 @@ const HeroSection = () => {
         <ArrowDown className="h-8 w-8 text-[#3A3124]/80 bounce" />
       </div>
 
-      {/* Нижний градиент (Дымка) */}
+      {/* Нижний градиент (Дымка для мягкого перехода к следующему блоку) */}
       <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-[#F5F1E6] to-transparent pointer-events-none z-20" />
     </section>
   );
